@@ -1,0 +1,301 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		8A539DB415ECEE6500A267B6 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A539DB315ECEE6500A267B6 /* Cocoa.framework */; };
+		8A539DBE15ECEE6500A267B6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8A539DBC15ECEE6500A267B6 /* InfoPlist.strings */; };
+		8A539DC015ECEE6500A267B6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A539DBF15ECEE6500A267B6 /* main.m */; };
+		8A539DC415ECEE6500A267B6 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 8A539DC215ECEE6500A267B6 /* Credits.rtf */; };
+		8A539DC715ECEE6500A267B6 /* arangoAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A539DC615ECEE6500A267B6 /* arangoAppDelegate.m */; };
+		8A539DCA15ECEE6500A267B6 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8A539DC815ECEE6500A267B6 /* MainMenu.xib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		8A539DAF15ECEE6500A267B6 /* Arango.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Arango.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8A539DB315ECEE6500A267B6 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		8A539DB615ECEE6500A267B6 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		8A539DB715ECEE6500A267B6 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		8A539DB815ECEE6500A267B6 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		8A539DBB15ECEE6500A267B6 /* Arango-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Arango-Info.plist"; sourceTree = "<group>"; };
+		8A539DBD15ECEE6500A267B6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		8A539DBF15ECEE6500A267B6 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		8A539DC115ECEE6500A267B6 /* Arango-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Arango-Prefix.pch"; sourceTree = "<group>"; };
+		8A539DC315ECEE6500A267B6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
+		8A539DC515ECEE6500A267B6 /* arangoAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = arangoAppDelegate.h; sourceTree = "<group>"; };
+		8A539DC615ECEE6500A267B6 /* arangoAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = arangoAppDelegate.m; sourceTree = "<group>"; };
+		8A539DC915ECEE6500A267B6 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8A539DAC15ECEE6500A267B6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8A539DB415ECEE6500A267B6 /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		8A539DA415ECEE6500A267B6 = {
+			isa = PBXGroup;
+			children = (
+				8A539DB915ECEE6500A267B6 /* Arango */,
+				8A539DB215ECEE6500A267B6 /* Frameworks */,
+				8A539DB015ECEE6500A267B6 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		8A539DB015ECEE6500A267B6 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8A539DAF15ECEE6500A267B6 /* Arango.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		8A539DB215ECEE6500A267B6 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				8A539DB315ECEE6500A267B6 /* Cocoa.framework */,
+				8A539DB515ECEE6500A267B6 /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		8A539DB515ECEE6500A267B6 /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				8A539DB615ECEE6500A267B6 /* AppKit.framework */,
+				8A539DB715ECEE6500A267B6 /* CoreData.framework */,
+				8A539DB815ECEE6500A267B6 /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		8A539DB915ECEE6500A267B6 /* Arango */ = {
+			isa = PBXGroup;
+			children = (
+				8A539DC515ECEE6500A267B6 /* arangoAppDelegate.h */,
+				8A539DC615ECEE6500A267B6 /* arangoAppDelegate.m */,
+				8A539DC815ECEE6500A267B6 /* MainMenu.xib */,
+				8A539DBA15ECEE6500A267B6 /* Supporting Files */,
+			);
+			path = Arango;
+			sourceTree = "<group>";
+		};
+		8A539DBA15ECEE6500A267B6 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				8A539DBB15ECEE6500A267B6 /* Arango-Info.plist */,
+				8A539DBC15ECEE6500A267B6 /* InfoPlist.strings */,
+				8A539DBF15ECEE6500A267B6 /* main.m */,
+				8A539DC115ECEE6500A267B6 /* Arango-Prefix.pch */,
+				8A539DC215ECEE6500A267B6 /* Credits.rtf */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8A539DAE15ECEE6500A267B6 /* Arango */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8A539DCD15ECEE6500A267B6 /* Build configuration list for PBXNativeTarget "Arango" */;
+			buildPhases = (
+				8A539DAB15ECEE6500A267B6 /* Sources */,
+				8A539DAC15ECEE6500A267B6 /* Frameworks */,
+				8A539DAD15ECEE6500A267B6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Arango;
+			productName = Arango;
+			productReference = 8A539DAF15ECEE6500A267B6 /* Arango.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		8A539DA615ECEE6500A267B6 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = arango;
+				LastUpgradeCheck = 0440;
+				ORGANIZATIONNAME = triAgens;
+			};
+			buildConfigurationList = 8A539DA915ECEE6500A267B6 /* Build configuration list for PBXProject "Arango" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 8A539DA415ECEE6500A267B6;
+			productRefGroup = 8A539DB015ECEE6500A267B6 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8A539DAE15ECEE6500A267B6 /* Arango */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8A539DAD15ECEE6500A267B6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8A539DBE15ECEE6500A267B6 /* InfoPlist.strings in Resources */,
+				8A539DC415ECEE6500A267B6 /* Credits.rtf in Resources */,
+				8A539DCA15ECEE6500A267B6 /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8A539DAB15ECEE6500A267B6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8A539DC015ECEE6500A267B6 /* main.m in Sources */,
+				8A539DC715ECEE6500A267B6 /* arangoAppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		8A539DBC15ECEE6500A267B6 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				8A539DBD15ECEE6500A267B6 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		8A539DC215ECEE6500A267B6 /* Credits.rtf */ = {
+			isa = PBXVariantGroup;
+			children = (
+				8A539DC315ECEE6500A267B6 /* en */,
+			);
+			name = Credits.rtf;
+			sourceTree = "<group>";
+		};
+		8A539DC815ECEE6500A267B6 /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				8A539DC915ECEE6500A267B6 /* en */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		8A539DCB15ECEE6500A267B6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		8A539DCC15ECEE6500A267B6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		8A539DCE15ECEE6500A267B6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Arango/Arango-Prefix.pch";
+				INFOPLIST_FILE = "Arango/Arango-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		8A539DCF15ECEE6500A267B6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Arango/Arango-Prefix.pch";
+				INFOPLIST_FILE = "Arango/Arango-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		8A539DA915ECEE6500A267B6 /* Build configuration list for PBXProject "Arango" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8A539DCB15ECEE6500A267B6 /* Debug */,
+				8A539DCC15ECEE6500A267B6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8A539DCD15ECEE6500A267B6 /* Build configuration list for PBXNativeTarget "Arango" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8A539DCE15ECEE6500A267B6 /* Debug */,
+				8A539DCF15ECEE6500A267B6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 8A539DA615ECEE6500A267B6 /* Project object */;
+}
