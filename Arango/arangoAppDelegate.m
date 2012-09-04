@@ -11,34 +11,45 @@
 
 @implementation arangoAppDelegate
 
-@synthesize myTask;
+@synthesize arango;
+@synthesize statusMenu;
+@synthesize statusItem;
 
-- (int) runSystemCommand:(NSString*) cmd
+- (void) startArango
 {
-  myTask = [[NSTask alloc]init];
-  [myTask setLaunchPath:@"/bin/sh"];
-  NSLog( @"%@" , [[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/" ]  stringByAppendingString:cmd]);
-  [myTask setArguments:[NSArray arrayWithObjects:@"-c", [[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/" ]  stringByAppendingString:cmd], nil]];
-  myTask.terminationHandler = ^(NSTask *task) {
-    NSLog(@"Terminated");
-    NSLog([NSString stringWithFormat:@"%l",[task terminationReason]]);
+  NSString* arangoPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/arangod"];
+  NSString* configPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/arangod.conf"];
+  arango = [[NSTask alloc]init];
+  [arango setLaunchPath:arangoPath];
+  [arango setArguments:[NSArray arrayWithObjects:@"--config", configPath, @"--exit-on-parent-death", @"true", nil]];
+  arango.terminationHandler = ^(NSTask *task) {
+    NSLog(@"Terminated Arango");
   };
-//  NSLog([NSString stringWithFormat:@"%i",[myTask processIdentifier]]);
-  [myTask launch];
-//  NSLog([NSString stringWithFormat:@"%i",[myTask terminationReason]]);
-  return [myTask processIdentifier];
+  [arango launch];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-  NSLog( @"%@" , [[NSBundle mainBundle] bundlePath] );
-  NSLog([NSString stringWithFormat:@"%i",[self runSystemCommand:@"arangod"]]);
+  [self startArango];
 }
 
-
-- (void)applicationWillTerminate:(NSNotification *)notification
+- (IBAction) quitApplication
 {
-  [myTask terminate];
+  [[NSApplication sharedApplication] terminate:nil];
+}
+
+//- (void) applicationWillTerminate:(NSNotification *)notification
+//{
+//  [arango terminate];
+//}
+
+
+-(void) awakeFromNib
+{
+  statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength];
+  [statusItem setMenu: statusMenu];
+  [statusItem setImage: [NSImage imageNamed:@"arangoStatusLogo"]];
+  [statusItem setHighlightMode:YES];
 }
 
 @end
