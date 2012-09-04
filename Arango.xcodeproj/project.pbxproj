@@ -11,6 +11,8 @@
 		8A293B4415F5EC58008959B1 /* arangod.conf in Resources */ = {isa = PBXBuildFile; fileRef = 8A293B4315F5EC58008959B1 /* arangod.conf */; };
 		8A293B4D15F5F832008959B1 /* icons.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8A293B4C15F5F832008959B1 /* icons.icns */; };
 		8A293B4F15F5FD1A008959B1 /* arangoStatusLogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 8A293B4E15F5FD1A008959B1 /* arangoStatusLogo.png */; };
+		8A293B5215F619B4008959B1 /* html in Resources */ = {isa = PBXBuildFile; fileRef = 8A293B5015F619B4008959B1 /* html */; };
+		8A293B5315F619B4008959B1 /* js in Resources */ = {isa = PBXBuildFile; fileRef = 8A293B5115F619B4008959B1 /* js */; };
 		8A539DB415ECEE6500A267B6 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A539DB315ECEE6500A267B6 /* Cocoa.framework */; };
 		8A539DBE15ECEE6500A267B6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8A539DBC15ECEE6500A267B6 /* InfoPlist.strings */; };
 		8A539DC015ECEE6500A267B6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A539DBF15ECEE6500A267B6 /* main.m */; };
@@ -25,6 +27,8 @@
 		8A293B4315F5EC58008959B1 /* arangod.conf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = arangod.conf; sourceTree = "<group>"; };
 		8A293B4C15F5F832008959B1 /* icons.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = icons.icns; sourceTree = "<group>"; };
 		8A293B4E15F5FD1A008959B1 /* arangoStatusLogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = arangoStatusLogo.png; sourceTree = "<group>"; };
+		8A293B5015F619B4008959B1 /* html */ = {isa = PBXFileReference; lastKnownFileType = folder; path = html; sourceTree = "<group>"; };
+		8A293B5115F619B4008959B1 /* js */ = {isa = PBXFileReference; lastKnownFileType = folder; path = js; sourceTree = "<group>"; };
 		8A539DAF15ECEE6500A267B6 /* Arango.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Arango.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8A539DB315ECEE6500A267B6 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		8A539DB615ECEE6500A267B6 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -56,6 +60,8 @@
 		8A293B3F15F5E23D008959B1 /* ArangoCore */ = {
 			isa = PBXGroup;
 			children = (
+				8A293B5015F619B4008959B1 /* html */,
+				8A293B5115F619B4008959B1 /* js */,
 				8A293B4315F5EC58008959B1 /* arangod.conf */,
 				8A293B4115F5E68D008959B1 /* arangod */,
 			);
@@ -191,6 +197,8 @@
 				8A293B4415F5EC58008959B1 /* arangod.conf in Resources */,
 				8A293B4D15F5F832008959B1 /* icons.icns in Resources */,
 				8A293B4F15F5FD1A008959B1 /* arangoStatusLogo.png in Resources */,
+				8A293B5215F619B4008959B1 /* html in Resources */,
+				8A293B5315F619B4008959B1 /* js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
