@@ -7,15 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8A293B4215F5E68D008959B1 /* arangod in Resources */ = {isa = PBXBuildFile; fileRef = 8A293B4115F5E68D008959B1 /* arangod */; };
+		8A293B4415F5EC58008959B1 /* arangod.conf in Resources */ = {isa = PBXBuildFile; fileRef = 8A293B4315F5EC58008959B1 /* arangod.conf */; };
 		8A539DB415ECEE6500A267B6 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A539DB315ECEE6500A267B6 /* Cocoa.framework */; };
 		8A539DBE15ECEE6500A267B6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8A539DBC15ECEE6500A267B6 /* InfoPlist.strings */; };
 		8A539DC015ECEE6500A267B6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A539DBF15ECEE6500A267B6 /* main.m */; };
 		8A539DC415ECEE6500A267B6 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 8A539DC215ECEE6500A267B6 /* Credits.rtf */; };
 		8A539DC715ECEE6500A267B6 /* arangoAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A539DC615ECEE6500A267B6 /* arangoAppDelegate.m */; };
 		8A539DCA15ECEE6500A267B6 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8A539DC815ECEE6500A267B6 /* MainMenu.xib */; };
+		8A539DD015ED01B300A267B6 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A539DB815ECEE6500A267B6 /* Foundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		8A293B4115F5E68D008959B1 /* arangod */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = arangod; sourceTree = "<group>"; };
+		8A293B4315F5EC58008959B1 /* arangod.conf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = arangod.conf; sourceTree = "<group>"; };
 		8A539DAF15ECEE6500A267B6 /* Arango.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Arango.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8A539DB315ECEE6500A267B6 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		8A539DB615ECEE6500A267B6 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -36,6 +41,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8A539DD015ED01B300A267B6 /* Foundation.framework in Frameworks */,
 				8A539DB415ECEE6500A267B6 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -43,9 +49,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8A293B3F15F5E23D008959B1 /* ArangoCore */ = {
+			isa = PBXGroup;
+			children = (
+				8A293B4315F5EC58008959B1 /* arangod.conf */,
+				8A293B4115F5E68D008959B1 /* arangod */,
+			);
+			name = ArangoCore;
+			sourceTree = "<group>";
+		};
 		8A539DA415ECEE6500A267B6 = {
 			isa = PBXGroup;
 			children = (
+				8A293B3F15F5E23D008959B1 /* ArangoCore */,
 				8A539DB915ECEE6500A267B6 /* Arango */,
 				8A539DB215ECEE6500A267B6 /* Frameworks */,
 				8A539DB015ECEE6500A267B6 /* Products */,
@@ -157,6 +173,8 @@
 				8A539DBE15ECEE6500A267B6 /* InfoPlist.strings in Resources */,
 				8A539DC415ECEE6500A267B6 /* Credits.rtf in Resources */,
 				8A539DCA15ECEE6500A267B6 /* MainMenu.xib in Resources */,
+				8A293B4215F5E68D008959B1 /* arangod in Resources */,
+				8A293B4415F5EC58008959B1 /* arangod.conf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -294,6 +312,7 @@
 				8A539DCF15ECEE6500A267B6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

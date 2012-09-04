@@ -11,5 +11,6 @@
 @interface arangoAppDelegate : NSObject <NSApplicationDelegate>
 
 @property (assign) IBOutlet NSWindow *window;
+@property (retain) NSTask* myTask;
 
 @end
