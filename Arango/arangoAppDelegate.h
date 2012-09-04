@@ -10,9 +10,7 @@
 
 @interface arangoAppDelegate : NSObject <NSApplicationDelegate>
 
-//@property (assign) IBOutlet NSWindow *window;
 @property (assign) IBOutlet NSMenu *statusMenu;
 @property (retain) NSStatusItem * statusItem;
-@property (retain) NSTask* arango;
 
 @end

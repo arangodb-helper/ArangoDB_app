@@ -13,6 +13,8 @@
 		8A293B4F15F5FD1A008959B1 /* arangoStatusLogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 8A293B4E15F5FD1A008959B1 /* arangoStatusLogo.png */; };
 		8A293B5215F619B4008959B1 /* html in Resources */ = {isa = PBXBuildFile; fileRef = 8A293B5015F619B4008959B1 /* html */; };
 		8A293B5315F619B4008959B1 /* js in Resources */ = {isa = PBXBuildFile; fileRef = 8A293B5115F619B4008959B1 /* js */; };
+		8A293B5C15F64C28008959B1 /* arangoCreateNewDBWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A293B5A15F64C27008959B1 /* arangoCreateNewDBWindowController.m */; };
+		8A293B5D15F64C28008959B1 /* arangoCreateNewDBWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8A293B5B15F64C27008959B1 /* arangoCreateNewDBWindowController.xib */; };
 		8A539DB415ECEE6500A267B6 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A539DB315ECEE6500A267B6 /* Cocoa.framework */; };
 		8A539DBE15ECEE6500A267B6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8A539DBC15ECEE6500A267B6 /* InfoPlist.strings */; };
 		8A539DC015ECEE6500A267B6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A539DBF15ECEE6500A267B6 /* main.m */; };
@@ -29,6 +31,9 @@
 		8A293B4E15F5FD1A008959B1 /* arangoStatusLogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = arangoStatusLogo.png; sourceTree = "<group>"; };
 		8A293B5015F619B4008959B1 /* html */ = {isa = PBXFileReference; lastKnownFileType = folder; path = html; sourceTree = "<group>"; };
 		8A293B5115F619B4008959B1 /* js */ = {isa = PBXFileReference; lastKnownFileType = folder; path = js; sourceTree = "<group>"; };
+		8A293B5915F64C27008959B1 /* arangoCreateNewDBWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = arangoCreateNewDBWindowController.h; sourceTree = "<group>"; };
+		8A293B5A15F64C27008959B1 /* arangoCreateNewDBWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = arangoCreateNewDBWindowController.m; sourceTree = "<group>"; };
+		8A293B5B15F64C27008959B1 /* arangoCreateNewDBWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = arangoCreateNewDBWindowController.xib; sourceTree = "<group>"; };
 		8A539DAF15ECEE6500A267B6 /* Arango.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Arango.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8A539DB315ECEE6500A267B6 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		8A539DB615ECEE6500A267B6 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -122,6 +127,9 @@
 				8A539DC615ECEE6500A267B6 /* arangoAppDelegate.m */,
 				8A539DC815ECEE6500A267B6 /* MainMenu.xib */,
 				8A539DBA15ECEE6500A267B6 /* Supporting Files */,
+				8A293B5915F64C27008959B1 /* arangoCreateNewDBWindowController.h */,
+				8A293B5A15F64C27008959B1 /* arangoCreateNewDBWindowController.m */,
+				8A293B5B15F64C27008959B1 /* arangoCreateNewDBWindowController.xib */,
 			);
 			path = Arango;
 			sourceTree = "<group>";
@@ -199,6 +207,7 @@
 				8A293B4F15F5FD1A008959B1 /* arangoStatusLogo.png in Resources */,
 				8A293B5215F619B4008959B1 /* html in Resources */,
 				8A293B5315F619B4008959B1 /* js in Resources */,
+				8A293B5D15F64C28008959B1 /* arangoCreateNewDBWindowController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -211,6 +220,7 @@
 			files = (
 				8A539DC015ECEE6500A267B6 /* main.m in Sources */,
 				8A539DC715ECEE6500A267B6 /* arangoAppDelegate.m in Sources */,
+				8A293B5C15F64C28008959B1 /* arangoCreateNewDBWindowController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
