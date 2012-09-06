@@ -7,9 +7,8 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "arangoAppDelegate.h"
 
-
+@class arangoAppDelegate;
 @interface arangoCreateNewDBWindowController : NSWindowController
 @property (strong) IBOutlet NSWindow *window;
 @property (weak) IBOutlet NSTextField *dbPathField;

@@ -7,9 +7,9 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "arangoCreateNewDBWindowController.h"
-#import "arangoAppDelegate.h"
 
+@class arangoAppDelegate;
+@class arangoCreateNewDBWindowController;
 @interface arangoToolbarMenu : NSMenu
 
 

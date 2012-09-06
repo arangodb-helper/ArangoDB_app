@@ -104,7 +104,7 @@ NSString* jsModPath;
 - (void) startNewArangoWithPath:(NSString*) path andPort: (NSInteger) port andLog: (NSString*) logPath andAlias:(NSString*) alias
 {
   NSTask* arang = [self startArangoWithPath:path andPort:[NSNumber numberWithInteger: port] andLog:logPath];
-  NSlog([NSString stringWithFormat:@"Started new Arango at PID %i as Alias %@",[arang processIdentifier], alias]);
+  NSLog([NSString stringWithFormat:@"Started new Arango at PID %i as Alias %@",[arang processIdentifier], alias]);
 }
 
 

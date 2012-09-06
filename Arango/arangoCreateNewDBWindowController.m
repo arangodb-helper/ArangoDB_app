@@ -118,7 +118,9 @@
     NSLog(@"Is NOT a directory");
     return NO;
   }
-  NSInteger port = [portField.stringValue integerValue];
+  NSNumberFormatter* formatter = [[NSNumberFormatter alloc] init];
+  [formatter setNumberStyle:NSNumberFormatterDecimalStyle];
+  NSInteger port = [[formatter numberFromString:portField.stringValue] integerValue];
   if (port <= 0) {
     NSLog(@"Invalid Port");
     return NO;
