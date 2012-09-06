@@ -140,6 +140,7 @@
 							<string key="NSFrame">{{208, 13}, {59, 32}}</string>
 							<reference key="NSSuperview" ref="692756673"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="135764706">
@@ -185,7 +186,7 @@
 							<string key="NSFrame">{{298, 126}, {96, 22}}</string>
 							<reference key="NSSuperview" ref="692756673"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="253693977"/>
+							<reference key="NSNextKeyView" ref="872633985"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="65081037">
@@ -264,7 +265,7 @@
 							<string key="NSFrame">{{171, 154}, {223, 22}}</string>
 							<reference key="NSSuperview" ref="692756673"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="270429151"/>
+							<reference key="NSNextKeyView" ref="253693977"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="518032990">
@@ -286,7 +287,7 @@
 							<string key="NSFrame">{{171, 96}, {223, 22}}</string>
 							<reference key="NSSuperview" ref="692756673"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="534826897"/>
+							<reference key="NSNextKeyView" ref="561000229"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="27340526">
@@ -330,7 +331,7 @@
 							<string key="NSFrame">{{396, 148}, {65, 32}}</string>
 							<reference key="NSSuperview" ref="692756673"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="872633985"/>
+							<reference key="NSNextKeyView" ref="270429151"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="237530012">
@@ -355,6 +356,7 @@
 							<string key="NSFrame">{{396, 90}, {65, 32}}</string>
 							<reference key="NSSuperview" ref="692756673"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="534826897"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="267499587">
@@ -380,7 +382,7 @@
 					<reference key="NSNextKeyView" ref="751122197"/>
 					<string key="NSReuseIdentifierKey">_NS:20</string>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1280, 800}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
 			</object>
@@ -426,6 +428,46 @@
 						<reference key="destination" ref="1003585141"/>
 					</object>
 					<int key="connectionID">62</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">openDBButton</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="253693977"/>
+					</object>
+					<int key="connectionID">66</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">openLogButton</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="561000229"/>
+					</object>
+					<int key="connectionID">67</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">start:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="1034732593"/>
+					</object>
+					<int key="connectionID">69</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">openLog:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="561000229"/>
+					</object>
+					<int key="connectionID">70</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">openDatabase:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="253693977"/>
+					</object>
+					<int key="connectionID">71</int>
 				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -1333,7 +1375,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">62</int>
+			<int key="maxID">71</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1348,10 +1390,31 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">arangoCreateNewDBWindowController</string>
 					<string key="superclassName">NSWindowController</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="openDatabase:">id</string>
+						<string key="openLog:">id</string>
+						<string key="start:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="openDatabase:">
+							<string key="name">openDatabase:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="openLog:">
+							<string key="name">openLog:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="start:">
+							<string key="name">start:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="aliasField">NSTextField</string>
 						<string key="dbPathField">NSTextField</string>
 						<string key="logField">NSTextField</string>
+						<string key="openDBButton">NSButton</string>
+						<string key="openLogButton">NSButton</string>
 						<string key="portField">NSTextField</string>
 						<string key="window">NSWindow</string>
 					</dictionary>
@@ -1367,6 +1430,14 @@
 						<object class="IBToOneOutletInfo" key="logField">
 							<string key="name">logField</string>
 							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="openDBButton">
+							<string key="name">openDBButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="openLogButton">
+							<string key="name">openLogButton</string>
+							<string key="candidateClassName">NSButton</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="portField">
 							<string key="name">portField</string>

@@ -18,15 +18,24 @@
 @synthesize portField;
 @synthesize logField;
 @synthesize aliasField;
+@synthesize openDBButton;
+@synthesize openLogButton;
 
 - (id)initWithWindow:(NSWindow *)window
 {
-    self = [super initWithWindow:window];
     if (self) {
         // Initialization code here.
     }
-    
     return self;
+}
+
+- (id)init
+{
+  [[NSBundle mainBundle] loadNibNamed:@"arangoCreateNewDBWindowController" owner:self topLevelObjects:nil];
+  if (self) {
+    [self showWindow:self.window];
+  }
+  return self;
 }
 
 - (void)windowDidLoad
@@ -63,37 +72,45 @@
 }
 
 
-- (IBAction) openDatabase
+- (IBAction) openDatabase: (id) sender
 {
   NSURL* dburl = [self showSelectDatabaseDialog];
   if (dburl) {
     BOOL isDir;
     [[NSFileManager defaultManager] fileExistsAtPath:[dburl path] isDirectory:&isDir];
     if (isDir) {
-      
+      NSLog(@"Is directory");
+      NSLog([NSString stringWithFormat:@"%@",[dburl path]]);
     } else {
-      
+      NSLog(@"Is NOT a directory");
+      NSLog([NSString stringWithFormat:@"%@",[dburl path]]);
     }
   } else {
-    
+    NSLog(@"Aborted");
   }
 }
 
-- (IBAction) openLog
+- (IBAction) openLog: (id) sender
 {
   NSURL* logurl = [self showSelectLogDialog];
-  BOOL isDir;
-  [[NSFileManager defaultManager] fileExistsAtPath:[logurl path] isDirectory:&isDir];
-  if (isDir) {
-    
+  if (logurl) {
+    BOOL isDir;
+    [[NSFileManager defaultManager] fileExistsAtPath:[logurl path] isDirectory:&isDir];
+    if (isDir) {
+      NSLog(@"Is directory");
+      NSLog([NSString stringWithFormat:@"%@",[logurl path]]);
+    } else {
+      NSLog(@"Is NOT a directory");
+      NSLog([NSString stringWithFormat:@"%@",[logurl path]]);
+    }
   } else {
-    
+    NSLog(@"Aborted");
   }
 }
 
--(IBAction) start
+- (IBAction) start: (id) sender
 {
-  
+  NSLog(@"START!!!");
 }
 
 @end

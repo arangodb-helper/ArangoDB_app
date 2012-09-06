@@ -22,6 +22,7 @@
 		8A539DC715ECEE6500A267B6 /* arangoAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A539DC615ECEE6500A267B6 /* arangoAppDelegate.m */; };
 		8A539DCA15ECEE6500A267B6 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8A539DC815ECEE6500A267B6 /* MainMenu.xib */; };
 		8A539DD015ED01B300A267B6 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A539DB815ECEE6500A267B6 /* Foundation.framework */; };
+		8A94993015F88BF000A0ABA7 /* arangoToolbarMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A94992F15F88BF000A0ABA7 /* arangoToolbarMenu.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -47,6 +48,8 @@
 		8A539DC515ECEE6500A267B6 /* arangoAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = arangoAppDelegate.h; sourceTree = "<group>"; };
 		8A539DC615ECEE6500A267B6 /* arangoAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = arangoAppDelegate.m; sourceTree = "<group>"; };
 		8A539DC915ECEE6500A267B6 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		8A94992E15F88BF000A0ABA7 /* arangoToolbarMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = arangoToolbarMenu.h; sourceTree = "<group>"; };
+		8A94992F15F88BF000A0ABA7 /* arangoToolbarMenu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = arangoToolbarMenu.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,6 +133,8 @@
 				8A293B5915F64C27008959B1 /* arangoCreateNewDBWindowController.h */,
 				8A293B5A15F64C27008959B1 /* arangoCreateNewDBWindowController.m */,
 				8A293B5B15F64C27008959B1 /* arangoCreateNewDBWindowController.xib */,
+				8A94992E15F88BF000A0ABA7 /* arangoToolbarMenu.h */,
+				8A94992F15F88BF000A0ABA7 /* arangoToolbarMenu.m */,
 			);
 			path = Arango;
 			sourceTree = "<group>";
@@ -221,6 +226,7 @@
 				8A539DC015ECEE6500A267B6 /* main.m in Sources */,
 				8A539DC715ECEE6500A267B6 /* arangoAppDelegate.m in Sources */,
 				8A293B5C15F64C28008959B1 /* arangoCreateNewDBWindowController.m in Sources */,
+				8A94993015F88BF000A0ABA7 /* arangoToolbarMenu.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

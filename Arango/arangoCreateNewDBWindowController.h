@@ -14,5 +14,11 @@
 @property (weak) IBOutlet NSTextField *portField;
 @property (weak) IBOutlet NSTextField *logField;
 @property (weak) IBOutlet NSTextField *aliasField;
+@property (weak) IBOutlet NSButton *openDBButton;
+@property (weak) IBOutlet NSButton *openLogButton;
+
+- (IBAction) openDatabase: (id) sender;
+- (IBAction) openLog: (id) sender;
+- (IBAction) start: (id) sender;
 
 @end

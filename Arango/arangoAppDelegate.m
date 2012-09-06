@@ -8,6 +8,8 @@
 
 #import "arangoAppDelegate.h"
 #import <Foundation/NSTask.h>
+#import "arangoToolbarMenu.h"
+
 
 @implementation arangoAppDelegate
 
@@ -104,20 +106,19 @@ NSString* jsModPath;
   [self startArangoWithPath:@"/arangoTestDB/" andPort:[NSNumber numberWithInt:1337] andLog:@"/arangoLogs/testLog.log"];
 }
 
-- (IBAction) quitApplication
-{
-  [[NSApplication sharedApplication] terminate:nil];
-}
+
 
 -(void) awakeFromNib
 {
   adminDir = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/html/admin"];
   jsActionDir = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/actions/system"];
   jsModPath = [[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/modules:"] stringByAppendingString:[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/common/modules"]];
+  statusMenu = [[arangoToolbarMenu alloc] init];
   statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength];
   [statusItem setMenu: statusMenu];
   [statusItem setImage: [NSImage imageNamed:@"arangoStatusLogo"]];
   [statusItem setHighlightMode:YES];
+  [statusMenu setAutoenablesItems: NO];
 }
 
 @end

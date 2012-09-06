@@ -7,10 +7,12 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "arangoToolbarMenu.h"
 
 @interface arangoAppDelegate : NSObject <NSApplicationDelegate>
 
-@property (assign) IBOutlet NSMenu *statusMenu;
+@property (retain) arangoToolbarMenu *statusMenu;
 @property (retain) NSStatusItem * statusItem;
+
 
 @end
