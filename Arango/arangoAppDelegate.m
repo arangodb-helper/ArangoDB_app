@@ -9,7 +9,7 @@
 #import "arangoAppDelegate.h"
 #import <Foundation/NSTask.h>
 #import "arangoToolbarMenu.h"
-
+#import "ArangoConfiguration.h"
 
 @implementation arangoAppDelegate
 
@@ -101,10 +101,37 @@ NSString* jsModPath;
   return newArango;
 }
 
-- (void) startNewArangoWithPath:(NSString*) path andPort: (NSInteger) port andLog: (NSString*) logPath andAlias:(NSString*) alias
+- (NSManagedObjectContext*) getArangoManagedObjectContext
 {
-  NSTask* arang = [self startArangoWithPath:path andPort:[NSNumber numberWithInteger: port] andLog:logPath];
+  if (self.managedObjectContext == nil) {
+    NSURL *storeURL = [[[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"Arango.sqlite"];
+    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"configurationModel" withExtension:@"momd"];
+    NSError *error = nil;
+    NSPersistentStoreCoordinator* coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL]];
+    if (![coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:nil error:&error])
+    {
+      // TODO Handle Error.
+      NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+      abort();
+    }
+    self.managedObjectContext = [[NSManagedObjectContext alloc] init];
+    [self.managedObjectContext setPersistentStoreCoordinator:coordinator];
+  }
+  return self.managedObjectContext;
+}
+
+- (void) startNewArangoWithPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath andAlias:(NSString*) alias
+{
+  NSTask* arang = [self startArangoWithPath:path andPort: port andLog:logPath];
   NSLog([NSString stringWithFormat:@"Started new Arango at PID %i as Alias %@",[arang processIdentifier], alias]);
+  NSManagedObjectContext* ctxt = [self getArangoManagedObjectContext];
+  ArangoConfiguration* newArang = (ArangoConfiguration*) [NSEntityDescription insertNewObjectForEntityForName:@"ArangoConfiguration" inManagedObjectContext:ctxt];
+  newArang.path = path;
+  newArang.port = port;
+  newArang.log = logPath;
+  newArang.alias = alias;
+  newArang.isRunning = [NSNumber numberWithBool:YES];
+  [statusMenu updateMenu];
 }
 
 
@@ -112,9 +139,7 @@ NSString* jsModPath;
 
 // System Stuff
 
-- (void)applicationDidFinishLaunching:(NSNotification *)aNotification
-{
-  //[self startArangoWithPath:@"/arangoTestDB/" andPort:[NSNumber numberWithInt:1337] andLog:@"/arangoLogs/testLog.log"];
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
 }
 
 

@@ -13,7 +13,9 @@
 
 @property (strong) arangoToolbarMenu* statusMenu;
 @property (retain) NSStatusItem * statusItem;
+@property (retain) NSManagedObjectContext* managedObjectContext;
 
-- (void) startNewArangoWithPath:(NSString*) path andPort: (NSInteger) port andLog: (NSString*) logPath andAlias:(NSString*) alias;
+- (NSManagedObjectContext*) getArangoManagedObjectContext;
+- (void) startNewArangoWithPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath andAlias:(NSString*) alias;
 
 @end

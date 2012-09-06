@@ -120,7 +120,7 @@
   }
   NSNumberFormatter* formatter = [[NSNumberFormatter alloc] init];
   [formatter setNumberStyle:NSNumberFormatterDecimalStyle];
-  NSInteger port = [[formatter numberFromString:portField.stringValue] integerValue];
+  NSNumber* port = [formatter numberFromString:portField.stringValue];
   if (port <= 0) {
     NSLog(@"Invalid Port");
     return NO;

@@ -20,6 +20,7 @@
 
 
 - (id)initWithAppDelegate:(arangoAppDelegate*) aD;
+- (void) updateMenu;
 - (void) quitApplication;
 - (void) createNewInstance;
 @end

@@ -9,6 +9,7 @@
 #import "arangoToolbarMenu.h"
 #import "arangoCreateNewDBWindowController.h"
 #import "arangoAppDelegate.h"
+#import "ArangoConfiguration.h"
 
 @implementation arangoToolbarMenu
 
@@ -28,19 +29,46 @@
     //[self.createDB setKey:@"N"];
     [self.createDB setTarget:self];
     [self.createDB setAction:@selector(createNewInstance)];
-    [self addItem:self.createDB];
-    
-    
     self.quit = [[NSMenuItem alloc] init];
     [self.quit setEnabled:YES];
     [self.quit setTitle:@"Quit"];
     //[self.quit setKey:@"Q"];
     [self.quit setTarget:self];
     [self.quit setAction:@selector(quitApplication)];
-    [self addItem:self.quit];
+    [self updateMenu];
   }
   return self;
 }
+
+- (void) updateMenu
+{
+  [self removeAllItems];
+  // Request stored Arangos
+  NSFetchRequest *request = [[NSFetchRequest alloc] init];
+  NSEntityDescription *entity = [NSEntityDescription entityForName:@"ArangoConfiguration" inManagedObjectContext: [self.appDelegate getArangoManagedObjectContext]];
+  [request setEntity:entity];
+  NSError *error = nil;
+  NSArray *fetchedResults = [[self.appDelegate getArangoManagedObjectContext] executeFetchRequest:request error:&error];
+  if (fetchedResults == nil) {
+    NSLog(error.localizedDescription);
+  } else {
+    for (ArangoConfiguration* c in fetchedResults) {
+      NSMenuItem* item = [[NSMenuItem alloc] init];
+      [item setEnabled:YES];
+      [item setTitle: c.alias];
+      if (c.isRunning) {
+        [item setState:1];
+      } else {
+        [item setState:0];
+      }
+      [self addItem:item];
+    }
+  }
+  [self addItem:self.createDB];
+  [self addItem:self.quit];
+  [self update];
+}
+
 
 - (void) quitApplication
 {
