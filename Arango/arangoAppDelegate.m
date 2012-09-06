@@ -101,9 +101,20 @@ NSString* jsModPath;
   return newArango;
 }
 
+- (void) startNewArangoWithPath:(NSString*) path andPort: (NSInteger) port andLog: (NSString*) logPath andAlias:(NSString*) alias
+{
+  NSTask* arang = [self startArangoWithPath:path andPort:[NSNumber numberWithInteger: port] andLog:logPath];
+  NSlog([NSString stringWithFormat:@"Started new Arango at PID %i as Alias %@",[arang processIdentifier], alias]);
+}
+
+
+
+
+// System Stuff
+
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-  [self startArangoWithPath:@"/arangoTestDB/" andPort:[NSNumber numberWithInt:1337] andLog:@"/arangoLogs/testLog.log"];
+  //[self startArangoWithPath:@"/arangoTestDB/" andPort:[NSNumber numberWithInt:1337] andLog:@"/arangoLogs/testLog.log"];
 }
 
 
@@ -113,7 +124,7 @@ NSString* jsModPath;
   adminDir = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/html/admin"];
   jsActionDir = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/actions/system"];
   jsModPath = [[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/modules:"] stringByAppendingString:[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/common/modules"]];
-  statusMenu = [[arangoToolbarMenu alloc] init];
+  statusMenu = [[arangoToolbarMenu alloc] initWithAppDelegate:self];
   statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength];
   [statusItem setMenu: statusMenu];
   [statusItem setImage: [NSImage imageNamed:@"arangoStatusLogo"]];

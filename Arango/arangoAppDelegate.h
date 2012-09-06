@@ -14,5 +14,6 @@
 @property (retain) arangoToolbarMenu *statusMenu;
 @property (retain) NSStatusItem * statusItem;
 
+- (void) startNewArangoWithPath:(NSString*) path andPort: (NSInteger) port andLog: (NSString*) logPath andAlias:(NSString*) alias;
 
 @end

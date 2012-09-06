@@ -8,6 +8,7 @@
 
 #import "arangoToolbarMenu.h"
 #import "arangoCreateNewDBWindowController.h"
+#import "arangoAppDelegate.h"
 
 @implementation arangoToolbarMenu
 
@@ -16,10 +17,11 @@
 @synthesize createNewWindowController;
 
 // TODO: Localize
-- (id)init
+- (id)initWithAppDelegate:(arangoAppDelegate*) aD
 {
   self = [super init];
   if (self) {
+    self.appDelegate = aD;
     self.createDB = [[NSMenuItem alloc] init];
     [self.createDB setEnabled:YES];
     [self.createDB setTitle:@"New..."];
@@ -47,7 +49,7 @@
 
 - (void) createNewInstance
 {
-  self.createNewWindowController = [[arangoCreateNewDBWindowController alloc] init];
+  self.createNewWindowController = [[arangoCreateNewDBWindowController alloc] initWithAppDelegate:self.appDelegate];
   [self.createNewWindowController.window makeKeyWindow];
 }
 

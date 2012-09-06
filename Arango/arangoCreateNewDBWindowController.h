@@ -7,6 +7,8 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "arangoAppDelegate.h"
+
 
 @interface arangoCreateNewDBWindowController : NSWindowController
 @property (strong) IBOutlet NSWindow *window;
@@ -16,7 +18,10 @@
 @property (weak) IBOutlet NSTextField *aliasField;
 @property (weak) IBOutlet NSButton *openDBButton;
 @property (weak) IBOutlet NSButton *openLogButton;
+@property (weak) arangoAppDelegate *appDelegate;
 
+
+- (id)initWithAppDelegate:(arangoAppDelegate*) aD;
 - (IBAction) openDatabase: (id) sender;
 - (IBAction) openLog: (id) sender;
 - (IBAction) start: (id) sender;
