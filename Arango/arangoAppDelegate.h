@@ -20,5 +20,6 @@
 - (NSManagedObjectContext*) getArangoManagedObjectContext;
 - (void) startNewArangoWithPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath andAlias:(NSString*) alias;
 - (void) updateArangoConfig:(ArangoConfiguration*) config withPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath andAlias:(NSString*) alias;
+- (void) deleteArangoConfig:(ArangoConfiguration*) config;
 
 @end

@@ -46,30 +46,6 @@ NSString* jsModPath;
   [self save];
 }
 
-- (NSTask*) startArangoWithPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath
-{
-  NSString* arangoPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/arangod"];
-  NSString* configPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/arangod.conf"];
-  NSTask* newArango = [[NSTask alloc]init];
-  [newArango setLaunchPath:arangoPath];
-  NSArray* arguments = [NSArray arrayWithObjects:
-                        @"--config", configPath,
-                        @"--exit-on-parent-death", @"true",
-                        @"--server.http-port", port.stringValue,
-                        @"--log.file", logPath,
-                        @"--server.admin-directory", adminDir,
-                        @"--javascript.action-directory", jsActionDir,
-                        @"--javascript.modules-path", jsModPath,
-                        path, nil];
-  [newArango setArguments:arguments];
-  newArango.terminationHandler = ^(NSTask *task) {
-    NSLog(@"Terminated Arango");
-  };
-  [newArango launch];
-  return newArango;
-}
-
-
 - (NSTask*) testArangoWithPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath
 {
   NSString* arangoPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/arangod"];
@@ -147,21 +123,13 @@ NSString* jsModPath;
 
 - (void) startNewArangoWithPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath andAlias:(NSString*) alias
 {
-  NSTask* arang = [self startArangoWithPath:path andPort: port andLog:logPath];
-  NSLog([NSString stringWithFormat:@"Started new Arango at PID %i as Alias %@",[arang processIdentifier], alias]);
-  NSManagedObjectContext* ctxt = [self getArangoManagedObjectContext];
-  ArangoConfiguration* newArang = (ArangoConfiguration*) [NSEntityDescription insertNewObjectForEntityForName:@"ArangoConfiguration" inManagedObjectContext:ctxt];
+  ArangoConfiguration* newArang = (ArangoConfiguration*) [NSEntityDescription insertNewObjectForEntityForName:@"ArangoConfiguration" inManagedObjectContext:[self getArangoManagedObjectContext]];
   newArang.path = path;
   newArang.port = port;
   newArang.log = logPath;
   newArang.alias = alias;
-  newArang.isRunning = [NSNumber numberWithBool:YES];
-  newArang.instance = arang;
-  NSError* error = nil;
-  [ctxt save: &error];
-  if (error != nil) {
-    NSLog(error.localizedDescription);
-  }
+  [self save];
+  [self startArango:newArang];
   [statusMenu updateMenu];
 }
 
@@ -177,6 +145,16 @@ NSString* jsModPath;
   config.alias = alias;
   [self save];
   [self startArango:config];
+}
+
+- (void) deleteArangoConfig:(ArangoConfiguration*) config
+{
+  if ([config.isRunning isEqualToNumber:[NSNumber numberWithBool:YES]]) {
+    [config.instance terminate];
+  }
+  [[self getArangoManagedObjectContext] deleteObject: config];
+  [self save];
+  [statusMenu updateMenu];
 }
 
 - (void) save

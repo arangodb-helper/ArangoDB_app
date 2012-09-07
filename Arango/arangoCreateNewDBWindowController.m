@@ -61,7 +61,6 @@
   self.dbPathField.stringValue = config.path;
   NSNumberFormatter* f = [[NSNumberFormatter alloc] init];
   [f setThousandSeparator:@""];
-  [f stringFromNumber:config.port];
   self.portField.stringValue = [f stringFromNumber:config.port];
   self.logField.stringValue = config.log;
   self.aliasField.stringValue = config.alias;

@@ -69,12 +69,26 @@
       
       
       NSMenu* subMenu = [[NSMenu alloc] init];
+      NSMenuItem* browser = [[NSMenuItem alloc] init];
+      [browser setTitle:@"Browser"];
+      [browser setTarget:self];
+      [browser setRepresentedObject:c];
+      [browser setAction:@selector(openBrowser:)];
+      [subMenu addItem:browser];
+      [subMenu addItem: [NSMenuItem separatorItem]];
       NSMenuItem* edit = [[NSMenuItem alloc] init];
       [edit setTitle:@"Edit"];
       [edit setTarget:self];
       [edit setRepresentedObject:c];
       [edit setAction:@selector(editInstance:)];
       [subMenu addItem:edit];
+      NSMenuItem* delete = [[NSMenuItem alloc] init];
+      [delete setTitle:@"Delete"];
+      [delete setTarget:self];
+      [delete setRepresentedObject:c];
+      [delete setAction:@selector(deleteInstance:)];
+      [subMenu addItem:delete];
+      
       [item setSubmenu:subMenu];
       
     }
@@ -118,6 +132,21 @@
   self.createNewWindowController = nil;
   self.createNewWindowController = [[arangoCreateNewDBWindowController alloc] initWithAppDelegate:self.appDelegate andArango: [sender representedObject]];
   [self.createNewWindowController.window makeKeyWindow];
+}
+
+// TODO: Ask user if data should be deleted also!
+- (void) deleteInstance:(id) sender
+{
+  [self.appDelegate deleteArangoConfig:[sender representedObject]];
+}
+
+- (void) openBrowser:(id) sender
+{
+  ArangoConfiguration* config = [sender representedObject];
+  NSNumberFormatter* f = [[NSNumberFormatter alloc] init];
+  NSLog([@"localhost:" stringByAppendingString:[f stringFromNumber:config.port]]);
+  [f setThousandSeparator:@""];
+  [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[@"http://localhost:" stringByAppendingString:[f stringFromNumber:config.port]]]];
 }
 
 @end
