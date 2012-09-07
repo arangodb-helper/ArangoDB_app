@@ -138,7 +138,34 @@
 // TODO: Ask user if data should be deleted also!
 - (void) deleteInstance:(id) sender
 {
-  [self.appDelegate deleteArangoConfig:[sender representedObject]];
+  ArangoConfiguration* config = [sender representedObject];
+  NSMutableString* infoText = [[NSMutableString alloc] init];
+  [infoText setString:@"Do you want to delete the contents of folder \""];
+  [infoText appendString:config.path];
+  [infoText appendString:@"\" and the log-file as well?"];
+  NSAlert* info = [NSAlert alertWithMessageText:@"Delete Data?" defaultButton:@"No" alternateButton:@"Yes" otherButton:nil informativeTextWithFormat:infoText];
+  [info beginSheetModalForWindow:nil modalDelegate:self didEndSelector:@selector(confirmedDialog:returnCode:contextInfo:) contextInfo:(__bridge void *)(config)];
+}
+
+- (void) confirmedDialog:(NSAlert*) dialog returnCode:(int) rC contextInfo: (ArangoConfiguration *) config
+{
+  if (rC == 0) {
+    if ([config.isRunning isEqualToNumber:[NSNumber numberWithBool:YES]]) {
+      [config.instance terminate];
+      sleep(2);
+    }
+    NSError* error = nil;
+    [[NSFileManager defaultManager] removeItemAtPath:config.log error:&error];
+    if (error != nil) {
+      NSLog(error.localizedDescription);
+    }
+    error = nil;
+    [[NSFileManager defaultManager] removeItemAtPath:config.path error:&error];
+    if (error != nil) {
+      NSLog(error.localizedDescription);
+    }
+  }
+  [self.appDelegate deleteArangoConfig:config];
 }
 
 - (void) openBrowser:(id) sender
