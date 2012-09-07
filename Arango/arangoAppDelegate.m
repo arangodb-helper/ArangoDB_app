@@ -145,6 +145,7 @@ NSString* jsModPath;
   config.alias = alias;
   [self save];
   [self startArango:config];
+  [statusMenu updateMenu];
 }
 
 - (void) deleteArangoConfig:(ArangoConfiguration*) config

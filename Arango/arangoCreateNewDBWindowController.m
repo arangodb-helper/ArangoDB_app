@@ -81,6 +81,11 @@
   [selectDatabaseLocation setCanChooseDirectories:YES];
   [selectDatabaseLocation setAllowsMultipleSelection:NO];
   [selectDatabaseLocation setPrompt:@"Choose"];
+  // Hack as the API does not give the New Folder button in an open function.
+  if([selectDatabaseLocation respondsToSelector:@selector(_setIncludeNewFolderButton:)] )
+  {
+    [selectDatabaseLocation performSelector:@selector(_setIncludeNewFolderButton:) withObject:[NSNumber numberWithBool:YES]];
+  }
   if ([selectDatabaseLocation runModal] == NSFileHandlingPanelOKButton) {
     NSArray* selection = [selectDatabaseLocation URLs];
     return[selection objectAtIndex:0];
@@ -111,11 +116,7 @@
     [[NSFileManager defaultManager] fileExistsAtPath:[dburl path] isDirectory:&isDir];
     if (isDir) {
       [dbPathField setStringValue:[dburl path]];
-    } else {
-      NSLog(@"Is NOT a directory");
     }
-  } else {
-    NSLog(@"Aborted");
   }
 }
 
@@ -130,42 +131,80 @@
     } else {
       [logField setStringValue:[logurl path]];
     }
-  } else {
-    NSLog(@"Aborted");
   }
 }
 
 - (BOOL) checkValuesAndStartInstance
 {
   NSURL* dbPath = [NSURL URLWithString:dbPathField.stringValue];
+  if (![[NSFileManager defaultManager] fileExistsAtPath:[dbPath path]]) {
+    NSError* error = nil;
+    [[NSFileManager defaultManager] createDirectoryAtPath:[dbPath path] withIntermediateDirectories:YES attributes:nil error:&error];
+    if (error != nil) {
+      NSAlert* info = [[NSAlert alloc] init];
+      [info setMessageText:@"Error while Creating File!"];
+      [info setInformativeText:error.localizedDescription];
+      [info beginSheetModalForWindow:self.window modalDelegate:self didEndSelector:@selector(confirmedError:returnCode:contextInfo:) contextInfo:nil];
+      return NO;
+    }
+  }
   BOOL isDir;
   [[NSFileManager defaultManager] fileExistsAtPath:[dbPath path] isDirectory:&isDir];
   if (!isDir) {
-    NSLog(@"Is NOT a directory");
+    if (![[NSFileManager defaultManager] isWritableFileAtPath:[dbPath path]]) {
+      NSAlert* info = [[NSAlert alloc] init];
+      [info setMessageText:@"Invalid Location!"];
+      [info setInformativeText:@"Arango is not allowed to write in the selected folder."];
+      [info beginSheetModalForWindow:self.window modalDelegate:self didEndSelector:@selector(confirmedError:returnCode:contextInfo:) contextInfo:nil];
+      return NO;
+    }
+    NSAlert* info = [[NSAlert alloc] init];
+    [info setMessageText:@"Invalid Location!"];
+    [info setInformativeText:@"The path you have defined is not a folder."];
+    [info beginSheetModalForWindow:self.window modalDelegate:self didEndSelector:@selector(confirmedError:returnCode:contextInfo:) contextInfo:nil];
     return NO;
   }
   NSNumberFormatter* formatter = [[NSNumberFormatter alloc] init];
   [formatter setNumberStyle:NSNumberFormatterDecimalStyle];
   NSNumber* port = [formatter numberFromString:portField.stringValue];
   if (port <= 0) {
-    NSLog(@"Invalid Port");
+    NSAlert* info = [[NSAlert alloc] init];
+    [info setMessageText:@"Invalid Port!"];
+    [info setInformativeText:@"The Port you have defined is either not a number or blocked."];
+    [info beginSheetModalForWindow:self.window modalDelegate:self didEndSelector:@selector(confirmedError:returnCode:contextInfo:) contextInfo:nil];
     return NO;
   }
   NSString* alias = aliasField.stringValue;
   if ([alias isEqualToString:@""]) {
     alias = @"Arango";
   }
-  NSURL* logPath = [NSURL URLWithString:logField.stringValue];
-  [[NSFileManager defaultManager] fileExistsAtPath:[logPath path] isDirectory:&isDir];
-  if (isDir) {
-    logPath = [[logPath URLByAppendingPathComponent:alias] URLByAppendingPathExtension:@"log"];
-    NSLog(logPath);
+  NSURL* logPath;
+  if ([logField.stringValue isEqualToString:@""]) {
+    logPath = [NSURL URLWithString:dbPathField.stringValue];
+    [[NSFileManager defaultManager] fileExistsAtPath:[logPath path] isDirectory:&isDir];
+    if (isDir) {
+      NSMutableString* append = [[NSMutableString alloc] init];
+      [append setString:[logPath path]];
+      [append appendString:@"/"];
+      [append appendString:alias];
+      [append appendString:@".log"];
+      logPath = [NSURL fileURLWithPath:append];
+    }
+  } else {
+    logPath = [NSURL URLWithString:logField.stringValue];
+    [[NSFileManager defaultManager] fileExistsAtPath:[logPath path] isDirectory:&isDir];
+    if (isDir) {
+      NSMutableString* append = [[NSMutableString alloc] init];
+      [append setString:[logPath path]];
+      [append appendString:@"/"];
+      [append appendString:alias];
+      [append appendString:@".log"];
+      logPath = [NSURL fileURLWithPath:append];
+    }
   }
   if (self.editedConfig != nil) {
-    NSLog(@"Edited");
     [self.appDelegate updateArangoConfig:self.editedConfig withPath:[dbPath path] andPort:port andLog:[logPath path] andAlias:alias];
   } else {
-    NSLog(@"New");
     [self.appDelegate startNewArangoWithPath:[dbPath path] andPort:port andLog:[logPath path] andAlias: alias];
   }
   return YES;
@@ -179,6 +218,13 @@
   } else {
     [self.window orderOut:self.window];
   }
+}
+
+
+- (void)confirmedError:(NSAlert *)alert
+                          returnCode:(int)returnCode contextInfo:(void *)contextInfo
+{
+  NSLog(@"clicked %d button\n", returnCode);
 }
 
 @end

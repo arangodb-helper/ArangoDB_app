@@ -21,7 +21,6 @@
 @property (weak) arangoAppDelegate *appDelegate;
 @property (strong) ArangoConfiguration *editedConfig;
 
-
 - (id)initWithAppDelegate:(arangoAppDelegate*) aD;
 - (id)initWithAppDelegate:(arangoAppDelegate*) aD andArango: (ArangoConfiguration*) config;
 

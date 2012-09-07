@@ -47,6 +47,8 @@
   NSFetchRequest *request = [[NSFetchRequest alloc] init];
   NSEntityDescription *entity = [NSEntityDescription entityForName:@"ArangoConfiguration" inManagedObjectContext: [self.appDelegate getArangoManagedObjectContext]];
   [request setEntity:entity];
+  NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"alias" ascending:YES];
+  [request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
   NSError *error = nil;
   NSArray *fetchedResults = [[self.appDelegate getArangoManagedObjectContext] executeFetchRequest:request error:&error];
   if (fetchedResults == nil) {
@@ -66,7 +68,6 @@
       [item setRepresentedObject:c];
       [item setAction:@selector(toggleArango:)];
       [self addItem:item];
-      
       
       NSMenu* subMenu = [[NSMenu alloc] init];
       NSMenuItem* browser = [[NSMenuItem alloc] init];
@@ -144,7 +145,6 @@
 {
   ArangoConfiguration* config = [sender representedObject];
   NSNumberFormatter* f = [[NSNumberFormatter alloc] init];
-  NSLog([@"localhost:" stringByAppendingString:[f stringFromNumber:config.port]]);
   [f setThousandSeparator:@""];
   [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[@"http://localhost:" stringByAppendingString:[f stringFromNumber:config.port]]]];
 }
