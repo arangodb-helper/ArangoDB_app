@@ -136,7 +136,12 @@
 
 - (BOOL) checkValuesAndStartInstance
 {
-  NSURL* dbPath = [NSURL URLWithString:dbPathField.stringValue];
+  NSURL* dbPath;
+  if ([dbPathField.stringValue hasPrefix:@"~"]){
+    dbPath = [NSURL URLWithString:[NSHomeDirectory() stringByAppendingString:[dbPathField.stringValue substringFromIndex:1]]];
+  } else {
+    dbPath = [NSURL URLWithString:dbPathField.stringValue];
+  }
   if (![[NSFileManager defaultManager] fileExistsAtPath:[dbPath path]]) {
     NSError* error = nil;
     [[NSFileManager defaultManager] createDirectoryAtPath:[dbPath path] withIntermediateDirectories:YES attributes:nil error:&error];
@@ -180,16 +185,13 @@
   }
   NSURL* logPath;
   if ([logField.stringValue isEqualToString:@""]) {
-    logPath = [NSURL URLWithString:dbPathField.stringValue];
-    [[NSFileManager defaultManager] fileExistsAtPath:[logPath path] isDirectory:&isDir];
-    if (isDir) {
-      NSMutableString* append = [[NSMutableString alloc] init];
-      [append setString:[logPath path]];
-      [append appendString:@"/"];
-      [append appendString:alias];
-      [append appendString:@".log"];
-      logPath = [NSURL fileURLWithPath:append];
-    }
+    logPath = dbPath;
+    NSMutableString* append = [[NSMutableString alloc] init];
+    [append setString:[logPath path]];
+    [append appendString:@"/"];
+    [append appendString:alias];
+    [append appendString:@".log"];
+    logPath = [NSURL fileURLWithPath:append];
   } else {
     logPath = [NSURL URLWithString:logField.stringValue];
     [[NSFileManager defaultManager] fileExistsAtPath:[logPath path] isDirectory:&isDir];
