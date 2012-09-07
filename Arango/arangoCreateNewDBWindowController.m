@@ -8,6 +8,7 @@
 
 #import "arangoCreateNewDBWindowController.h"
 #import "arangoAppDelegate.h"
+#import "ArangoConfiguration.h"
 
 @interface arangoCreateNewDBWindowController ()
 
@@ -22,6 +23,7 @@
 @synthesize openDBButton;
 @synthesize openLogButton;
 @synthesize appDelegate;
+@synthesize editedConfig;
 
 - (id)initWithWindow:(NSWindow *)window
 {
@@ -39,6 +41,31 @@
     [self showWindow:self.window];
   }
   return self;
+}
+
+
+- (id)initWithAppDelegate:(arangoAppDelegate*) aD andArango: (ArangoConfiguration*) config
+{
+  [[NSBundle mainBundle] loadNibNamed:@"arangoCreateNewDBWindowController" owner:self topLevelObjects:nil];
+  if (self) {
+    self.appDelegate = aD;
+    [self fillArango: config];
+    [self showWindow:self.window];
+  }
+  return self;
+}
+
+
+- (void) fillArango: (ArangoConfiguration*) config
+{
+  self.dbPathField.stringValue = config.path;
+  NSNumberFormatter* f = [[NSNumberFormatter alloc] init];
+  [f setThousandSeparator:@""];
+  [f stringFromNumber:config.port];
+  self.portField.stringValue = [f stringFromNumber:config.port];
+  self.logField.stringValue = config.log;
+  self.aliasField.stringValue = config.alias;
+  self.editedConfig = config;
 }
 
 - (void)windowDidLoad
@@ -135,8 +162,13 @@
     logPath = [[logPath URLByAppendingPathComponent:alias] URLByAppendingPathExtension:@"log"];
     NSLog(logPath);
   }
-  
-  [self.appDelegate startNewArangoWithPath:[dbPath path] andPort:port andLog:[logPath path] andAlias: alias];
+  if (self.editedConfig != nil) {
+    NSLog(@"Edited");
+    [self.appDelegate updateArangoConfig:self.editedConfig withPath:[dbPath path] andPort:port andLog:[logPath path] andAlias:alias];
+  } else {
+    NSLog(@"New");
+    [self.appDelegate startNewArangoWithPath:[dbPath path] andPort:port andLog:[logPath path] andAlias: alias];
+  }
   return YES;
 }
 
@@ -146,7 +178,7 @@
   if (![self checkValuesAndStartInstance]) {
     NSLog(@"FAILED");
   } else {
-    NSLog(@"Success!");
+    [self.window orderOut:self.window];
   }
 }
 

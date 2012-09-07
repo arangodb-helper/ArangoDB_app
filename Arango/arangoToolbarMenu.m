@@ -53,22 +53,53 @@
     NSLog(error.localizedDescription);
   } else {
     for (ArangoConfiguration* c in fetchedResults) {
+      
       NSMenuItem* item = [[NSMenuItem alloc] init];
       [item setEnabled:YES];
       [item setTitle: c.alias];
-      if (c.isRunning) {
+      if ([c.isRunning isEqualToNumber: [NSNumber numberWithBool:YES]]) {
         [item setState:1];
       } else {
         [item setState:0];
       }
+      [item setTarget:self];
+      [item setRepresentedObject:c];
+      [item setAction:@selector(toggleArango:)];
       [self addItem:item];
+      
+      
+      NSMenu* subMenu = [[NSMenu alloc] init];
+      NSMenuItem* edit = [[NSMenuItem alloc] init];
+      [edit setTitle:@"Edit"];
+      [edit setTarget:self];
+      [edit setRepresentedObject:c];
+      [edit setAction:@selector(editInstance:)];
+      [subMenu addItem:edit];
+      [item setSubmenu:subMenu];
+      
     }
   }
+  [self addItem:[NSMenuItem separatorItem]];
   [self addItem:self.createDB];
   [self addItem:self.quit];
-  [self update];
 }
 
+- (void) toggleArango: (id) sender{
+  ArangoConfiguration* arango = [sender representedObject];
+  if ([arango.isRunning isEqualToNumber: [NSNumber numberWithBool:NO]]) {
+    arango.isRunning = [NSNumber numberWithBool:YES];
+    [self.appDelegate startArango:arango];
+  } else {
+    arango.isRunning = [NSNumber numberWithBool:NO];
+    [arango.instance terminate];
+  }
+  NSError* error = nil;
+  [[self.appDelegate getArangoManagedObjectContext] save: &error];
+  if (error != nil) {
+    NSLog(error.localizedDescription);
+  }
+  [self updateMenu];
+}
 
 - (void) quitApplication
 {
@@ -77,9 +108,16 @@
 
 - (void) createNewInstance
 {
+  self.createNewWindowController = nil;
   self.createNewWindowController = [[arangoCreateNewDBWindowController alloc] initWithAppDelegate:self.appDelegate];
   [self.createNewWindowController.window makeKeyWindow];
 }
 
+- (void) editInstance:(id) sender
+{
+  self.createNewWindowController = nil;
+  self.createNewWindowController = [[arangoCreateNewDBWindowController alloc] initWithAppDelegate:self.appDelegate andArango: [sender representedObject]];
+  [self.createNewWindowController.window makeKeyWindow];
+}
 
 @end

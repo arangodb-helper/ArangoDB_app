@@ -9,6 +9,7 @@
 #import <Cocoa/Cocoa.h>
 
 @class arangoAppDelegate;
+@class ArangoConfiguration;
 @interface arangoCreateNewDBWindowController : NSWindowController
 @property (strong) IBOutlet NSWindow *window;
 @property (weak) IBOutlet NSTextField *dbPathField;
@@ -18,9 +19,12 @@
 @property (weak) IBOutlet NSButton *openDBButton;
 @property (weak) IBOutlet NSButton *openLogButton;
 @property (weak) arangoAppDelegate *appDelegate;
+@property (strong) ArangoConfiguration *editedConfig;
 
 
 - (id)initWithAppDelegate:(arangoAppDelegate*) aD;
+- (id)initWithAppDelegate:(arangoAppDelegate*) aD andArango: (ArangoConfiguration*) config;
+
 - (IBAction) openDatabase: (id) sender;
 - (IBAction) openLog: (id) sender;
 - (IBAction) start: (id) sender;

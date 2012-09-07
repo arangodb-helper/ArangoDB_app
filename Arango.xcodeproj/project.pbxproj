@@ -24,7 +24,7 @@
 		8A539DD015ED01B300A267B6 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A539DB815ECEE6500A267B6 /* Foundation.framework */; };
 		8A94993015F88BF000A0ABA7 /* arangoToolbarMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A94992F15F88BF000A0ABA7 /* arangoToolbarMenu.m */; };
 		8A94993C15F8B9BF00A0ABA7 /* configurationModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 8A94993A15F8B9BF00A0ABA7 /* configurationModel.xcdatamodeld */; };
-		8A94994D15F8DBB700A0ABA7 /* ArangoConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A94994C15F8DBB700A0ABA7 /* ArangoConfiguration.m */; };
+		8A94995015F8EEBF00A0ABA7 /* ArangoConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A94994F15F8EEBF00A0ABA7 /* ArangoConfiguration.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -53,8 +53,8 @@
 		8A94992E15F88BF000A0ABA7 /* arangoToolbarMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = arangoToolbarMenu.h; sourceTree = "<group>"; };
 		8A94992F15F88BF000A0ABA7 /* arangoToolbarMenu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = arangoToolbarMenu.m; sourceTree = "<group>"; };
 		8A94993B15F8B9BF00A0ABA7 /* configurationModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = configurationModel.xcdatamodel; sourceTree = "<group>"; };
-		8A94994B15F8DBB700A0ABA7 /* ArangoConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArangoConfiguration.h; sourceTree = "<group>"; };
-		8A94994C15F8DBB700A0ABA7 /* ArangoConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ArangoConfiguration.m; sourceTree = "<group>"; };
+		8A94994E15F8EEBF00A0ABA7 /* ArangoConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArangoConfiguration.h; sourceTree = "<group>"; };
+		8A94994F15F8EEBF00A0ABA7 /* ArangoConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ArangoConfiguration.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -140,9 +140,9 @@
 				8A293B5B15F64C27008959B1 /* arangoCreateNewDBWindowController.xib */,
 				8A94992E15F88BF000A0ABA7 /* arangoToolbarMenu.h */,
 				8A94992F15F88BF000A0ABA7 /* arangoToolbarMenu.m */,
+				8A94994E15F8EEBF00A0ABA7 /* ArangoConfiguration.h */,
+				8A94994F15F8EEBF00A0ABA7 /* ArangoConfiguration.m */,
 				8A94993A15F8B9BF00A0ABA7 /* configurationModel.xcdatamodeld */,
-				8A94994B15F8DBB700A0ABA7 /* ArangoConfiguration.h */,
-				8A94994C15F8DBB700A0ABA7 /* ArangoConfiguration.m */,
 			);
 			path = Arango;
 			sourceTree = "<group>";
@@ -236,7 +236,7 @@
 				8A293B5C15F64C28008959B1 /* arangoCreateNewDBWindowController.m in Sources */,
 				8A94993015F88BF000A0ABA7 /* arangoToolbarMenu.m in Sources */,
 				8A94993C15F8B9BF00A0ABA7 /* configurationModel.xcdatamodeld in Sources */,
-				8A94994D15F8DBB700A0ABA7 /* ArangoConfiguration.m in Sources */,
+				8A94995015F8EEBF00A0ABA7 /* ArangoConfiguration.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

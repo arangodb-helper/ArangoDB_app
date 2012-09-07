@@ -21,6 +21,31 @@ NSString* adminDir;
 NSString* jsActionDir;
 NSString* jsModPath;
 
+
+- (void) startArango:(ArangoConfiguration*) config {
+  NSString* arangoPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/arangod"];
+  NSString* configPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/arangod.conf"];
+  NSTask* newArango = [[NSTask alloc]init];
+  [newArango setLaunchPath:arangoPath];
+  NSArray* arguments = [NSArray arrayWithObjects:
+                        @"--config", configPath,
+                        @"--exit-on-parent-death", @"true",
+                        @"--server.http-port", config.port.stringValue,
+                        @"--log.file", config.log,
+                        @"--server.admin-directory", adminDir,
+                        @"--javascript.action-directory", jsActionDir,
+                        @"--javascript.modules-path", jsModPath,
+                        config.path, nil];
+  [newArango setArguments:arguments];
+  newArango.terminationHandler = ^(NSTask *task) {
+    NSLog(@"Terminated Arango");
+  };
+  [newArango launch];
+  config.isRunning = [NSNumber numberWithBool:YES];
+  config.instance = newArango;
+  [self save];
+}
+
 - (NSTask*) startArangoWithPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath
 {
   NSString* arangoPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/arangod"];
@@ -131,15 +156,61 @@ NSString* jsModPath;
   newArang.log = logPath;
   newArang.alias = alias;
   newArang.isRunning = [NSNumber numberWithBool:YES];
+  newArang.instance = arang;
+  NSError* error = nil;
+  [ctxt save: &error];
+  if (error != nil) {
+    NSLog(error.localizedDescription);
+  }
   [statusMenu updateMenu];
 }
 
+- (void) updateArangoConfig:(ArangoConfiguration*) config withPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath andAlias:(NSString*) alias
+{
+  if ([config.isRunning isEqualToNumber:[NSNumber numberWithBool:YES]]) {
+    [config.instance terminate];
+    sleep(2);
+  }
+  config.path = path;
+  config.port = port;
+  config.log = logPath;
+  config.alias = alias;
+  [self save];
+  [self startArango:config];
+}
 
+- (void) save
+{
+  NSError* error = nil;
+  [[self getArangoManagedObjectContext] save:&error];
+  if (error != nil) {
+    NSLog(error.localizedDescription);
+  }
+}
 
 
 // System Stuff
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+  // TODO Start ArangosCorrectly!
+  
+  
+  // StartUp LastStarted
+  // Request stored Arangos
+  NSFetchRequest *request = [[NSFetchRequest alloc] init];
+  NSEntityDescription *entity = [NSEntityDescription entityForName:@"ArangoConfiguration" inManagedObjectContext: [self getArangoManagedObjectContext]];
+  [request setEntity:entity];
+  NSError *error = nil;
+  NSArray *fetchedResults = [[self getArangoManagedObjectContext] executeFetchRequest:request error:&error];
+  if (fetchedResults == nil) {
+    NSLog(error.localizedDescription);
+  } else {
+    for (ArangoConfiguration* c in fetchedResults) {
+      if ([c.isRunning isEqualToNumber: [NSNumber numberWithBool:YES]]) {
+        [self startArango:c];
+      }
+    }
+  }
 }
 
 

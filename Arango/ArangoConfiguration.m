@@ -16,5 +16,7 @@
 @dynamic alias;
 @dynamic port;
 @dynamic isRunning;
+@dynamic runOnStartUp;
+@synthesize instance;
 
 @end

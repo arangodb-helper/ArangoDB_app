@@ -2,10 +2,11 @@
 <model name="" userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="1487" systemVersion="12B19" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="ArangoConfiguration" representedClassName="ArangoConfiguration" syncable="YES">
         <attribute name="alias" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="isRunning" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="isRunning" optional="YES" attributeType="Integer 32" syncable="YES"/>
         <attribute name="log" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="path" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="port" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="runOnStartUp" optional="YES" attributeType="Boolean" syncable="YES"/>
     </entity>
     <elements>
         <element name="ArangoConfiguration" positionX="0" positionY="0" width="0" height="0"/>

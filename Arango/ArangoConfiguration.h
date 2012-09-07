@@ -17,5 +17,7 @@
 @property (nonatomic, retain) NSString * alias;
 @property (nonatomic, retain) NSNumber * port;
 @property (nonatomic, retain) NSNumber * isRunning;
+@property (nonatomic, retain) NSNumber * runOnStartUp;
+@property (retain) NSTask* instance;
 
 @end
