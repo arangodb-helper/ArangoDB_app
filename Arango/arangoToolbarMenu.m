@@ -22,6 +22,7 @@
 {
   self = [super init];
   if (self) {
+    self.createNewWindowController = nil;
     self.appDelegate = aD;
     self.createDB = [[NSMenuItem alloc] init];
     [self.createDB setEnabled:YES];
@@ -123,16 +124,12 @@
 
 - (void) createNewInstance
 {
-  self.createNewWindowController = nil;
   self.createNewWindowController = [[arangoCreateNewDBWindowController alloc] initWithAppDelegate:self.appDelegate];
-  [self.createNewWindowController.window makeKeyWindow];
 }
 
 - (void) editInstance:(id) sender
 {
-  self.createNewWindowController = nil;
-  self.createNewWindowController = [[arangoCreateNewDBWindowController alloc] initWithAppDelegate:self.appDelegate andArango: [sender representedObject]];
-  [self.createNewWindowController.window makeKeyWindow];
+  self.createNewWindowController = [[arangoCreateNewDBWindowController alloc] initWithAppDelegate:self.appDelegate andArango:[sender representedObject]];
 }
 
 // TODO: Ask user if data should be deleted also!
@@ -143,13 +140,13 @@
   [infoText setString:@"Do you want to delete the contents of folder \""];
   [infoText appendString:config.path];
   [infoText appendString:@"\" and the log-file as well?"];
-  NSAlert* info = [NSAlert alertWithMessageText:@"Delete Data?" defaultButton:@"No" alternateButton:@"Yes" otherButton:nil informativeTextWithFormat:infoText];
+  NSAlert* info = [NSAlert alertWithMessageText:@"Delete Data?" defaultButton:@"Keep Data" alternateButton:@"Abort" otherButton:@"Delete Data" informativeTextWithFormat:infoText];
   [info beginSheetModalForWindow:nil modalDelegate:self didEndSelector:@selector(confirmedDialog:returnCode:contextInfo:) contextInfo:(__bridge void *)(config)];
 }
 
 - (void) confirmedDialog:(NSAlert*) dialog returnCode:(int) rC contextInfo: (ArangoConfiguration *) config
 {
-  if (rC == 0) {
+  if (rC == -1) {
     if ([config.isRunning isEqualToNumber:[NSNumber numberWithBool:YES]]) {
       [config.instance terminate];
       sleep(2);
@@ -164,8 +161,11 @@
     if (error != nil) {
       NSLog(error.localizedDescription);
     }
+    [self.appDelegate deleteArangoConfig:config];
+  } else if (rC == 1) {
+    [self.appDelegate deleteArangoConfig:config];
   }
-  [self.appDelegate deleteArangoConfig:config];
+  
 }
 
 - (void) openBrowser:(id) sender

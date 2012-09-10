@@ -9,6 +9,7 @@
 #import "arangoCreateNewDBWindowController.h"
 #import "arangoAppDelegate.h"
 #import "ArangoConfiguration.h"
+#import "arangoToolbarMenu.h"
 
 @interface arangoCreateNewDBWindowController ()
 
@@ -38,6 +39,11 @@
   [[NSBundle mainBundle] loadNibNamed:@"arangoCreateNewDBWindowController" owner:self topLevelObjects:nil];
   if (self) {
     self.appDelegate = aD;
+    [self.window setReleasedWhenClosed:NO];
+    self.window.delegate = self;
+    [self.window center];
+    [NSApp activateIgnoringOtherApps:YES];
+    [self.window makeKeyWindow];
     [self showWindow:self.window];
   }
   return self;
@@ -49,7 +55,13 @@
   [[NSBundle mainBundle] loadNibNamed:@"arangoCreateNewDBWindowController" owner:self topLevelObjects:nil];
   if (self) {
     self.appDelegate = aD;
+    [self.window setReleasedWhenClosed:NO];
+    self.window.delegate = self;
+    [self.window center];
     [self fillArango: config];
+    [self.window center];
+    [NSApp activateIgnoringOtherApps:YES];
+    [self.window makeKeyWindow];
     [self showWindow:self.window];
   }
   return self;
@@ -79,13 +91,9 @@
   NSOpenPanel* selectDatabaseLocation = [NSOpenPanel openPanel];
   [selectDatabaseLocation setCanChooseFiles:NO];
   [selectDatabaseLocation setCanChooseDirectories:YES];
+  [selectDatabaseLocation setCanCreateDirectories:YES];
   [selectDatabaseLocation setAllowsMultipleSelection:NO];
   [selectDatabaseLocation setPrompt:@"Choose"];
-  // Hack as the API does not give the New Folder button in an open function.
-  if([selectDatabaseLocation respondsToSelector:@selector(_setIncludeNewFolderButton:)] )
-  {
-    [selectDatabaseLocation performSelector:@selector(_setIncludeNewFolderButton:) withObject:[NSNumber numberWithBool:YES]];
-  }
   if ([selectDatabaseLocation runModal] == NSFileHandlingPanelOKButton) {
     NSArray* selection = [selectDatabaseLocation URLs];
     return[selection objectAtIndex:0];
@@ -221,6 +229,7 @@
     [self.window orderOut:self.window];
   }
 }
+
 
 
 - (void)confirmedError:(NSAlert *)alert

@@ -55,6 +55,7 @@
 		8A94993B15F8B9BF00A0ABA7 /* configurationModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = configurationModel.xcdatamodel; sourceTree = "<group>"; };
 		8A94994E15F8EEBF00A0ABA7 /* ArangoConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArangoConfiguration.h; sourceTree = "<group>"; };
 		8A94994F15F8EEBF00A0ABA7 /* ArangoConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ArangoConfiguration.m; sourceTree = "<group>"; };
+		8A94995115FA3D2100A0ABA7 /* Arango.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Arango.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,6 +132,7 @@
 		8A539DB915ECEE6500A267B6 /* Arango */ = {
 			isa = PBXGroup;
 			children = (
+				8A94995115FA3D2100A0ABA7 /* Arango.entitlements */,
 				8A539DC515ECEE6500A267B6 /* arangoAppDelegate.h */,
 				8A539DC615ECEE6500A267B6 /* arangoAppDelegate.m */,
 				8A539DC815ECEE6500A267B6 /* MainMenu.xib */,
@@ -322,10 +324,12 @@
 		8A539DCE15ECEE6500A267B6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Arango/Arango.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Arango/Arango-Prefix.pch";
 				INFOPLIST_FILE = "Arango/Arango-Info.plist";
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -334,10 +338,12 @@
 		8A539DCF15ECEE6500A267B6 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Arango/Arango.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Arango/Arango-Prefix.pch";
 				INFOPLIST_FILE = "Arango/Arango-Info.plist";
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};

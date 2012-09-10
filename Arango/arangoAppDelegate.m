@@ -105,7 +105,15 @@ NSString* jsModPath;
 - (NSManagedObjectContext*) getArangoManagedObjectContext
 {
   if (self.managedObjectContext == nil) {
-    NSURL *storeURL = [[[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"Arango.sqlite"];
+    NSURL *storeURL = [[[[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"Arango"];
+    if (![[NSFileManager defaultManager] fileExistsAtPath:[storeURL path]]) {
+      NSError* error = nil;
+      [[NSFileManager defaultManager] createDirectoryAtURL:storeURL withIntermediateDirectories:YES attributes:nil error:&error];
+      if (error != nil) {
+        NSLog(@"Failed to create sqlite");
+      }
+    }
+    storeURL = [storeURL URLByAppendingPathComponent:@"Arango.sqlite"];
     NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"configurationModel" withExtension:@"momd"];
     NSError *error = nil;
     NSPersistentStoreCoordinator* coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL]];

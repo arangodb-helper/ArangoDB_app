@@ -10,7 +10,7 @@
 
 @class arangoAppDelegate;
 @class ArangoConfiguration;
-@interface arangoCreateNewDBWindowController : NSWindowController
+@interface arangoCreateNewDBWindowController : NSWindowController <NSWindowDelegate>
 @property (strong) IBOutlet NSWindow *window;
 @property (weak) IBOutlet NSTextField *dbPathField;
 @property (weak) IBOutlet NSTextField *portField;

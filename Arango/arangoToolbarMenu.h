@@ -15,11 +15,11 @@
 
 @property (retain) NSMenuItem* createDB;
 @property (retain) NSMenuItem* quit;
-@property (retain) arangoCreateNewDBWindowController* createNewWindowController;
+@property (strong) arangoCreateNewDBWindowController* createNewWindowController;
 @property (weak) arangoAppDelegate* appDelegate;
 
 
-- (id)initWithAppDelegate:(arangoAppDelegate*) aD;
+- (id) initWithAppDelegate:(arangoAppDelegate*) aD;
 - (void) updateMenu;
 - (void) quitApplication;
 - (void) createNewInstance;
