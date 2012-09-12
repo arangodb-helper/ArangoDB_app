@@ -210,8 +210,8 @@ NSString* jsModPath;
   statusMenu = [[arangoToolbarMenu alloc] initWithAppDelegate:self];
   statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength];
   [statusItem setMenu: statusMenu];
-  //[statusItem setImage: [NSImage imageNamed:@"arangoStatusLogo"]];
-  [statusItem setImage: [NSImage imageNamed:@"arangodbGraustufen16x16"]];
+  //[statusItem setImage: [NSImage imageNamed:@"arangoLogoGrey"]];
+  [statusItem setImage: [NSImage imageNamed:@"arangoLogoGreen"]];
   [statusItem setHighlightMode:YES];
   [statusMenu setAutoenablesItems: NO];
 }
