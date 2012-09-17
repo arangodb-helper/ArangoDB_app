@@ -16,5 +16,6 @@
 
 - (id) initWithAppDelegate: (arangoAppDelegate*) aD;
 - (IBAction) store: (id) sender;
+- (IBAction) abort: (id) sender;
 
 @end

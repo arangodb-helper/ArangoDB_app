@@ -105,6 +105,12 @@ const NSString* NON = @"Do not start ArangoDBs";
     // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
 }
 
+- (IBAction) abort: (id) sender
+{
+  [self.window orderOut:self.window];
+}
+
+
 - (IBAction) store: (id) sender
 {
   NSFetchRequest *userRequest = [[NSFetchRequest alloc] init];
