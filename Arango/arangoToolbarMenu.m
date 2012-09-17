@@ -67,7 +67,9 @@
       
       NSMenuItem* item = [[NSMenuItem alloc] init];
       [item setEnabled:YES];
-      [item setTitle: c.alias];
+      NSString* itemTitle = @"%a (%p)";
+      itemTitle = [[itemTitle stringByReplacingOccurrencesOfString:@"%a" withString:c.alias] stringByReplacingOccurrencesOfString:@"%p" withString:[NSString stringWithFormat:@"%i",[c.port intValue]]];
+      [item setTitle: itemTitle];
       if ([c.isRunning isEqualToNumber: [NSNumber numberWithBool:YES]]) {
         [item setState:1];
       } else {
