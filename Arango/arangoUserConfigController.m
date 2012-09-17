@@ -20,9 +20,9 @@
 @synthesize rosDefinition;
 
 const NSString* RES = @"Restart all ArangoDBs running at last shutdown";
-const NSString* DEF = @"Define all ArangoDBs to start";
-const NSString* ALL = @"Autostart all ArangoDBs";
-const NSString* NON = @"Do not autostart ArangoDBs";
+const NSString* DEF = @"Define for each ArangoDB";
+const NSString* ALL = @"Start all ArangoDBs";
+const NSString* NON = @"Do not start ArangoDBs";
 
 - (id) initWithAppDelegate: (arangoAppDelegate*) aD
 {
@@ -113,13 +113,13 @@ const NSString* NON = @"Do not autostart ArangoDBs";
   NSError *error = nil;
   NSArray *fetchedResults = [[self.delegate getArangoManagedObjectContext] executeFetchRequest:userRequest error:&error];
   NSNumber* ros = [NSNumber numberWithInt:0];
-  if([self.rosDefinition.stringValue isEqualToString:RES]) {
+  if([self.rosDefinition.stringValue isEqual:RES]) {
     ros = [NSNumber numberWithInt:1];
-  } else if([self.rosDefinition.stringValue isEqualToString:DEF]) {
+  } else if([self.rosDefinition.stringValue isEqual:DEF]) {
     ros = [NSNumber numberWithInt:2];
-  } else if([self.rosDefinition.stringValue isEqualToString:ALL]) {
+  } else if([self.rosDefinition.stringValue isEqual:ALL]) {
     ros = [NSNumber numberWithInt:3];
-  } else if([self.rosDefinition.stringValue isEqualToString:NON]) {
+  } else if([self.rosDefinition.stringValue isEqual:NON]) {
     ros = [NSNumber numberWithInt:0];
   }
   if (fetchedResults == nil) {

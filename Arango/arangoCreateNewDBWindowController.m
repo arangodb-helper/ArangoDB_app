@@ -214,6 +214,7 @@ const int advancedHeightDifference = 70;
     return NO;
   }
   NSString* alias = aliasField.stringValue;
+  alias = [alias stringByReplacingOccurrencesOfString:@" " withString: @"_"];
   if ([alias isEqualToString:@""]) {
     alias = @"Arango";
   }
