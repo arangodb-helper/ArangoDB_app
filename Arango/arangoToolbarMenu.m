@@ -131,9 +131,9 @@
   [[NSApplication sharedApplication] terminate:nil];
 }
 
-- (void) showConfiguration: (id) sender
+- (void) showConfiguration
 {
-  self.configurationViewController = [[arangoUserConfigController alloc] init];
+  self.configurationViewController = [[arangoUserConfigController alloc] initWithAppDelegate:self.appDelegate];
 }
 
 - (void) createNewInstance

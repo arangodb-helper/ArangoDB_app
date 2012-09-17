@@ -199,11 +199,6 @@ NSString* jsModPath;
       // TODO Show Config/Welcome Screen
     }
   }
-  // TODO Start ArangosCorrectly!
-  
-  
-  // StartUp LastStarted
-  // Request stored Arangos
   NSFetchRequest *request = [[NSFetchRequest alloc] init];
   NSEntityDescription *entity = [NSEntityDescription entityForName:@"ArangoConfiguration" inManagedObjectContext: [self getArangoManagedObjectContext]];
   [request setEntity:entity];
@@ -215,6 +210,10 @@ NSString* jsModPath;
     switch ([ros integerValue]) {
       // Start no Arango.
       case 0:
+        for (ArangoConfiguration* c in fetchedResults) {
+          c.isRunning = [NSNumber numberWithBool:NO];
+        }
+        [self save];
         break;
       // Start all Arangos running at last shutdown.
       case 1:
@@ -229,8 +228,11 @@ NSString* jsModPath;
         for (ArangoConfiguration* c in fetchedResults) {
           if ([c.runOnStartUp isEqualToNumber: [NSNumber numberWithBool:YES]]) {
             [self startArango:c];
+          } else {
+            c.isRunning = [NSNumber numberWithBool:NO];
           }
         }
+        [self save];
         break;
       // Start all
       case 3:
@@ -248,6 +250,7 @@ NSString* jsModPath;
         break;
     }
   }
+  [self.statusMenu updateMenu];
 }
 
 
@@ -257,13 +260,13 @@ NSString* jsModPath;
   adminDir = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/html/admin"];
   jsActionDir = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/actions/system"];
   jsModPath = [[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/modules:"] stringByAppendingString:[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/common/modules"]];
-  statusMenu = [[arangoToolbarMenu alloc] initWithAppDelegate:self];
-  statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength];
-  [statusItem setMenu: statusMenu];
+  self.statusMenu = [[arangoToolbarMenu alloc] initWithAppDelegate:self];
+  self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength];
+  [self.statusItem setMenu: statusMenu];
   //[statusItem setImage: [NSImage imageNamed:@"arangoLogoGrey"]];
-  [statusItem setImage: [NSImage imageNamed:@"arangoLogoGreen"]];
-  [statusItem setHighlightMode:YES];
-  [statusMenu setAutoenablesItems: NO];
+  [self.statusItem setImage: [NSImage imageNamed:@"arangoLogoGreen"]];
+  [self.statusItem setHighlightMode:YES];
+  [self.statusMenu setAutoenablesItems: NO];
 }
 
 @end
