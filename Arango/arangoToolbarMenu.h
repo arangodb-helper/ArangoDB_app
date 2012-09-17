@@ -10,12 +10,15 @@
 
 @class arangoAppDelegate;
 @class arangoCreateNewDBWindowController;
+@class arangoUserConfigController;
 @interface arangoToolbarMenu : NSMenu
 
 
 @property (retain) NSMenuItem* createDB;
+@property (retain) NSMenuItem* configure;
 @property (retain) NSMenuItem* quit;
 @property (strong) arangoCreateNewDBWindowController* createNewWindowController;
+@property (strong) arangoUserConfigController* configurationViewController;
 @property (weak) arangoAppDelegate* appDelegate;
 
 

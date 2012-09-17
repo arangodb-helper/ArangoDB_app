@@ -29,6 +29,7 @@
 		8A94996A1607159C00A0ABA7 /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A9499691607159C00A0ABA7 /* User.m */; };
 		8A94996E16071D3700A0ABA7 /* arangoUserConfigController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A94996C16071D3700A0ABA7 /* arangoUserConfigController.m */; };
 		8A94996F16071D3700A0ABA7 /* arangoUserConfigController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8A94996D16071D3700A0ABA7 /* arangoUserConfigController.xib */; };
+		8A9499711607214A00A0ABA7 /* arangodbLogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 8A9499701607214A00A0ABA7 /* arangodbLogo.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -66,6 +67,7 @@
 		8A94996B16071D3700A0ABA7 /* arangoUserConfigController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = arangoUserConfigController.h; sourceTree = "<group>"; };
 		8A94996C16071D3700A0ABA7 /* arangoUserConfigController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = arangoUserConfigController.m; sourceTree = "<group>"; };
 		8A94996D16071D3700A0ABA7 /* arangoUserConfigController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = arangoUserConfigController.xib; sourceTree = "<group>"; };
+		8A9499701607214A00A0ABA7 /* arangodbLogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = arangodbLogo.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,6 +97,7 @@
 		8A293B4B15F5F82A008959B1 /* Icons */ = {
 			isa = PBXGroup;
 			children = (
+				8A9499701607214A00A0ABA7 /* arangodbLogo.png */,
 				8A9499541600752100A0ABA7 /* arangodbLogoGrey.png */,
 				8A949952160072B500A0ABA7 /* icon.icns */,
 				8A293B4E15F5FD1A008959B1 /* arangoLogoGreen.png */,
@@ -241,6 +244,7 @@
 				8A949953160072B500A0ABA7 /* icon.icns in Resources */,
 				8A9499551600752100A0ABA7 /* arangodbLogoGrey.png in Resources */,
 				8A94996F16071D3700A0ABA7 /* arangoUserConfigController.xib in Resources */,
+				8A9499711607214A00A0ABA7 /* arangodbLogo.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -10,12 +10,15 @@
 #import "arangoCreateNewDBWindowController.h"
 #import "arangoAppDelegate.h"
 #import "ArangoConfiguration.h"
+#import "arangoUserConfigController.h"
 
 @implementation arangoToolbarMenu
 
 @synthesize createDB;
+@synthesize configure;
 @synthesize quit;
 @synthesize createNewWindowController;
+@synthesize configurationViewController;
 
 // TODO: Localize
 - (id)initWithAppDelegate:(arangoAppDelegate*) aD
@@ -30,6 +33,11 @@
     //[self.createDB setKey:@"N"];
     [self.createDB setTarget:self];
     [self.createDB setAction:@selector(createNewInstance)];
+    self.configure = [[NSMenuItem alloc] init];
+    [self.configure setEnabled:YES];
+    [self.configure setTitle:@"Configure"];
+    [self.configure setTarget:self];
+    [self.configure setAction:@selector(showConfiguration)];
     self.quit = [[NSMenuItem alloc] init];
     [self.quit setEnabled:YES];
     [self.quit setTitle:@"Quit"];
@@ -97,6 +105,7 @@
   }
   [self addItem:[NSMenuItem separatorItem]];
   [self addItem:self.createDB];
+  [self addItem:self.configure];
   [self addItem:self.quit];
 }
 
@@ -120,6 +129,11 @@
 - (void) quitApplication
 {
   [[NSApplication sharedApplication] terminate:nil];
+}
+
+- (void) showConfiguration: (id) sender
+{
+  self.configurationViewController = [[arangoUserConfigController alloc] init];
 }
 
 - (void) createNewInstance
