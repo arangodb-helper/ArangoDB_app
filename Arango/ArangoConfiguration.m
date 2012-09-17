@@ -1,6 +1,7 @@
 //
 //  ArangoConfiguration.m
-//  Arango
+//
+// Simple class to store configurations permanently.
 //
 //  Created by Michael Hackstein on 12.09.12.
 //  Copyright (c) 2012 triAgens. All rights reserved.

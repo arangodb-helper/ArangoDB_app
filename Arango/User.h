@@ -1,6 +1,7 @@
 //
 //  User.h
-//  Arango
+//
+// Simple class to make user-decissions permanent.
 //
 //  Created by Michael Hackstein on 17.09.12.
 //  Copyright (c) 2012 triAgens. All rights reserved.
@@ -12,6 +13,11 @@
 
 @interface User : NSManagedObject
 
+// Decission which Arangos should be started on App-Startup:
+// * 0 => None
+// * 1 => Arangos that were running at last shutdown.
+// * 2 => Arangos that are labeled by the user.
+// * 3 => All Arangos.
 @property (nonatomic, retain) NSNumber * runOnStartUp;
 
 @end

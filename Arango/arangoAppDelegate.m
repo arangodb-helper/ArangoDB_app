@@ -11,18 +11,20 @@
 #import "arangoToolbarMenu.h"
 #import "ArangoConfiguration.h"
 #import "User.h"
+#import "arangoUserConfigController.h"
 
 @implementation arangoAppDelegate
 
 @synthesize statusMenu;
 @synthesize statusItem;
-
+@synthesize userConfigController;
+@synthesize managedObjectContext;
 
 NSString* adminDir;
 NSString* jsActionDir;
 NSString* jsModPath;
 
-
+// Method to start a new Arango with the given Configuration.
 - (void) startArango:(ArangoConfiguration*) config {
   NSString* arangoPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/arangod"];
   NSString* configPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/arangod.conf"];
@@ -39,8 +41,12 @@ NSString* jsModPath;
                         @"--javascript.modules-path", jsModPath,
                         config.path, nil];
   [newArango setArguments:arguments];
+  // Callback if the Arango is terminated for whatever reason.
   newArango.terminationHandler = ^(NSTask *task) {
-    NSLog(@"Terminated Arango");
+    config.isRunning = [NSNumber numberWithBool:NO];
+    config.instance = nil;
+    [self save];
+    [self.statusMenu updateMenu];
   };
   [newArango launch];
   config.isRunning = [NSNumber numberWithBool:YES];
@@ -48,6 +54,9 @@ NSString* jsModPath;
   [self save];
 }
 
+// Function to run the javascript tests.
+// Should never be invoked by the enduser and is not linked in the UI.
+// Can be invoked after App-launch for testing purposes.
 - (NSTask*) testArangoWithPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath
 {
   NSString* arangoPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/arangod"];
@@ -104,6 +113,7 @@ NSString* jsModPath;
   return newArango;
 }
 
+// Function to get the Context necessary for persistent storage.
 - (NSManagedObjectContext*) getArangoManagedObjectContext
 {
   if (self.managedObjectContext == nil) {
@@ -121,7 +131,8 @@ NSString* jsModPath;
     NSPersistentStoreCoordinator* coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL]];
     if (![coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:nil error:&error])
     {
-      // TODO Handle Error.
+      // TODO Handle Error so the user can be informed.
+      // Although it should never occur anyways.
       NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
       abort();
     }
@@ -131,6 +142,7 @@ NSString* jsModPath;
   return self.managedObjectContext;
 }
 
+// Public function to start a new Arango with all given informations.
 - (void) startNewArangoWithPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath andLogLevel:(NSString*) level andRunOnStartUp: (BOOL) ros andAlias:(NSString*) alias
 {
   ArangoConfiguration* newArang = (ArangoConfiguration*) [NSEntityDescription insertNewObjectForEntityForName:@"ArangoConfiguration" inManagedObjectContext:[self getArangoManagedObjectContext]];
@@ -145,6 +157,8 @@ NSString* jsModPath;
   [statusMenu updateMenu];
 }
 
+// Public function to update an given Arango with all given informations.
+// If the given Arango is still running it is shutdown, updated and afterwards restarted.
 - (void) updateArangoConfig:(ArangoConfiguration*) config withPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath andLogLevel:(NSString*) level andRunOnStartUp: (BOOL) ros andAlias:(NSString*) alias
 {
   if ([config.isRunning isEqualToNumber:[NSNumber numberWithBool:YES]]) {
@@ -162,6 +176,7 @@ NSString* jsModPath;
   [statusMenu updateMenu];
 }
 
+// Public funcntion to delete the given Arango.
 - (void) deleteArangoConfig:(ArangoConfiguration*) config
 {
   if ([config.isRunning isEqualToNumber:[NSNumber numberWithBool:YES]]) {
@@ -172,6 +187,9 @@ NSString* jsModPath;
   [statusMenu updateMenu];
 }
 
+
+// Public function to save all changes made to persistent objects.
+// Like all ArangoConfigs and the UserConfig.
 - (void) save
 {
   NSError* error = nil;
@@ -181,6 +199,9 @@ NSString* jsModPath;
   }
 }
 
+// Function called after the app finished lanching.
+// This starts all Arangos according to the users decission.
+// If this is the first launch of the App also the Configuration will be shown.
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
   NSFetchRequest *userRequest = [[NSFetchRequest alloc] init];
   NSEntityDescription *userEntity = [NSEntityDescription entityForName:@"User" inManagedObjectContext: [self getArangoManagedObjectContext]];
@@ -196,7 +217,7 @@ NSString* jsModPath;
         ros = u.runOnStartUp;
       }
     } else {
-      // TODO Show Config/Welcome Screen
+      self.userConfigController = [[arangoUserConfigController alloc] initWithAppDelegate:self];
     }
   }
   NSFetchRequest *request = [[NSFetchRequest alloc] init];
@@ -253,8 +274,9 @@ NSString* jsModPath;
   [self.statusMenu updateMenu];
 }
 
-
-
+// Function that gets called at App-launch.
+// Sets some constants and creates the status menu with icon.
+// Currently only the green logo is allowed.
 -(void) awakeFromNib
 {
   adminDir = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/html/admin"];
