@@ -32,6 +32,7 @@ NSString* jsModPath;
                         @"--exit-on-parent-death", @"true",
                         @"--server.http-port", config.port.stringValue,
                         @"--log.file", config.log,
+                        @"--log.level", config.loglevel,
                         @"--server.admin-directory", adminDir,
                         @"--javascript.action-directory", jsActionDir,
                         @"--javascript.modules-path", jsModPath,
@@ -129,19 +130,20 @@ NSString* jsModPath;
   return self.managedObjectContext;
 }
 
-- (void) startNewArangoWithPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath andAlias:(NSString*) alias
+- (void) startNewArangoWithPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath andLogLevel:(NSString*) level andAlias:(NSString*) alias
 {
   ArangoConfiguration* newArang = (ArangoConfiguration*) [NSEntityDescription insertNewObjectForEntityForName:@"ArangoConfiguration" inManagedObjectContext:[self getArangoManagedObjectContext]];
   newArang.path = path;
   newArang.port = port;
   newArang.log = logPath;
+  newArang.loglevel = level;
   newArang.alias = alias;
   [self save];
   [self startArango:newArang];
   [statusMenu updateMenu];
 }
 
-- (void) updateArangoConfig:(ArangoConfiguration*) config withPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath andAlias:(NSString*) alias
+- (void) updateArangoConfig:(ArangoConfiguration*) config withPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath andLogLevel:(NSString*) level andAlias:(NSString*) alias
 {
   if ([config.isRunning isEqualToNumber:[NSNumber numberWithBool:YES]]) {
     [config.instance terminate];
@@ -150,6 +152,7 @@ NSString* jsModPath;
   config.path = path;
   config.port = port;
   config.log = logPath;
+  config.loglevel = level;
   config.alias = alias;
   [self save];
   [self startArango:config];

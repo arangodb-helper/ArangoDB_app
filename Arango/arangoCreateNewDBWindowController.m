@@ -16,6 +16,9 @@
 @end
 
 @implementation arangoCreateNewDBWindowController
+@synthesize portFormatter;
+@synthesize okButton;
+@synthesize abortButton;
 @synthesize window;
 @synthesize dbPathField;
 @synthesize portField;
@@ -25,6 +28,12 @@
 @synthesize openLogButton;
 @synthesize appDelegate;
 @synthesize editedConfig;
+@synthesize showAdvanced;
+@synthesize logLevelLabel;
+@synthesize logLevelOptions;
+@synthesize logLabel;
+
+const int advancedHeightDifference = 60;
 
 - (id)initWithWindow:(NSWindow *)window
 {
@@ -38,10 +47,18 @@
 {
   [[NSBundle mainBundle] loadNibNamed:@"arangoCreateNewDBWindowController" owner:self topLevelObjects:nil];
   if (self) {
+    self.portFormatter = [[NSNumberFormatter alloc] init];
+    [self.portFormatter setNumberStyle:NSNumberFormatterNoStyle];
+    [self.portFormatter setGeneratesDecimalNumbers:NO];
+    [self.portFormatter setMinimumFractionDigits:0];
+    [self.portFormatter setMaximumFractionDigits:0];
+    [self.portFormatter setThousandSeparator:@""];
+    [self.portField setFormatter:self.portFormatter];
     self.appDelegate = aD;
     [self.window setReleasedWhenClosed:NO];
     self.window.delegate = self;
     [self.window center];
+    [self toggleAdvanced:NO];
     [NSApp activateIgnoringOtherApps:YES];
     [self.window makeKeyWindow];
     [self showWindow:self.window];
@@ -54,12 +71,20 @@
 {
   [[NSBundle mainBundle] loadNibNamed:@"arangoCreateNewDBWindowController" owner:self topLevelObjects:nil];
   if (self) {
+    self.portFormatter = [[NSNumberFormatter alloc] init];
+    [self.portFormatter setNumberStyle:NSNumberFormatterNoStyle];
+    [self.portFormatter setGeneratesDecimalNumbers:NO];
+    [self.portFormatter setMinimumFractionDigits:0];
+    [self.portFormatter setMaximumFractionDigits:0];
+    [self.portFormatter setThousandSeparator:@""];
+    [self.portField setFormatter:self.portFormatter];
     self.appDelegate = aD;
     [self.window setReleasedWhenClosed:NO];
     self.window.delegate = self;
     [self.window center];
     [self fillArango: config];
     [self.window center];
+    [self toggleAdvanced:NO];
     [NSApp activateIgnoringOtherApps:YES];
     [self.window makeKeyWindow];
     [self showWindow:self.window];
@@ -71,19 +96,16 @@
 - (void) fillArango: (ArangoConfiguration*) config
 {
   self.dbPathField.stringValue = config.path;
-  NSNumberFormatter* f = [[NSNumberFormatter alloc] init];
-  [f setThousandSeparator:@""];
-  self.portField.stringValue = [f stringFromNumber:config.port];
+  self.portField.stringValue = [self.portFormatter stringFromNumber:config.port];
   self.logField.stringValue = config.log;
   self.aliasField.stringValue = config.alias;
+  self.logLevelOptions.stringValue = config.loglevel;
   self.editedConfig = config;
 }
 
 - (void)windowDidLoad
 {
     [super windowDidLoad];
-    
-    // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
 }
 
 - (NSURL*) showSelectDatabaseDialog
@@ -177,9 +199,7 @@
     [info beginSheetModalForWindow:self.window modalDelegate:self didEndSelector:@selector(confirmedError:returnCode:contextInfo:) contextInfo:nil];
     return NO;
   }
-  NSNumberFormatter* formatter = [[NSNumberFormatter alloc] init];
-  [formatter setNumberStyle:NSNumberFormatterDecimalStyle];
-  NSNumber* port = [formatter numberFromString:portField.stringValue];
+  NSNumber* port = [self.portFormatter numberFromString:portField.stringValue];
   if (port <= 0) {
     NSAlert* info = [[NSAlert alloc] init];
     [info setMessageText:@"Invalid Port!"];
@@ -213,11 +233,11 @@
     }
   }
   if (self.editedConfig != nil) {
-    [self.appDelegate updateArangoConfig:self.editedConfig withPath:[dbPath path] andPort:port andLog:[logPath path] andAlias:alias];
+    [self.appDelegate updateArangoConfig:self.editedConfig withPath:[dbPath path] andPort:port andLog:[logPath path] andLogLevel:self.logLevelOptions.stringValue andAlias:alias];
   } else {
-    [self.appDelegate startNewArangoWithPath:[dbPath path] andPort:port andLog:[logPath path] andAlias: alias];
+    [self.appDelegate startNewArangoWithPath:[dbPath path] andPort:port andLog:[logPath path] andLogLevel:self.logLevelOptions.stringValue andAlias: alias];
   }
-  return YES;
+  //return YES;
 }
 
 
@@ -235,7 +255,61 @@
 - (void)confirmedError:(NSAlert *)alert
                           returnCode:(int)returnCode contextInfo:(void *)contextInfo
 {
-  NSLog(@"clicked %d button\n", returnCode);
+  
 }
+
+- (void) displayAdvanced: (id) sender
+{
+  [self.logField setHidden:NO];
+  [self.logLabel setHidden:NO];
+  [self.logLevelLabel setHidden:NO];
+  [self.logLevelOptions setHidden:NO];
+  [self.openLogButton setHidden:NO];
+  [self.okButton setHidden:NO];
+  [self.abortButton setHidden:NO];
+}
+
+- (void) displayControls: (id) sender
+{
+  [self.okButton setHidden:NO];
+  [self.abortButton setHidden:NO];
+}
+
+- (void) toggleAdvanced: (BOOL) animate
+{
+  NSRect changeTo = self.window.frame;
+  [self.okButton setHidden:YES];
+  [self.abortButton setHidden:YES];
+  if ([self.logField isHidden]) {
+    changeTo.size.height += advancedHeightDifference;
+    changeTo.origin.y -= advancedHeightDifference;
+    double toSleep = [self.window animationResizeTime:changeTo];
+    [self.window setFrame:changeTo display:NO animate:animate];
+    [NSTimer scheduledTimerWithTimeInterval:toSleep target:self selector:@selector(displayAdvanced:) userInfo:nil repeats:NO];
+  } else {
+    changeTo.size.height -= advancedHeightDifference;
+    changeTo.origin.y += advancedHeightDifference;
+    double toSleep = [self.window animationResizeTime:changeTo];
+    [self.logField setHidden:YES];
+    [self.logLabel setHidden:YES];
+    [self.logLevelLabel setHidden:YES];
+    [self.logLevelOptions setHidden:YES];
+    [self.openLogButton setHidden:YES];
+    [self.window setFrame:changeTo display:NO animate:animate];
+    [NSTimer scheduledTimerWithTimeInterval:toSleep target:self selector:@selector(displayControls:) userInfo:nil repeats:NO];
+  }
+  
+}
+
+- (IBAction) abort: (id) sender
+{
+  [self.window orderOut:self.window];
+}
+
+- (IBAction) disclose: (id) sender
+{
+  [self toggleAdvanced:YES];
+}
+
 
 @end

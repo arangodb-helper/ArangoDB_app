@@ -2,7 +2,7 @@
 //  ArangoConfiguration.m
 //  Arango
 //
-//  Created by Michael Hackstein on 06.09.12.
+//  Created by Michael Hackstein on 12.09.12.
 //  Copyright (c) 2012 triAgens. All rights reserved.
 //
 
@@ -17,6 +17,7 @@
 @dynamic port;
 @dynamic isRunning;
 @dynamic runOnStartUp;
+@dynamic loglevel;
 @synthesize instance;
 
 @end

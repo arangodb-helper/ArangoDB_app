@@ -2,7 +2,7 @@
 //  ArangoConfiguration.h
 //  Arango
 //
-//  Created by Michael Hackstein on 06.09.12.
+//  Created by Michael Hackstein on 12.09.12.
 //  Copyright (c) 2012 triAgens. All rights reserved.
 //
 
@@ -18,6 +18,7 @@
 @property (nonatomic, retain) NSNumber * port;
 @property (nonatomic, retain) NSNumber * isRunning;
 @property (nonatomic, retain) NSNumber * runOnStartUp;
+@property (nonatomic, retain) NSString * loglevel;
 @property (retain) NSTask* instance;
 
 @end
