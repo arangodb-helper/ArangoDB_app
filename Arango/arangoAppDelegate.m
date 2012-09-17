@@ -10,6 +10,7 @@
 #import <Foundation/NSTask.h>
 #import "arangoToolbarMenu.h"
 #import "ArangoConfiguration.h"
+#import "User.h"
 
 @implementation arangoAppDelegate
 
@@ -130,20 +131,21 @@ NSString* jsModPath;
   return self.managedObjectContext;
 }
 
-- (void) startNewArangoWithPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath andLogLevel:(NSString*) level andAlias:(NSString*) alias
+- (void) startNewArangoWithPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath andLogLevel:(NSString*) level andRunOnStartUp: (BOOL) ros andAlias:(NSString*) alias
 {
   ArangoConfiguration* newArang = (ArangoConfiguration*) [NSEntityDescription insertNewObjectForEntityForName:@"ArangoConfiguration" inManagedObjectContext:[self getArangoManagedObjectContext]];
   newArang.path = path;
   newArang.port = port;
   newArang.log = logPath;
   newArang.loglevel = level;
+  newArang.runOnStartUp = [NSNumber numberWithBool:ros];
   newArang.alias = alias;
   [self save];
   [self startArango:newArang];
   [statusMenu updateMenu];
 }
 
-- (void) updateArangoConfig:(ArangoConfiguration*) config withPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath andLogLevel:(NSString*) level andAlias:(NSString*) alias
+- (void) updateArangoConfig:(ArangoConfiguration*) config withPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath andLogLevel:(NSString*) level andRunOnStartUp: (BOOL) ros andAlias:(NSString*) alias
 {
   if ([config.isRunning isEqualToNumber:[NSNumber numberWithBool:YES]]) {
     [config.instance terminate];
@@ -153,6 +155,7 @@ NSString* jsModPath;
   config.port = port;
   config.log = logPath;
   config.loglevel = level;
+  config.runOnStartUp = [NSNumber numberWithBool:ros];
   config.alias = alias;
   [self save];
   [self startArango:config];
@@ -178,10 +181,24 @@ NSString* jsModPath;
   }
 }
 
-
-// System Stuff
-
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+  NSFetchRequest *userRequest = [[NSFetchRequest alloc] init];
+  NSEntityDescription *userEntity = [NSEntityDescription entityForName:@"User" inManagedObjectContext: [self getArangoManagedObjectContext]];
+  [userRequest setEntity:userEntity];
+  NSError *error = nil;
+  NSArray *fetchedResults = [[self getArangoManagedObjectContext] executeFetchRequest:userRequest error:&error];
+  NSNumber* ros = nil;
+  if (fetchedResults == nil) {
+    NSLog(error.localizedDescription);
+  } else {
+    if (fetchedResults.count > 0) {
+      for (User* u in fetchedResults) {
+        ros = u.runOnStartUp;
+      }
+    } else {
+      // TODO Show Config/Welcome Screen
+    }
+  }
   // TODO Start ArangosCorrectly!
   
   
@@ -190,15 +207,45 @@ NSString* jsModPath;
   NSFetchRequest *request = [[NSFetchRequest alloc] init];
   NSEntityDescription *entity = [NSEntityDescription entityForName:@"ArangoConfiguration" inManagedObjectContext: [self getArangoManagedObjectContext]];
   [request setEntity:entity];
-  NSError *error = nil;
-  NSArray *fetchedResults = [[self getArangoManagedObjectContext] executeFetchRequest:request error:&error];
+  error = nil;
+  fetchedResults = [[self getArangoManagedObjectContext] executeFetchRequest:request error:&error];
   if (fetchedResults == nil) {
     NSLog(error.localizedDescription);
   } else {
-    for (ArangoConfiguration* c in fetchedResults) {
-      if ([c.isRunning isEqualToNumber: [NSNumber numberWithBool:YES]]) {
-        [self startArango:c];
-      }
+    switch ([ros integerValue]) {
+      // Start no Arango.
+      case 0:
+        break;
+      // Start all Arangos running at last shutdown.
+      case 1:
+        for (ArangoConfiguration* c in fetchedResults) {
+          if ([c.isRunning isEqualToNumber: [NSNumber numberWithBool:YES]]) {
+            [self startArango:c];
+          }
+        }
+        break;
+      // Start all defined as Run on StartUp
+      case 2:
+        for (ArangoConfiguration* c in fetchedResults) {
+          if ([c.runOnStartUp isEqualToNumber: [NSNumber numberWithBool:YES]]) {
+            [self startArango:c];
+          }
+        }
+        break;
+      // Start all
+      case 3:
+        for (ArangoConfiguration* c in fetchedResults) {
+          [self startArango:c];
+        }
+        break;
+        // Default: Start all Arangos running at last shutdown.
+      default:
+        for (ArangoConfiguration* c in fetchedResults) {
+          if ([c.isRunning isEqualToNumber: [NSNumber numberWithBool:YES]]) {
+            [self startArango:c];
+          }
+        }
+        break;
     }
   }
 }

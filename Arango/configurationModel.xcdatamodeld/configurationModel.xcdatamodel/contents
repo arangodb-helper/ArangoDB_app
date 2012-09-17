@@ -9,7 +9,11 @@
         <attribute name="port" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
         <attribute name="runOnStartUp" optional="YES" attributeType="Boolean" syncable="YES"/>
     </entity>
+    <entity name="User" representedClassName="User" syncable="YES">
+        <attribute name="runOnStartUp" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+    </entity>
     <elements>
-        <element name="ArangoConfiguration" positionX="160" positionY="192" width="128" height="150"/>
+        <element name="ArangoConfiguration" positionX="0" positionY="0" width="0" height="0"/>
+        <element name="User" positionX="0" positionY="0" width="0" height="0"/>
     </elements>
 </model>

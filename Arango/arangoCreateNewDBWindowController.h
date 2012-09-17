@@ -29,6 +29,7 @@
 @property (weak) IBOutlet NSTextField *logLabel;
 @property (weak) IBOutlet NSButton *openLogButton;
 @property (weak) IBOutlet NSComboBox *logLevelOptions;
+@property (weak) IBOutlet NSButton *runOnStartup;
 
 - (id)initWithAppDelegate:(arangoAppDelegate*) aD;
 - (id)initWithAppDelegate:(arangoAppDelegate*) aD andArango: (ArangoConfiguration*) config;
@@ -36,6 +37,7 @@
 - (IBAction) openDatabase: (id) sender;
 - (IBAction) openLog: (id) sender;
 - (IBAction) start: (id) sender;
+- (IBAction) abort: (id) sender;
 - (IBAction) disclose: (id) sender;
 
 @end

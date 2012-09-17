@@ -31,9 +31,10 @@
 @synthesize showAdvanced;
 @synthesize logLevelLabel;
 @synthesize logLevelOptions;
+@synthesize runOnStartup;
 @synthesize logLabel;
 
-const int advancedHeightDifference = 60;
+const int advancedHeightDifference = 70;
 
 - (id)initWithWindow:(NSWindow *)window
 {
@@ -100,6 +101,11 @@ const int advancedHeightDifference = 60;
   self.logField.stringValue = config.log;
   self.aliasField.stringValue = config.alias;
   self.logLevelOptions.stringValue = config.loglevel;
+  if ([config.runOnStartUp isEqualToNumber: [NSNumber numberWithBool:YES]]) {
+    self.runOnStartup.state = NSOnState;
+  } else {
+    self.runOnStartup.state = NSOffState;
+  }
   self.editedConfig = config;
 }
 
@@ -233,11 +239,11 @@ const int advancedHeightDifference = 60;
     }
   }
   if (self.editedConfig != nil) {
-    [self.appDelegate updateArangoConfig:self.editedConfig withPath:[dbPath path] andPort:port andLog:[logPath path] andLogLevel:self.logLevelOptions.stringValue andAlias:alias];
+    [self.appDelegate updateArangoConfig:self.editedConfig withPath:[dbPath path] andPort:port andLog:[logPath path] andLogLevel:self.logLevelOptions.stringValue andRunOnStartUp: (self.runOnStartup.state == NSOnState) andAlias:alias];
   } else {
-    [self.appDelegate startNewArangoWithPath:[dbPath path] andPort:port andLog:[logPath path] andLogLevel:self.logLevelOptions.stringValue andAlias: alias];
+    [self.appDelegate startNewArangoWithPath:[dbPath path] andPort:port andLog:[logPath path] andLogLevel:self.logLevelOptions.stringValue andRunOnStartUp: (self.runOnStartup.state == NSOnState) andAlias: alias];
   }
-  //return YES;
+  return YES;
 }
 
 
