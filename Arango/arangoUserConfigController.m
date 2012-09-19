@@ -19,13 +19,14 @@
 @synthesize delegate;
 @synthesize rosDefinition;
 
-const NSString* RES = @"Restart all ArangoDBs running at last shutdown";
-const NSString* DEF = @"Define for each ArangoDB";
-const NSString* ALL = @"Start all ArangoDBs";
-const NSString* NON = @"Do not start ArangoDBs";
+const NSString* RES = @"Restart all instances running at last shutdown";
+const NSString* DEF = @"Define for each instance";
+const NSString* ALL = @"Start all instances";
+const NSString* NON = @"Do not start instaces";
 
 - (id) initWithAppDelegate: (arangoAppDelegate*) aD
 {
+  self = [super init];
   [[NSBundle mainBundle] loadNibNamed:@"arangoUserConfigController" owner:self topLevelObjects:nil];
   if (self) {
     self.delegate = aD;
@@ -38,6 +39,7 @@ const NSString* NON = @"Do not start ArangoDBs";
     [userRequest setEntity:userEntity];
     NSError *error = nil;
     NSArray *fetchedResults = [[self.delegate getArangoManagedObjectContext] executeFetchRequest:userRequest error:&error];
+    [userRequest release];
     if (fetchedResults == nil) {
       NSLog(error.localizedDescription);
     } else {
@@ -65,19 +67,19 @@ const NSString* NON = @"Do not start ArangoDBs";
     LSSharedFileListRef autostart = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems, nil);
     if (autostart) {
       UInt32 seedValue;
-      NSArray  *loginItemsArray = (NSArray *) CFBridgingRelease(LSSharedFileListCopySnapshot(autostart, &seedValue));
+      NSArray  *loginItemsArray = (NSArray *) LSSharedFileListCopySnapshot(autostart, &seedValue);
       for(int i = 0; i< [loginItemsArray count]; i++){
-        LSSharedFileListItemRef itemRef = (LSSharedFileListItemRef) CFBridgingRetain([loginItemsArray objectAtIndex:i]);
-        CFURLRef url = CFBridgingRetain([NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]]);
+        LSSharedFileListItemRef itemRef = (LSSharedFileListItemRef) [loginItemsArray objectAtIndex:i];
+        CFURLRef url = (CFURLRef) [NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]];
         if (LSSharedFileListItemResolve(itemRef, 0, &url, nil) == noErr) {
-          NSString * urlPath = [(NSURL*)CFBridgingRelease(url) path];
+          NSString * urlPath = [(NSURL*)url path];
           if ([urlPath compare:[[NSBundle mainBundle] bundlePath]] == NSOrderedSame){
             self.putAsStartUp.state = NSOnState;
           }
         }
       }
+      [loginItemsArray release];
     }
-    CFRelease(autostart);
     [self.window setReleasedWhenClosed:NO];
     [self.window center];
     [NSApp activateIgnoringOtherApps:YES];
@@ -118,6 +120,7 @@ const NSString* NON = @"Do not start ArangoDBs";
   [userRequest setEntity:userEntity];
   NSError *error = nil;
   NSArray *fetchedResults = [[self.delegate getArangoManagedObjectContext] executeFetchRequest:userRequest error:&error];
+  [userRequest release];
   NSNumber* ros = [NSNumber numberWithInt:0];
   if([self.rosDefinition.stringValue isEqual:RES]) {
     ros = [NSNumber numberWithInt:1];
@@ -145,26 +148,28 @@ const NSString* NON = @"Do not start ArangoDBs";
   LSSharedFileListRef autostart = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems, nil);
   if (autostart) {
     if (self.putAsStartUp.state == NSOnState) {
-      LSSharedFileListItemRef arangoStarter = LSSharedFileListInsertItemURL(autostart, kLSSharedFileListItemLast, nil, nil, CFBridgingRetain([NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]]), nil, nil);
+      LSSharedFileListItemRef arangoStarter = LSSharedFileListInsertItemURL(autostart, kLSSharedFileListItemLast, nil, nil, (CFURLRef)[NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]], nil, nil);
       if (arangoStarter) {
         CFRelease(arangoStarter);
       }
+      CFRelease(autostart);
     } else {
       UInt32 seedValue;
-      NSArray  *loginItemsArray = (NSArray *) CFBridgingRelease(LSSharedFileListCopySnapshot(autostart, &seedValue));
+      NSArray  *loginItemsArray = (NSArray *) LSSharedFileListCopySnapshot(autostart, &seedValue);
       for(int i = 0; i< [loginItemsArray count]; i++){
-        LSSharedFileListItemRef itemRef = (LSSharedFileListItemRef) CFBridgingRetain([loginItemsArray objectAtIndex:i]);
-        CFURLRef url = CFBridgingRetain([NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]]);
+        LSSharedFileListItemRef itemRef = (LSSharedFileListItemRef) [loginItemsArray objectAtIndex:i];
+        CFURLRef url = (CFURLRef) [NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]];
         if (LSSharedFileListItemResolve(itemRef, 0, &url, nil) == noErr) {
-          NSString * urlPath = [(NSURL*)CFBridgingRelease(url) path];
+          NSString * urlPath = [(NSURL*)url path];
           if ([urlPath compare:[[NSBundle mainBundle] bundlePath]] == NSOrderedSame){
             LSSharedFileListItemRemove(autostart,itemRef);
           }
         }
       }
+      [loginItemsArray release];
     }
-    CFRelease(autostart);
   }
+  
   [self.window orderOut:self.window];
 }
 

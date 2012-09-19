@@ -11,25 +11,25 @@
 @class arangoAppDelegate;
 @class ArangoConfiguration;
 @interface arangoCreateNewDBWindowController : NSWindowController <NSWindowDelegate>
-@property (strong) IBOutlet NSWindow *window;
-@property (weak) IBOutlet NSTextField *dbPathField;
-@property (weak) IBOutlet NSTextField *portField;
-@property (weak) IBOutlet NSTextField *aliasField;
-@property (weak) IBOutlet NSButton *openDBButton;
-@property (weak) arangoAppDelegate *appDelegate;
-@property (strong) ArangoConfiguration *editedConfig;
-@property (strong) NSNumberFormatter *portFormatter;
-@property (weak) IBOutlet NSButton *okButton;
-@property (weak) IBOutlet NSButton *abortButton;
+@property (retain) IBOutlet NSWindow *window;
+@property (assign) IBOutlet NSTextField *dbPathField;
+@property (assign) IBOutlet NSTextField *portField;
+@property (assign) IBOutlet NSTextField *aliasField;
+@property (assign) IBOutlet NSButton *openDBButton;
+@property (assign) arangoAppDelegate *appDelegate;
+@property (retain) ArangoConfiguration *editedConfig;
+@property (retain) NSNumberFormatter *portFormatter;
+@property (assign) IBOutlet NSButton *okButton;
+@property (assign) IBOutlet NSButton *abortButton;
 
 // Advanced Menu
-@property (weak) IBOutlet NSButton *showAdvanced;
-@property (weak) IBOutlet NSTextField *logField;
-@property (weak) IBOutlet NSTextField *logLevelLabel;
-@property (weak) IBOutlet NSTextField *logLabel;
-@property (weak) IBOutlet NSButton *openLogButton;
-@property (weak) IBOutlet NSComboBox *logLevelOptions;
-@property (weak) IBOutlet NSButton *runOnStartup;
+@property (assign) IBOutlet NSButton *showAdvanced;
+@property (assign) IBOutlet NSTextField *logField;
+@property (assign) IBOutlet NSTextField *logLevelLabel;
+@property (assign) IBOutlet NSTextField *logLabel;
+@property (assign) IBOutlet NSButton *openLogButton;
+@property (assign) IBOutlet NSComboBox *logLevelOptions;
+@property (assign) IBOutlet NSButton *runOnStartup;
 
 - (id)initWithAppDelegate:(arangoAppDelegate*) aD;
 - (id)initWithAppDelegate:(arangoAppDelegate*) aD andArango: (ArangoConfiguration*) config;

@@ -58,8 +58,10 @@
   [request setEntity:entity];
   NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"alias" ascending:YES];
   [request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+  [sortDescriptor release];
   NSError *error = nil;
   NSArray *fetchedResults = [[self.appDelegate getArangoManagedObjectContext] executeFetchRequest:request error:&error];
+  [request release];
   if (fetchedResults == nil) {
     NSLog(error.localizedDescription);
   } else {
@@ -79,7 +81,7 @@
       [item setRepresentedObject:c];
       [item setAction:@selector(toggleArango:)];
       [self addItem:item];
-      
+      [item release];
       NSMenu* subMenu = [[NSMenu alloc] init];
       NSMenuItem* browser = [[NSMenuItem alloc] init];
       [browser setTitle:@"Browser"];
@@ -87,6 +89,7 @@
       [browser setRepresentedObject:c];
       [browser setAction:@selector(openBrowser:)];
       [subMenu addItem:browser];
+      [browser release];
       [subMenu addItem: [NSMenuItem separatorItem]];
       NSMenuItem* edit = [[NSMenuItem alloc] init];
       [edit setTitle:@"Edit"];
@@ -94,14 +97,16 @@
       [edit setRepresentedObject:c];
       [edit setAction:@selector(editInstance:)];
       [subMenu addItem:edit];
+      [edit release];
       NSMenuItem* delete = [[NSMenuItem alloc] init];
       [delete setTitle:@"Delete"];
       [delete setTarget:self];
       [delete setRepresentedObject:c];
       [delete setAction:@selector(deleteInstance:)];
       [subMenu addItem:delete];
-      
+      [delete release];
       [item setSubmenu:subMenu];
+      [subMenu release];
       
     }
   }
@@ -135,17 +140,17 @@
 
 - (void) showConfiguration
 {
-  self.configurationViewController = [[arangoUserConfigController alloc] initWithAppDelegate:self.appDelegate];
+  self.configurationViewController = [[[arangoUserConfigController alloc] initWithAppDelegate:self.appDelegate] autorelease];
 }
 
 - (void) createNewInstance
 {
-  self.createNewWindowController = [[arangoCreateNewDBWindowController alloc] initWithAppDelegate:self.appDelegate];
+  self.createNewWindowController = [[[arangoCreateNewDBWindowController alloc] initWithAppDelegate:self.appDelegate] autorelease];
 }
 
 - (void) editInstance:(id) sender
 {
-  self.createNewWindowController = [[arangoCreateNewDBWindowController alloc] initWithAppDelegate:self.appDelegate andArango:[sender representedObject]];
+  self.createNewWindowController = [[[arangoCreateNewDBWindowController alloc] initWithAppDelegate:self.appDelegate andArango:[sender representedObject]] autorelease];
 }
 
 // TODO: Ask user if data should be deleted also!
@@ -157,7 +162,8 @@
   [infoText appendString:config.path];
   [infoText appendString:@"\" and the log-file as well?"];
   NSAlert* info = [NSAlert alertWithMessageText:@"Delete Data?" defaultButton:@"Keep Data" alternateButton:@"Abort" otherButton:@"Delete Data" informativeTextWithFormat:infoText];
-  [info beginSheetModalForWindow:nil modalDelegate:self didEndSelector:@selector(confirmedDialog:returnCode:contextInfo:) contextInfo:(__bridge void *)(config)];
+  [infoText release];
+  [info beginSheetModalForWindow:nil modalDelegate:self didEndSelector:@selector(confirmedDialog:returnCode:contextInfo:) contextInfo: (void *)(config)];
 }
 
 - (void) confirmedDialog:(NSAlert*) dialog returnCode:(int) rC contextInfo: (ArangoConfiguration *) config
@@ -190,6 +196,7 @@
   NSNumberFormatter* f = [[NSNumberFormatter alloc] init];
   [f setThousandSeparator:@""];
   [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[@"http://localhost:" stringByAppendingString:[f stringFromNumber:config.port]]]];
+  [f release];
 }
 
 @end

@@ -14,12 +14,12 @@
 @interface arangoToolbarMenu : NSMenu
 
 
-@property (retain) NSMenuItem* createDB;
-@property (retain) NSMenuItem* configure;
-@property (retain) NSMenuItem* quit;
-@property (strong) arangoCreateNewDBWindowController* createNewWindowController;
-@property (strong) arangoUserConfigController* configurationViewController;
-@property (weak) arangoAppDelegate* appDelegate;
+@property (assign) NSMenuItem* createDB;
+@property (assign) NSMenuItem* configure;
+@property (assign) NSMenuItem* quit;
+@property (retain) arangoCreateNewDBWindowController* createNewWindowController;
+@property (retain) arangoUserConfigController* configurationViewController;
+@property (retain) arangoAppDelegate* appDelegate;
 
 
 - (id) initWithAppDelegate:(arangoAppDelegate*) aD;

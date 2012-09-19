@@ -46,6 +46,7 @@ const int advancedHeightDifference = 70;
 
 - (id)initWithAppDelegate:(arangoAppDelegate*) aD
 {
+  self = [super init];
   [[NSBundle mainBundle] loadNibNamed:@"arangoCreateNewDBWindowController" owner:self topLevelObjects:nil];
   if (self) {
     self.portFormatter = [[NSNumberFormatter alloc] init];
@@ -70,6 +71,7 @@ const int advancedHeightDifference = 70;
 
 - (id)initWithAppDelegate:(arangoAppDelegate*) aD andArango: (ArangoConfiguration*) config
 {
+  self = [super init];
   [[NSBundle mainBundle] loadNibNamed:@"arangoCreateNewDBWindowController" owner:self topLevelObjects:nil];
   if (self) {
     self.portFormatter = [[NSNumberFormatter alloc] init];
@@ -112,6 +114,11 @@ const int advancedHeightDifference = 70;
 - (void)windowDidLoad
 {
     [super windowDidLoad];
+}
+
+- (void) windowWillClose:(NSNotification *)notification
+{
+  [self.portFormatter release];
 }
 
 - (NSURL*) showSelectDatabaseDialog
@@ -227,6 +234,7 @@ const int advancedHeightDifference = 70;
     [append appendString:alias];
     [append appendString:@".log"];
     logPath = [NSURL fileURLWithPath:append];
+    [append release];
   } else {
     logPath = [NSURL URLWithString:logField.stringValue];
     [[NSFileManager defaultManager] fileExistsAtPath:[logPath path] isDirectory:&isDir];
@@ -237,6 +245,7 @@ const int advancedHeightDifference = 70;
       [append appendString:alias];
       [append appendString:@".log"];
       logPath = [NSURL fileURLWithPath:append];
+      [append release];
     }
   }
   if (self.editedConfig != nil) {
@@ -317,6 +326,5 @@ const int advancedHeightDifference = 70;
 {
   [self toggleAdvanced:YES];
 }
-
 
 @end

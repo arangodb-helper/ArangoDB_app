@@ -26,8 +26,8 @@ NSString* jsModPath;
 
 // Method to start a new Arango with the given Configuration.
 - (void) startArango:(ArangoConfiguration*) config {
-  NSString* arangoPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/arangod"];
-  NSString* configPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/arangod.conf"];
+  NSString* arangoPath = [[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/arangod"] retain];
+  NSString* configPath = [[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/arangod.conf"] retain];
   NSTask* newArango = [[NSTask alloc]init];
   [newArango setLaunchPath:arangoPath];
   NSArray* arguments = [NSArray arrayWithObjects:
@@ -51,12 +51,16 @@ NSString* jsModPath;
   [newArango launch];
   config.isRunning = [NSNumber numberWithBool:YES];
   config.instance = newArango;
+  [newArango release];
+  [arangoPath release];
+  [configPath release];
   [self save];
 }
 
 // Function to run the javascript tests.
 // Should never be invoked by the enduser and is not linked in the UI.
 // Can be invoked after App-launch for testing purposes.
+/*
 - (NSTask*) testArangoWithPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath
 {
   NSString* arangoPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/arangod"];
@@ -110,14 +114,15 @@ NSString* jsModPath;
     NSLog(@"Terminated Arango");
   };
   [newArango launch];
+  [newArango release];
   return newArango;
 }
-
+*/
 // Function to get the Context necessary for persistent storage.
 - (NSManagedObjectContext*) getArangoManagedObjectContext
 {
   if (self.managedObjectContext == nil) {
-    NSURL *storeURL = [[[[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"Arango"];
+    NSURL *storeURL = [[[[[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"Arango"] retain];
     if (![[NSFileManager defaultManager] fileExistsAtPath:[storeURL path]]) {
       NSError* error = nil;
       [[NSFileManager defaultManager] createDirectoryAtURL:storeURL withIntermediateDirectories:YES attributes:nil error:&error];
@@ -125,8 +130,8 @@ NSString* jsModPath;
         NSLog(@"Failed to create sqlite");
       }
     }
-    storeURL = [storeURL URLByAppendingPathComponent:@"Arango.sqlite"];
-    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"configurationModel" withExtension:@"momd"];
+    storeURL = [[storeURL URLByAppendingPathComponent:@"Arango.sqlite"] retain];
+    NSURL *modelURL = [[[NSBundle mainBundle] URLForResource:@"configurationModel" withExtension:@"momd"] retain];
     NSError *error = nil;
     NSPersistentStoreCoordinator* coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL]];
     if (![coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:nil error:&error])
@@ -138,6 +143,9 @@ NSString* jsModPath;
     }
     self.managedObjectContext = [[NSManagedObjectContext alloc] init];
     [self.managedObjectContext setPersistentStoreCoordinator:coordinator];
+    [storeURL release];
+    [modelURL release];
+    [coordinator release];
   }
   return self.managedObjectContext;
 }
@@ -204,10 +212,12 @@ NSString* jsModPath;
 // If this is the first launch of the App also the Configuration will be shown.
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
   NSFetchRequest *userRequest = [[NSFetchRequest alloc] init];
-  NSEntityDescription *userEntity = [NSEntityDescription entityForName:@"User" inManagedObjectContext: [self getArangoManagedObjectContext]];
+  NSEntityDescription *userEntity = [[NSEntityDescription entityForName:@"User" inManagedObjectContext: [self getArangoManagedObjectContext]] retain];
   [userRequest setEntity:userEntity];
+  [userEntity release];
   NSError *error = nil;
   NSArray *fetchedResults = [[self getArangoManagedObjectContext] executeFetchRequest:userRequest error:&error];
+  [userRequest release];
   NSNumber* ros = nil;
   if (fetchedResults == nil) {
     NSLog(error.localizedDescription);
@@ -223,8 +233,10 @@ NSString* jsModPath;
   NSFetchRequest *request = [[NSFetchRequest alloc] init];
   NSEntityDescription *entity = [NSEntityDescription entityForName:@"ArangoConfiguration" inManagedObjectContext: [self getArangoManagedObjectContext]];
   [request setEntity:entity];
+  [entity release];
   error = nil;
   fetchedResults = [[self getArangoManagedObjectContext] executeFetchRequest:request error:&error];
+  [request release];
   if (fetchedResults == nil) {
     NSLog(error.localizedDescription);
   } else {
@@ -279,9 +291,9 @@ NSString* jsModPath;
 // Currently only the green logo is allowed.
 -(void) awakeFromNib
 {
-  adminDir = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/html/admin"];
-  jsActionDir = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/actions/system"];
-  jsModPath = [[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/modules:"] stringByAppendingString:[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/common/modules"]];
+  adminDir = [[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/html/admin"] retain];
+  jsActionDir = [[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/actions/system"] retain];
+  jsModPath = [[[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/modules:"] stringByAppendingString:[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/common/modules"]] retain];
   self.statusMenu = [[arangoToolbarMenu alloc] initWithAppDelegate:self];
   self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength];
   [self.statusItem setMenu: statusMenu];
