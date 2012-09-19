@@ -44,12 +44,14 @@ NSString* arangoVersion;
                         config.path, nil];
   [newArango setArguments:arguments];
   // Callback if the Arango is terminated for whatever reason.
-  newArango.terminationHandler = ^(NSTask *task) {
-    config.isRunning = [NSNumber numberWithBool:NO];
-    config.instance = nil;
-    [self save];
-    [self.statusMenu updateMenu];
-  };
+  if ([newArango respondsToSelector:@selector(setTerminationHandler:)]) {
+    [newArango setTerminationHandler: ^(NSTask *task) {
+      config.isRunning = [NSNumber numberWithBool:NO];
+      config.instance = nil;
+      [self save];
+      [self.statusMenu updateMenu];
+    }];
+  }
   [newArango launch];
   config.isRunning = [NSNumber numberWithBool:YES];
   config.instance = newArango;
