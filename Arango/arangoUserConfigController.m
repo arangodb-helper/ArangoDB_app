@@ -63,6 +63,61 @@ const NSString* NON = @"Do not start instaces";
     // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
 }
 
+- (void)awakeFromNib
+{
+  [self.rosDefinition addItemWithObjectValue:RES];
+  [self.rosDefinition addItemWithObjectValue:DEF];
+  [self.rosDefinition addItemWithObjectValue:ALL];
+  [self.rosDefinition addItemWithObjectValue:NON];
+  NSFetchRequest *userRequest = [[NSFetchRequest alloc] init];
+  NSEntityDescription *userEntity = [NSEntityDescription entityForName:@"User" inManagedObjectContext: [self.delegate getArangoManagedObjectContext]];
+  [userRequest setEntity:userEntity];
+  NSError *error = nil;
+  NSArray *fetchedResults = [[self.delegate getArangoManagedObjectContext] executeFetchRequest:userRequest error:&error];
+  [userRequest release];
+  if (fetchedResults == nil) {
+    NSLog(error.localizedDescription);
+  } else {
+    if (fetchedResults.count > 0) {
+      for (User* u in fetchedResults) {
+        switch ([u.runOnStartUp intValue]) {
+          case 0:
+            [self.rosDefinition selectItemWithObjectValue:NON];
+            break;
+          case 1:
+            [self.rosDefinition selectItemWithObjectValue:RES];
+            break;
+          case 2:
+            [self.rosDefinition selectItemWithObjectValue:DEF];
+            break;
+          case 3:
+            [self.rosDefinition selectItemWithObjectValue:ALL];
+            break;
+        }
+      }
+    } else {
+      [self.rosDefinition selectItemWithObjectValue:RES];
+    }
+  }
+  LSSharedFileListRef autostart = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems, nil);
+  if (autostart) {
+    UInt32 seedValue;
+    NSArray  *loginItemsArray = (NSArray *) LSSharedFileListCopySnapshot(autostart, &seedValue);
+    for(int i = 0; i< [loginItemsArray count]; i++){
+      LSSharedFileListItemRef itemRef = (LSSharedFileListItemRef) [loginItemsArray objectAtIndex:i];
+      CFURLRef url = (CFURLRef) [NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]];
+      if (LSSharedFileListItemResolve(itemRef, 0, &url, nil) == noErr) {
+        NSString * urlPath = [(NSURL*)url path];
+        if ([urlPath compare:[[NSBundle mainBundle] bundlePath]] == NSOrderedSame){
+          self.putAsStartUp.state = NSOnState;
+        }
+      }
+    }
+    [loginItemsArray release];
+  }
+}
+
+
 - (IBAction) abort: (id) sender
 {
   [self.window orderOut:self.window];
@@ -127,60 +182,6 @@ const NSString* NON = @"Do not start instaces";
   }
   
   [self.window orderOut:self.window];
-}
-
-- (void)awakeFromNib
-{
-  [self.rosDefinition addItemWithObjectValue:RES];
-  [self.rosDefinition addItemWithObjectValue:DEF];
-  [self.rosDefinition addItemWithObjectValue:ALL];
-  [self.rosDefinition addItemWithObjectValue:NON];
-  NSFetchRequest *userRequest = [[NSFetchRequest alloc] init];
-  NSEntityDescription *userEntity = [NSEntityDescription entityForName:@"User" inManagedObjectContext: [self.delegate getArangoManagedObjectContext]];
-  [userRequest setEntity:userEntity];
-  NSError *error = nil;
-  NSArray *fetchedResults = [[self.delegate getArangoManagedObjectContext] executeFetchRequest:userRequest error:&error];
-  [userRequest release];
-  if (fetchedResults == nil) {
-    NSLog(error.localizedDescription);
-  } else {
-    if (fetchedResults.count > 0) {
-      for (User* u in fetchedResults) {
-        switch ([u.runOnStartUp intValue]) {
-          case 0:
-            [self.rosDefinition selectItemWithObjectValue:NON];
-            break;
-          case 1:
-            [self.rosDefinition selectItemWithObjectValue:RES];
-            break;
-          case 2:
-            [self.rosDefinition selectItemWithObjectValue:DEF];
-            break;
-          case 3:
-            [self.rosDefinition selectItemWithObjectValue:ALL];
-            break;
-        }
-      }
-    } else {
-      [self.rosDefinition selectItemWithObjectValue:RES];
-    }
-  }
-  LSSharedFileListRef autostart = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems, nil);
-  if (autostart) {
-    UInt32 seedValue;
-    NSArray  *loginItemsArray = (NSArray *) LSSharedFileListCopySnapshot(autostart, &seedValue);
-    for(int i = 0; i< [loginItemsArray count]; i++){
-      LSSharedFileListItemRef itemRef = (LSSharedFileListItemRef) [loginItemsArray objectAtIndex:i];
-      CFURLRef url = (CFURLRef) [NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]];
-      if (LSSharedFileListItemResolve(itemRef, 0, &url, nil) == noErr) {
-        NSString * urlPath = [(NSURL*)url path];
-        if ([urlPath compare:[[NSBundle mainBundle] bundlePath]] == NSOrderedSame){
-          self.putAsStartUp.state = NSOnState;
-        }
-      }
-    }
-    [loginItemsArray release];
-  }
 }
 
 @end

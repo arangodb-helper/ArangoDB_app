@@ -19,7 +19,6 @@
 @synthesize portFormatter;
 @synthesize okButton;
 @synthesize abortButton;
-@synthesize window;
 @synthesize dbPathField;
 @synthesize portField;
 @synthesize logField;
@@ -50,7 +49,7 @@ const int advancedHeightDifference = 70;
     self = [super init];
     [[NSBundle mainBundle] loadNibNamed:@"arangoCreateNewDBWindowController" owner:self topLevelObjects:nil];
   } else {
-    NSLog(@"Cant show window yet");
+    self = [self initWithWindowNibName:@"arangoCreateNewDBWindowController" owner:self];
   }
   if (self) {
     self.portFormatter = [[NSNumberFormatter alloc] init];
@@ -79,7 +78,7 @@ const int advancedHeightDifference = 70;
     self = [super init];
     [[NSBundle mainBundle] loadNibNamed:@"arangoCreateNewDBWindowController" owner:self topLevelObjects:nil];
   } else {
-    NSLog(@"Cant show window yet");
+    self = [self initWithWindowNibName:@"arangoCreateNewDBWindowController" owner:self];
   }
   if (self) {
     self.portFormatter = [[NSNumberFormatter alloc] init];
@@ -88,11 +87,9 @@ const int advancedHeightDifference = 70;
     [self.portFormatter setMinimumFractionDigits:0];
     [self.portFormatter setMaximumFractionDigits:0];
     [self.portFormatter setThousandSeparator:@""];
-    [self.portField setFormatter:self.portFormatter];
     self.appDelegate = aD;
     [self.window setReleasedWhenClosed:NO];
     self.window.delegate = self;
-    [self.window center];
     [self fillArango: config];
     [self.window center];
     [self toggleAdvanced:NO];
@@ -101,6 +98,11 @@ const int advancedHeightDifference = 70;
     [self showWindow:self.window];
   }
   return self;
+}
+
+- (void) awakeFromNib
+{
+  [self.portField setFormatter:self.portFormatter];
 }
 
 
