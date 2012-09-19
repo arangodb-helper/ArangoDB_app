@@ -23,10 +23,12 @@
 NSString* adminDir;
 NSString* jsActionDir;
 NSString* jsModPath;
+NSString* arangoVersion;
+
 
 // Method to start a new Arango with the given Configuration.
 - (void) startArango:(ArangoConfiguration*) config {
-  NSString* arangoPath = [[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/arangod"] retain];
+  NSString* arangoPath = [[[[NSBundle mainBundle] resourcePath] stringByAppendingString:arangoVersion] retain];
   NSString* configPath = [[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/arangod.conf"] retain];
   NSTask* newArango = [[NSTask alloc]init];
   [newArango setLaunchPath:arangoPath];
@@ -63,7 +65,7 @@ NSString* jsModPath;
 /*
 - (NSTask*) testArangoWithPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath
 {
-  NSString* arangoPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/arangod"];
+  NSString* arangoPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:arangoVersion];
   NSString* configPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/arangod.conf"];
   NSTask* newArango = [[NSTask alloc]init];
   [newArango setLaunchPath:arangoPath];
@@ -294,6 +296,12 @@ NSString* jsModPath;
   adminDir = [[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/html/admin"] retain];
   jsActionDir = [[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/actions/system"] retain];
   jsModPath = [[[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/modules:"] stringByAppendingString:[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/common/modules"]] retain];
+  if ([[NSBundle mainBundle] respondsToSelector:@selector(loadNibNamed:owner:topLevelObjects:)]) {
+    arangoVersion = @"/arangod_10_8";
+  } else {
+    arangoVersion = @"/arangod_10_7";
+  }
+  
   self.statusMenu = [[arangoToolbarMenu alloc] initWithAppDelegate:self];
   self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength];
   [self.statusItem setMenu: statusMenu];
