@@ -26,8 +26,12 @@ const NSString* NON = @"Do not start instaces";
 
 - (id) initWithAppDelegate: (arangoAppDelegate*) aD
 {
-  self = [super init];
-  [[NSBundle mainBundle] loadNibNamed:@"arangoUserConfigController" owner:self topLevelObjects:nil];
+  if([[NSBundle mainBundle] respondsToSelector:@selector(loadNibNamed:owner:topLevelObjects:)]) {
+    self = [super init];
+    [[NSBundle mainBundle] loadNibNamed:@"arangoUserConfigController" owner:self topLevelObjects:nil];
+  } else {
+    NSLog(@"Cant show window yet");
+  }
   if (self) {
     self.delegate = aD;
     [self.rosDefinition addItemWithObjectValue:RES];

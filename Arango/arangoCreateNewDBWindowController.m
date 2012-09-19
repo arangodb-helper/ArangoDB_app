@@ -46,8 +46,12 @@ const int advancedHeightDifference = 70;
 
 - (id)initWithAppDelegate:(arangoAppDelegate*) aD
 {
-  self = [super init];
-  [[NSBundle mainBundle] loadNibNamed:@"arangoCreateNewDBWindowController" owner:self topLevelObjects:nil];
+  if([[NSBundle mainBundle] respondsToSelector:@selector(loadNibNamed:owner:topLevelObjects:)]) {
+    self = [super init];
+    [[NSBundle mainBundle] loadNibNamed:@"arangoCreateNewDBWindowController" owner:self topLevelObjects:nil];
+  } else {
+    NSLog(@"Cant show window yet");
+  }
   if (self) {
     self.portFormatter = [[NSNumberFormatter alloc] init];
     [self.portFormatter setNumberStyle:NSNumberFormatterNoStyle];
@@ -71,8 +75,12 @@ const int advancedHeightDifference = 70;
 
 - (id)initWithAppDelegate:(arangoAppDelegate*) aD andArango: (ArangoConfiguration*) config
 {
-  self = [super init];
-  [[NSBundle mainBundle] loadNibNamed:@"arangoCreateNewDBWindowController" owner:self topLevelObjects:nil];
+  if([[NSBundle mainBundle] respondsToSelector:@selector(loadNibNamed:owner:topLevelObjects:)]) {
+    self = [super init];
+    [[NSBundle mainBundle] loadNibNamed:@"arangoCreateNewDBWindowController" owner:self topLevelObjects:nil];
+  } else {
+    NSLog(@"Cant show window yet");
+  }
   if (self) {
     self.portFormatter = [[NSNumberFormatter alloc] init];
     [self.portFormatter setNumberStyle:NSNumberFormatterNoStyle];
