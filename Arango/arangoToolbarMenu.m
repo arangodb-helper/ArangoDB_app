@@ -19,6 +19,7 @@
 @synthesize quit;
 @synthesize createNewWindowController;
 @synthesize configurationViewController;
+@synthesize appDelegate;
 
 // TODO: Localize
 - (id)initWithAppDelegate:(arangoAppDelegate*) aD
