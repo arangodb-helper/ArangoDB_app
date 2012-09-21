@@ -129,7 +129,11 @@ NSString* arangoVersion;
     NSURL *storeURL = [[[[[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"Arango"] retain];
     if (![[NSFileManager defaultManager] fileExistsAtPath:[storeURL path]]) {
       NSError* error = nil;
-      [[NSFileManager defaultManager] createDirectoryAtURL:storeURL withIntermediateDirectories:YES attributes:nil error:&error];
+      if ([[NSFileManager defaultManager] respondsToSelector:@selector(createDirectoryAtURL:withIntermediateDirectories:attributes:error:)]) {
+        [[NSFileManager defaultManager] createDirectoryAtURL:storeURL withIntermediateDirectories:YES attributes:nil error:&error];
+      } else {
+        [[NSFileManager defaultManager] createDirectoryAtPath:[storeURL path] withIntermediateDirectories:YES attributes:nil error:&error];
+      }
       if (error != nil) {
         NSLog(@"Failed to create sqlite");
       }
@@ -301,9 +305,13 @@ NSString* arangoVersion;
   if ([[NSBundle mainBundle] respondsToSelector:@selector(loadNibNamed:owner:topLevelObjects:)]) {
     arangoVersion = @"/arangod_10_8";
   } else {
-    arangoVersion = @"/arangod_10_7";
+    if ([[NSFileManager defaultManager] respondsToSelector:@selector(createDirectoryAtURL:withIntermediateDirectories:attributes:error:)]) {
+      arangoVersion = @"/arangod_10_7";
+    } else {
+      arangoVersion = @"/arangod_10_6";
+    }
+    
   }
-  
   self.statusMenu = [[arangoToolbarMenu alloc] initWithAppDelegate:self];
   self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength];
   [self.statusItem setMenu: statusMenu];
