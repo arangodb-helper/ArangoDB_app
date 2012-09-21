@@ -14,8 +14,8 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "8A539DAE15ECEE6500A267B6"
-               BuildableName = "Arango.app"
+               BlueprintIdentifier = "8A4E6355160C5EB70001D66F"
+               BuildableName = "Arango 10.6.app"
                BlueprintName = "Arango"
                ReferencedContainer = "container:Arango.xcodeproj">
             </BuildableReference>
@@ -32,8 +32,8 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "8A539DAE15ECEE6500A267B6"
-            BuildableName = "Arango.app"
+            BlueprintIdentifier = "8A4E6355160C5EB70001D66F"
+            BuildableName = "Arango 10.6.app"
             BlueprintName = "Arango"
             ReferencedContainer = "container:Arango.xcodeproj">
          </BuildableReference>
@@ -51,8 +51,8 @@
       <BuildableProductRunnable>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "8A539DAE15ECEE6500A267B6"
-            BuildableName = "Arango.app"
+            BlueprintIdentifier = "8A4E6355160C5EB70001D66F"
+            BuildableName = "Arango 10.6.app"
             BlueprintName = "Arango"
             ReferencedContainer = "container:Arango.xcodeproj">
          </BuildableReference>
@@ -69,8 +69,8 @@
       <BuildableProductRunnable>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "8A539DAE15ECEE6500A267B6"
-            BuildableName = "Arango.app"
+            BlueprintIdentifier = "8A4E6355160C5EB70001D66F"
+            BuildableName = "Arango 10.6.app"
             BlueprintName = "Arango"
             ReferencedContainer = "container:Arango.xcodeproj">
          </BuildableReference>

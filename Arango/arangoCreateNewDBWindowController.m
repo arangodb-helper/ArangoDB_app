@@ -34,6 +34,7 @@
 @synthesize logLabel;
 
 const int advancedHeightDifference = 70;
+float yButtonPosition = 0;
 
 - (id)initWithWindow:(NSWindow *)window
 {
@@ -63,7 +64,6 @@ const int advancedHeightDifference = 70;
     [self.window setReleasedWhenClosed:NO];
     self.window.delegate = self;
     [self.window center];
-    [self toggleAdvanced:NO];
     [NSApp activateIgnoringOtherApps:YES];
     [self.window makeKeyWindow];
     [self showWindow:self.window];
@@ -92,7 +92,6 @@ const int advancedHeightDifference = 70;
     self.window.delegate = self;
     [self fillArango: config];
     [self.window center];
-    [self toggleAdvanced:NO];
     [NSApp activateIgnoringOtherApps:YES];
     [self.window makeKeyWindow];
     [self showWindow:self.window];
@@ -102,7 +101,9 @@ const int advancedHeightDifference = 70;
 
 - (void) awakeFromNib
 {
+  yButtonPosition = self.okButton.frame.origin.y;
   [self.portField setFormatter:self.portFormatter];
+  [self toggleAdvanced:NO];
 }
 
 
@@ -286,6 +287,12 @@ const int advancedHeightDifference = 70;
 
 - (void) displayAdvanced: (id) sender
 {
+  NSRect okRect = self.okButton.frame;
+  okRect.origin.y = yButtonPosition;
+  self.okButton.frame = okRect;
+  NSRect abortRect = self.abortButton.frame;
+  abortRect.origin.y = yButtonPosition;
+  self.abortButton.frame = abortRect;
   [self.logField setHidden:NO];
   [self.logLabel setHidden:NO];
   [self.logLevelLabel setHidden:NO];
@@ -293,10 +300,17 @@ const int advancedHeightDifference = 70;
   [self.openLogButton setHidden:NO];
   [self.okButton setHidden:NO];
   [self.abortButton setHidden:NO];
+  
 }
 
 - (void) displayControls: (id) sender
 {
+  NSRect okRect = self.okButton.frame;
+  okRect.origin.y = yButtonPosition;
+  self.okButton.frame = okRect;
+  NSRect abortRect = self.abortButton.frame;
+  abortRect.origin.y = yButtonPosition;
+  self.abortButton.frame = abortRect;
   [self.okButton setHidden:NO];
   [self.abortButton setHidden:NO];
 }
