@@ -246,17 +246,26 @@ float yButtonPosition = 0;
     [append appendString:@".log"];
     logPath = [NSURL fileURLWithPath:append];
     [append release];
+    if (![[NSFileManager defaultManager] fileExistsAtPath:[logPath path]]) {
+      [[NSFileManager defaultManager] createFileAtPath:[logPath path] contents:nil attributes:nil];
+    }
   } else {
     logPath = [NSURL URLWithString:logField.stringValue];
-    [[NSFileManager defaultManager] fileExistsAtPath:[logPath path] isDirectory:&isDir];
-    if (isDir) {
-      NSMutableString* append = [[NSMutableString alloc] init];
-      [append setString:[logPath path]];
-      [append appendString:@"/"];
-      [append appendString:alias];
-      [append appendString:@".log"];
-      logPath = [NSURL fileURLWithPath:append];
-      [append release];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:[logPath path] isDirectory:&isDir]) {
+      if (isDir) {
+        NSMutableString* append = [[NSMutableString alloc] init];
+        [append setString:[logPath path]];
+        [append appendString:@"/"];
+        [append appendString:alias];
+        [append appendString:@".log"];
+        logPath = [NSURL fileURLWithPath:append];
+        [append release];
+        if (![[NSFileManager defaultManager] fileExistsAtPath:[logPath path]]) {
+          [[NSFileManager defaultManager] createFileAtPath:[logPath path] contents:nil attributes:nil];
+        }
+      }
+    } else {
+      [[NSFileManager defaultManager] createFileAtPath:[logPath path] contents:nil attributes:nil];
     }
   }
   if (self.editedConfig != nil) {

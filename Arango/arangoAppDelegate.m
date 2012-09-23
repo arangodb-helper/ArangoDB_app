@@ -11,6 +11,7 @@
 #import "arangoToolbarMenu.h"
 #import "ArangoConfiguration.h"
 #import "User.h"
+#import "Bookmarks.h"
 #import "arangoUserConfigController.h"
 
 @implementation arangoAppDelegate
@@ -32,6 +33,19 @@ NSString* arangoVersion;
   NSString* configPath = [[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/arangod.conf"] retain];
   NSTask* newArango = [[NSTask alloc]init];
   [newArango setLaunchPath:arangoPath];
+  // Check for Sandboxed mode
+  if (config.bookmarks != nil) {
+    NSURL* bmPath = [self urlForBookmark:config.bookmarks.path];
+    config.path = [bmPath path];
+    if(![bmPath startAccessingSecurityScopedResource]) {
+      NSLog(@"Not allowed to open path.");
+    }
+    NSURL* bmLog = [self urlForBookmark:config.bookmarks.log];
+    config.log = [bmLog path];
+    if(![bmLog startAccessingSecurityScopedResource]) {
+      NSLog(@"Not allowed to open log.");
+    }
+  }
   NSArray* arguments = [NSArray arrayWithObjects:
                         @"--config", configPath,
                         @"--exit-on-parent-death", @"true",
@@ -59,6 +73,7 @@ NSString* arangoVersion;
   [arangoPath release];
   [configPath release];
   [self save];
+  [self.statusMenu updateMenu];
 }
 
 // Function to run the javascript tests.
@@ -126,7 +141,7 @@ NSString* arangoVersion;
 - (NSManagedObjectContext*) getArangoManagedObjectContext
 {
   if (self.managedObjectContext == nil) {
-    NSURL *storeURL = [[[[[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"Arango"] retain];
+    NSURL *storeURL = [[[[[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"ArangoDB"] retain];
     if (![[NSFileManager defaultManager] fileExistsAtPath:[storeURL path]]) {
       NSError* error = nil;
       if ([[NSFileManager defaultManager] respondsToSelector:@selector(createDirectoryAtURL:withIntermediateDirectories:attributes:error:)]) {
@@ -138,7 +153,7 @@ NSString* arangoVersion;
         NSLog(@"Failed to create sqlite");
       }
     }
-    storeURL = [[storeURL URLByAppendingPathComponent:@"Arango.sqlite"] retain];
+    storeURL = [[storeURL URLByAppendingPathComponent:@"ArangoDB.sqlite"] retain];
     NSURL *modelURL = [[[NSBundle mainBundle] URLForResource:@"configurationModel" withExtension:@"momd"] retain];
     NSError *error = nil;
     NSPersistentStoreCoordinator* coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL]];
@@ -162,6 +177,17 @@ NSString* arangoVersion;
 - (void) startNewArangoWithPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath andLogLevel:(NSString*) level andRunOnStartUp: (BOOL) ros andAlias:(NSString*) alias
 {
   ArangoConfiguration* newArang = (ArangoConfiguration*) [NSEntityDescription insertNewObjectForEntityForName:@"ArangoConfiguration" inManagedObjectContext:[self getArangoManagedObjectContext]];
+  NSURL* pathURL = [NSURL fileURLWithPath:path];
+  if ([pathURL respondsToSelector:@selector(bookmarkDataWithOptions:includingResourceValuesForKeys:relativeToURL:error:)]) {
+    NSData* bookmarkPath = [self bookmarkForURL:pathURL];
+    NSURL* logURL = [NSURL fileURLWithPath:logPath];
+    NSData* bookmarkLog = [self bookmarkForURL:logURL];
+    Bookmarks* bookmarks = (Bookmarks*) [NSEntityDescription insertNewObjectForEntityForName:@"Bookmarks" inManagedObjectContext:[self getArangoManagedObjectContext]];
+    bookmarks.path = bookmarkPath;
+    bookmarks.log = bookmarkLog;
+    bookmarks.config = newArang;
+    newArang.bookmarks = bookmarks;
+  }
   newArang.path = path;
   newArang.port = port;
   newArang.log = logPath;
@@ -179,7 +205,30 @@ NSString* arangoVersion;
 {
   if ([config.isRunning isEqualToNumber:[NSNumber numberWithBool:YES]]) {
     [config.instance terminate];
-    sleep(2);
+  }
+  if (config.bookmarks != nil) {
+    NSURL* oldPath = [self urlForBookmark:config.bookmarks.path];
+    if (oldPath != nil) {
+      [oldPath stopAccessingSecurityScopedResource];
+    }
+    NSURL* oldLogPath = [self urlForBookmark:config.bookmarks.log];
+    if (oldLogPath != nil) {
+      [oldLogPath stopAccessingSecurityScopedResource];
+    }
+    if (![config.path isEqualToString:path]) {
+      NSURL* newPath = [NSURL fileURLWithPath:path];
+      NSData* bookmarkPath = [self bookmarkForURL:newPath];
+      if (bookmarkPath != nil) {
+        config.bookmarks.path = bookmarkPath;
+      }
+    }
+    if (![config.log isEqualToString:logPath]) {
+      NSURL* newLog = [NSURL fileURLWithPath:path];
+      NSData* bookmarkLog = [self bookmarkForURL:newLog];
+      if (bookmarkLog != nil) {
+        config.bookmarks.log = bookmarkLog;
+      }
+    }
   }
   config.path = path;
   config.port = port;
@@ -188,8 +237,12 @@ NSString* arangoVersion;
   config.runOnStartUp = [NSNumber numberWithBool:ros];
   config.alias = alias;
   [self save];
-  [self startArango:config];
+  [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(timedStart:) userInfo:config repeats:NO];
   [statusMenu updateMenu];
+}
+
+- (void) timedStart: (NSTimer*) timer {
+  [self startArango:timer.userInfo];
 }
 
 // Public funcntion to delete the given Arango.
@@ -197,6 +250,18 @@ NSString* arangoVersion;
 {
   if ([config.isRunning isEqualToNumber:[NSNumber numberWithBool:YES]]) {
     [config.instance terminate];
+  }
+  if (config.bookmarks != nil) {
+    NSURL* oldPath = [self urlForBookmark:config.bookmarks.path];
+    if (oldPath != nil) {
+      [oldPath stopAccessingSecurityScopedResource];
+    }
+    NSURL* oldLogPath = [self urlForBookmark:config.bookmarks.log];
+    if (oldLogPath != nil) {
+      [oldLogPath stopAccessingSecurityScopedResource];
+    }
+    [[self getArangoManagedObjectContext] deleteObject: config.bookmarks];
+    config.bookmarks = nil;
   }
   [[self getArangoManagedObjectContext] deleteObject: config];
   [self save];
@@ -320,5 +385,38 @@ NSString* arangoVersion;
   [self.statusItem setHighlightMode:YES];
   [self.statusMenu setAutoenablesItems: NO];
 }
+
+- (NSData*)bookmarkForURL:(NSURL*)url {
+  NSError* theError = nil;
+  //NSData* bookmark = [url bookmarkDataWithOptions:(NSURLBookmarkCreationSuitableForBookmarkFile|NSURLBookmarkCreationWithSecurityScope)
+  NSData* bookmark = [url bookmarkDataWithOptions:NSURLBookmarkCreationWithSecurityScope
+                   includingResourceValuesForKeys:nil
+                                    relativeToURL:nil
+                                            error:&theError];
+  if (theError || (bookmark == nil)) {
+    
+    NSLog(@"Failed to create Bookmark");
+    NSLog(theError.localizedDescription);
+    return nil;
+  }
+  return bookmark;
+}
+
+- (NSURL*)urlForBookmark:(NSData*)bookmark {
+  BOOL bookmarkIsStale = NO;
+  NSError* theError = nil;
+  NSURL* bookmarkURL = [NSURL URLByResolvingBookmarkData:bookmark
+                                                 options:(NSURLBookmarkResolutionWithoutUI|NSURLBookmarkResolutionWithSecurityScope)
+                                           relativeToURL:nil
+                                     bookmarkDataIsStale:&bookmarkIsStale
+                                                   error:&theError];
+  
+  if (bookmarkIsStale || (theError != nil)) {
+    NSLog(@"Failed to resolve URL");
+    NSLog(theError.localizedDescription);
+  }
+  return bookmarkURL;
+}
+
 
 @end
