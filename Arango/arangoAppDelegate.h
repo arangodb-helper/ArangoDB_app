@@ -36,7 +36,7 @@
 - (void) updateArangoConfig:(ArangoConfiguration*) config withPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath andLogLevel:(NSString*) level andRunOnStartUp: (BOOL) ros andAlias:(NSString*) alias;
 // Function to delete a given configuration.
 // Will ask the user if data should be deleted as well.
-- (void) deleteArangoConfig:(ArangoConfiguration*) config;
+- (void) deleteArangoConfig:(ArangoConfiguration*) config andFiles:(BOOL) deleteFiles;
 // Function to save all changes made to permanent objects.
 - (void) save;
 

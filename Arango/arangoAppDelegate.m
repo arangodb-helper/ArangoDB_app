@@ -25,6 +25,7 @@ NSString* adminDir;
 NSString* jsActionDir;
 NSString* jsModPath;
 NSString* arangoVersion;
+int version;
 
 
 // Method to start a new Arango with the given Configuration.
@@ -34,7 +35,7 @@ NSString* arangoVersion;
   NSTask* newArango = [[NSTask alloc]init];
   [newArango setLaunchPath:arangoPath];
   // Check for Sandboxed mode
-  if (config.bookmarks != nil) {
+  if (config.bookmarks != nil  && version > 106) {
     NSURL* bmPath = [self urlForBookmark:config.bookmarks.path];
     config.path = [bmPath path];
     if(![bmPath startAccessingSecurityScopedResource]) {
@@ -178,7 +179,7 @@ NSString* arangoVersion;
 {
   ArangoConfiguration* newArang = (ArangoConfiguration*) [NSEntityDescription insertNewObjectForEntityForName:@"ArangoConfiguration" inManagedObjectContext:[self getArangoManagedObjectContext]];
   NSURL* pathURL = [NSURL fileURLWithPath:path];
-  if ([pathURL respondsToSelector:@selector(bookmarkDataWithOptions:includingResourceValuesForKeys:relativeToURL:error:)]) {
+  if (version > 106) {
     NSData* bookmarkPath = [self bookmarkForURL:pathURL];
     NSURL* logURL = [NSURL fileURLWithPath:logPath];
     NSData* bookmarkLog = [self bookmarkForURL:logURL];
@@ -206,7 +207,7 @@ NSString* arangoVersion;
   if ([config.isRunning isEqualToNumber:[NSNumber numberWithBool:YES]]) {
     [config.instance terminate];
   }
-  if (config.bookmarks != nil) {
+  if (config.bookmarks != nil && version > 106) {
     NSURL* oldPath = [self urlForBookmark:config.bookmarks.path];
     if (oldPath != nil) {
       [oldPath stopAccessingSecurityScopedResource];
@@ -246,22 +247,66 @@ NSString* arangoVersion;
 }
 
 // Public funcntion to delete the given Arango.
-- (void) deleteArangoConfig:(ArangoConfiguration*) config
+- (void) deleteArangoConfig:(ArangoConfiguration*) config andFiles:(BOOL) deleteFiles
 {
   if ([config.isRunning isEqualToNumber:[NSNumber numberWithBool:YES]]) {
     [config.instance terminate];
   }
-  if (config.bookmarks != nil) {
-    NSURL* oldPath = [self urlForBookmark:config.bookmarks.path];
-    if (oldPath != nil) {
-      [oldPath stopAccessingSecurityScopedResource];
+  if (deleteFiles) {
+      [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(deleteFiles:) userInfo:config repeats:NO];
+  } else {
+    if (config.bookmarks != nil  && version > 106) {
+      NSURL* oldPath = [self urlForBookmark:config.bookmarks.path];
+      if (oldPath != nil) {
+        [oldPath stopAccessingSecurityScopedResource];
+      }
+      NSURL* oldLogPath = [self urlForBookmark:config.bookmarks.log];
+      if (oldLogPath != nil) {
+        [oldLogPath stopAccessingSecurityScopedResource];
+      }
+      [[self getArangoManagedObjectContext] deleteObject: config.bookmarks];
+      config.bookmarks = nil;
     }
+    [[self getArangoManagedObjectContext] deleteObject: config];
+    [self save];
+    [statusMenu updateMenu];
+  }
+}
+
+- (void) deleteFiles: (NSTimer*) timer {
+  ArangoConfiguration* config = timer.userInfo;
+  NSError* error = nil;
+  if (config.bookmarks != nil  && version > 106) {
+    
     NSURL* oldLogPath = [self urlForBookmark:config.bookmarks.log];
     if (oldLogPath != nil) {
       [oldLogPath stopAccessingSecurityScopedResource];
     }
+    [[NSFileManager defaultManager] removeItemAtPath:config.log error:&error];
+    if (error != nil) {
+      NSLog(error.localizedDescription);
+    }
+    error = nil;
+    NSURL* oldPath = [self urlForBookmark:config.bookmarks.path];
+    if (oldPath != nil) {
+      [oldPath stopAccessingSecurityScopedResource];
+    }
+    [[NSFileManager defaultManager] removeItemAtPath:config.path error:&error];
+    if (error != nil) {
+      NSLog(error.localizedDescription);
+    }
     [[self getArangoManagedObjectContext] deleteObject: config.bookmarks];
     config.bookmarks = nil;
+  } else {
+    [[NSFileManager defaultManager] removeItemAtPath:config.log error:&error];
+    if (error != nil) {
+      NSLog(error.localizedDescription);
+    }
+    error = nil;
+    [[NSFileManager defaultManager] removeItemAtPath:config.path error:&error];
+    if (error != nil) {
+      NSLog(error.localizedDescription);
+    }
   }
   [[self getArangoManagedObjectContext] deleteObject: config];
   [self save];
@@ -369,11 +414,14 @@ NSString* arangoVersion;
   jsModPath = [[[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/modules:"] stringByAppendingString:[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/common/modules"]] retain];
   if ([[NSBundle mainBundle] respondsToSelector:@selector(loadNibNamed:owner:topLevelObjects:)]) {
     arangoVersion = @"/arangod_10_8";
+    version = 108;
   } else {
     if ([[NSFileManager defaultManager] respondsToSelector:@selector(createDirectoryAtURL:withIntermediateDirectories:attributes:error:)]) {
       arangoVersion = @"/arangod_10_7";
+      version = 107;
     } else {
       arangoVersion = @"/arangod_10_6";
+      version = 106;
     }
     
   }
@@ -387,8 +435,10 @@ NSString* arangoVersion;
 }
 
 - (NSData*)bookmarkForURL:(NSURL*)url {
+  if (version == 106) {
+    return nil;
+  }
   NSError* theError = nil;
-  //NSData* bookmark = [url bookmarkDataWithOptions:(NSURLBookmarkCreationSuitableForBookmarkFile|NSURLBookmarkCreationWithSecurityScope)
   NSData* bookmark = [url bookmarkDataWithOptions:NSURLBookmarkCreationWithSecurityScope
                    includingResourceValuesForKeys:nil
                                     relativeToURL:nil
@@ -403,6 +453,9 @@ NSString* arangoVersion;
 }
 
 - (NSURL*)urlForBookmark:(NSData*)bookmark {
+  if (version == 106) {
+    return nil;
+  }
   BOOL bookmarkIsStale = NO;
   NSError* theError = nil;
   NSURL* bookmarkURL = [NSURL URLByResolvingBookmarkData:bookmark

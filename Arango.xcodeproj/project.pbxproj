@@ -105,6 +105,10 @@
 		8A9499D21609E44300A0ABA7 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8A949952160072B500A0ABA7 /* icon.icns */; };
 		8A9499D31609E44300A0ABA7 /* arangodbLogoGrey.png in Resources */ = {isa = PBXBuildFile; fileRef = 8A9499541600752100A0ABA7 /* arangodbLogoGrey.png */; };
 		8A9499D51609E44300A0ABA7 /* arangodbLogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 8A9499701607214A00A0ABA7 /* arangodbLogo.png */; };
+		8AE2060016109E53003CF0AA /* arangod.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = 8AE205FF16109E53003CF0AA /* arangod.entitlements */; };
+		8AE2060116109E53003CF0AA /* arangod.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = 8AE205FF16109E53003CF0AA /* arangod.entitlements */; };
+		8AE2060216109E53003CF0AA /* arangod.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = 8AE205FF16109E53003CF0AA /* arangod.entitlements */; };
+		8AE2060316109E53003CF0AA /* arangod.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = 8AE205FF16109E53003CF0AA /* arangod.entitlements */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -153,6 +157,7 @@
 		8A9499BB1609E40200A0ABA7 /* Arango 10.7-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Arango 10.7-Info.plist"; path = "/Users/hacki/triAgens/Arango/Arango 10.7-Info.plist"; sourceTree = "<absolute>"; };
 		8A9499DB1609E44300A0ABA7 /* Arango 10.6.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Arango 10.6.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8A9499DD1609E44400A0ABA7 /* Arango 10.6-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Arango 10.6-Info.plist"; path = "/Users/hacki/triAgens/Arango/Arango 10.6-Info.plist"; sourceTree = "<absolute>"; };
+		8AE205FF16109E53003CF0AA /* arangod.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = arangod.entitlements; path = Arango/arangod.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -198,6 +203,7 @@
 		8A293B3F15F5E23D008959B1 /* ArangoCore */ = {
 			isa = PBXGroup;
 			children = (
+				8AE205FF16109E53003CF0AA /* arangod.entitlements */,
 				8A4E632F160A12E60001D66F /* arangod_10_6 */,
 				8A9499761609DAD500A0ABA7 /* arangod_10_7 */,
 				8A9499771609DAD500A0ABA7 /* arangod_10_8 */,
@@ -320,6 +326,7 @@
 				8A4E6356160C5EB70001D66F /* Sources */,
 				8A4E635F160C5EB70001D66F /* Frameworks */,
 				8A4E6362160C5EB70001D66F /* Resources */,
+				8AE205FD1610990C003CF0AA /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -431,6 +438,7 @@
 				8A4E6371160C5EB70001D66F /* arangod_10_6 in Resources */,
 				8A4E6363160C5EB70001D66F /* arangod_10_7 in Resources */,
 				8A4E6364160C5EB70001D66F /* arangod_10_8 in Resources */,
+				8AE2060316109E53003CF0AA /* arangod.entitlements in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -451,6 +459,7 @@
 				8A94996F16071D3700A0ABA7 /* arangoUserConfigController.xib in Resources */,
 				8A9499711607214A00A0ABA7 /* arangodbLogo.png in Resources */,
 				8A9499791609DAD500A0ABA7 /* arangod_10_8 in Resources */,
+				8AE2060016109E53003CF0AA /* arangod.entitlements in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -471,6 +480,7 @@
 				8A9499B21609E40000A0ABA7 /* arangoUserConfigController.xib in Resources */,
 				8A9499B31609E40000A0ABA7 /* arangodbLogo.png in Resources */,
 				8A9499B41609E40000A0ABA7 /* arangod_10_7 in Resources */,
+				8AE2060116109E53003CF0AA /* arangod.entitlements in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -491,10 +501,27 @@
 				8A9499D31609E44300A0ABA7 /* arangodbLogoGrey.png in Resources */,
 				8A9499D51609E44300A0ABA7 /* arangodbLogo.png in Resources */,
 				8A4E6330160A12E60001D66F /* arangod_10_6 in Resources */,
+				8AE2060216109E53003CF0AA /* arangod.entitlements in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		8AE205FD1610990C003CF0AA /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "codesign --entitlements ${SOURCE_ROOT}/Arango/arangod.entitlements -f -v -s \"3rd Party Mac Developer Application: triAGENS GmbH\" $TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/arangod_10_6\ncodesign --entitlements ${SOURCE_ROOT}/Arango/arangod.entitlements -f -v -s \"3rd Party Mac Developer Application: triAGENS GmbH\" $TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/arangod_10_7\ncodesign --entitlements ${SOURCE_ROOT}/Arango/arangod.entitlements -f -v -s \"3rd Party Mac Developer Application: triAGENS GmbH\" $TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/arangod_10_8";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		8A4E6356160C5EB70001D66F /* Sources */ = {
@@ -595,7 +622,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Arango/ArangoDB.entitlements;
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application: triAGENS GmbH";
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Arango/Arango-Prefix.pch";
@@ -603,6 +630,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = ArangoDB;
+				PROVISIONING_PROFILE = "6F48D42F-FBC1-4037-A6D0-7A9B52A9DCC8";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -611,7 +639,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Arango/ArangoDB.entitlements;
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application: triAGENS GmbH";
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Arango/Arango-Prefix.pch";
@@ -619,6 +647,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = ArangoDB;
+				PROVISIONING_PROFILE = "6F48D42F-FBC1-4037-A6D0-7A9B52A9DCC8";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -631,6 +660,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application: triAGENS GmbH";
 				COPY_PHASE_STRIP = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -647,6 +677,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = YES;
+				PROVISIONING_PROFILE = "6F48D42F-FBC1-4037-A6D0-7A9B52A9DCC8";
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -659,6 +690,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application: triAGENS GmbH";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -668,6 +700,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PROVISIONING_PROFILE = "6F48D42F-FBC1-4037-A6D0-7A9B52A9DCC8";
 				SDKROOT = macosx;
 			};
 			name = Release;

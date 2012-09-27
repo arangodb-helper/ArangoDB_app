@@ -109,6 +109,8 @@ float yButtonPosition = 0;
 
 - (void) fillArango: (ArangoConfiguration*) config
 {
+  self.window.title = @"Edit ArangoDB";
+  self.okButton.title = @"Edit";
   self.dbPathField.stringValue = config.path;
   self.portField.stringValue = [self.portFormatter stringFromNumber:config.port];
   self.logField.stringValue = config.log;

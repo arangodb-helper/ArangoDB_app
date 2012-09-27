@@ -170,23 +170,9 @@
 - (void) confirmedDialog:(NSAlert*) dialog returnCode:(int) rC contextInfo: (ArangoConfiguration *) config
 {
   if (rC == -1) {
-    if ([config.isRunning isEqualToNumber:[NSNumber numberWithBool:YES]]) {
-      [config.instance terminate];
-      sleep(2);
-    }
-    NSError* error = nil;
-    [[NSFileManager defaultManager] removeItemAtPath:config.log error:&error];
-    if (error != nil) {
-      NSLog(error.localizedDescription);
-    }
-    error = nil;
-    [[NSFileManager defaultManager] removeItemAtPath:config.path error:&error];
-    if (error != nil) {
-      NSLog(error.localizedDescription);
-    }
-    [self.appDelegate deleteArangoConfig:config];
+    [self.appDelegate deleteArangoConfig:config andFiles:YES];
   } else if (rC == 1) {
-    [self.appDelegate deleteArangoConfig:config];
+    [self.appDelegate deleteArangoConfig:config andFiles:NO];
   }
   
 }
