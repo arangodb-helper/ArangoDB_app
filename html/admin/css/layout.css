@@ -1,3 +1,8 @@
+#logTableID {
+  border-left: 1px solid #AAAAAA;  
+  border-right: 1px solid #AAAAAA;  
+}
+
 .jediTextarea textarea {
   border: solid 1px #525252; 
   background-color: #F3F1EE; 
@@ -355,7 +360,7 @@ pre ul li span{
 
 #tabs {
   background: #F3F1EE;
-  border: 0; 
+  border: 0;
 }
 
 #tabs th{
@@ -381,7 +386,7 @@ form {
   height:20px;  
 }
 
-#submitQuery, #refreshShell {
+#submitQuery {
   height:30px !important;
   float:right;
 }
@@ -389,8 +394,8 @@ form {
 #formatshellJSONyesno {
   font-weight:0.8em; 
   float:right; 
-  padding-right:10px; 
-  margin-top: -3px; 
+  padding-right:5px; 
+  margin-top: -10px; 
   color: #797979;
 }
 
@@ -409,19 +414,16 @@ form {
   height:30px !important;
   width: 100px !important;
 }
-#refreshShell{
-  padding-bottom: 3px;
-  margin-top: -10px;  
-  width: 9.5% !important;
-}
 
 #queryOutput a, .queryError, .querySuccess {
   font-size: 0.9em !important; 
+  padding-left: 10px;  
   font-family: "courier"; 
 }
 
 
 #queryOutput {
+  padding-top: 10px;  
   height:35%; 
   overflow-y: auto; 
   border: 1px solid black;
@@ -431,7 +433,13 @@ form {
   resize: vertical !important; 
 }
 
+#queryOutput pre {
+  padding-left: 10px;  
+}
+
 #queryContent {
+  padding-left: 10px;
+  padding-top: 10px;  
   height: 45%; 
   font-family: "courier";
   width: 100%;
@@ -471,6 +479,7 @@ form {
   height: 30px;
   background-color: white; 
   margin-right: 0.5%;
+  padding-left: 10px; 
 } 
 
 .avocshSuccess {
@@ -490,9 +499,16 @@ form {
   font-family: "courier";
 }
 
+#refreshShell{
+  width: 6% !important; 
+  height: 29px !important;
+  vertical-align: -1px;
+  margin-left: 0.5%;  
+}
+
 #submitAvoc {
   height: 29px !important; 
-  width: 9.5% !important;  
+  width: 3% !important;  
   vertical-align: -1px;  
 }
 
