@@ -768,7 +768,7 @@ var logTable = $('#logTableID').dataTable({
       for (row in data) {
         var row_data = data[row];
         if ( row_data[1] == "_id" ) {
-          collectionID = JSON.parse(row_data[3]); 
+          collectionID = row_data[3]; 
         } 
         else {
           result[row_data[1]] = JSON.parse(row_data[3]);
