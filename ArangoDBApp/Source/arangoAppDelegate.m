@@ -284,7 +284,7 @@ int version;
     }
     [[NSFileManager defaultManager] removeItemAtPath:config.log error:&error];
     if (error != nil) {
-      NSLog(error.localizedDescription);
+      NSLog(@"%@", error.localizedDescription);
     }
     error = nil;
     NSURL* oldPath = [self urlForBookmark:config.bookmarks.path];
@@ -293,19 +293,19 @@ int version;
     }
     [[NSFileManager defaultManager] removeItemAtPath:config.path error:&error];
     if (error != nil) {
-      NSLog(error.localizedDescription);
+      NSLog(@"%@", error.localizedDescription);
     }
     [[self getArangoManagedObjectContext] deleteObject: config.bookmarks];
     config.bookmarks = nil;
   } else {
     [[NSFileManager defaultManager] removeItemAtPath:config.log error:&error];
     if (error != nil) {
-      NSLog(error.localizedDescription);
+      NSLog(@"%@", error.localizedDescription);
     }
     error = nil;
     [[NSFileManager defaultManager] removeItemAtPath:config.path error:&error];
     if (error != nil) {
-      NSLog(error.localizedDescription);
+      NSLog(@"%@", error.localizedDescription);
     }
   }
   [[self getArangoManagedObjectContext] deleteObject: config];
@@ -321,7 +321,7 @@ int version;
   NSError* error = nil;
   [[self getArangoManagedObjectContext] save:&error];
   if (error != nil) {
-    NSLog(error.localizedDescription);
+    NSLog(@"%@", error.localizedDescription);
   }
 }
 
@@ -338,7 +338,7 @@ int version;
   [userRequest release];
   NSNumber* ros = nil;
   if (fetchedResults == nil) {
-    NSLog(error.localizedDescription);
+    NSLog(@"%@", error.localizedDescription);
   } else {
     if (fetchedResults.count > 0) {
       for (User* u in fetchedResults) {
@@ -356,7 +356,7 @@ int version;
   fetchedResults = [[self getArangoManagedObjectContext] executeFetchRequest:request error:&error];
   [request release];
   if (fetchedResults == nil) {
-    NSLog(error.localizedDescription);
+    NSLog(@"%@", error.localizedDescription);
   } else {
     switch ([ros integerValue]) {
       // Start no Arango.
@@ -428,8 +428,7 @@ int version;
   self.statusMenu = [[arangoToolbarMenu alloc] initWithAppDelegate:self];
   self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength];
   [self.statusItem setMenu: statusMenu];
-  //[statusItem setImage: [NSImage imageNamed:@"arangoLogoGrey"]];
-  [self.statusItem setImage: [NSImage imageNamed:@"arangoLogoGreen"]];
+  [self.statusItem setImage: [NSImage imageNamed:@"IconColor"]];
   [self.statusItem setHighlightMode:YES];
   [self.statusMenu setAutoenablesItems: NO];
 }
@@ -446,7 +445,7 @@ int version;
   if (theError || (bookmark == nil)) {
     
     NSLog(@"Failed to create Bookmark");
-    NSLog(theError.localizedDescription);
+    NSLog(@"%@", theError.localizedDescription);
     return nil;
   }
   return bookmark;
@@ -466,7 +465,7 @@ int version;
   
   if (bookmarkIsStale || (theError != nil)) {
     NSLog(@"Failed to resolve URL");
-    NSLog(theError.localizedDescription);
+    NSLog(@"%@", theError.localizedDescription);
   }
   return bookmarkURL;
 }

@@ -76,7 +76,7 @@ const NSString* NON = @"Do not start instaces";
   NSArray *fetchedResults = [[self.delegate getArangoManagedObjectContext] executeFetchRequest:userRequest error:&error];
   [userRequest release];
   if (fetchedResults == nil) {
-    NSLog(error.localizedDescription);
+    NSLog(@"%@", error.localizedDescription);
   } else {
     if (fetchedResults.count > 0) {
       for (User* u in fetchedResults) {
@@ -143,7 +143,7 @@ const NSString* NON = @"Do not start instaces";
     ros = [NSNumber numberWithInt:0];
   }
   if (fetchedResults == nil) {
-    NSLog(error.localizedDescription);
+    NSLog(@"%@", error.localizedDescription);
   } else {
     if (fetchedResults.count > 0) {
       for (User* u in fetchedResults) {

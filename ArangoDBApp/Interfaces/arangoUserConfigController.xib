@@ -223,7 +223,7 @@
 								<int key="NSCellFlags2">33554432</int>
 								<object class="NSCustomResource" key="NSContents">
 									<string key="NSClassName">NSImage</string>
-									<string key="NSResourceName">arangodbLogo</string>
+									<string key="NSResourceName">Logo</string>
 								</object>
 								<string key="NSCellIdentifier">_NS:9</string>
 								<int key="NSAlign">0</int>
@@ -581,7 +581,7 @@
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
 		<dictionary class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
 			<string key="NSSwitch">{15, 15}</string>
-			<string key="arangodbLogo">{1024, 200}</string>
+			<string key="Logo">{1024, 200}</string>
 		</dictionary>
 	</data>
 </archive>

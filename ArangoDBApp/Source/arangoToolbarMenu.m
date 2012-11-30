@@ -64,7 +64,7 @@
   NSArray *fetchedResults = [[self.appDelegate getArangoManagedObjectContext] executeFetchRequest:request error:&error];
   [request release];
   if (fetchedResults == nil) {
-    NSLog(error.localizedDescription);
+    NSLog(@"%@", error.localizedDescription);
   } else {
     for (ArangoConfiguration* c in fetchedResults) {
       
@@ -129,7 +129,7 @@
   NSError* error = nil;
   [[self.appDelegate getArangoManagedObjectContext] save: &error];
   if (error != nil) {
-    NSLog(error.localizedDescription);
+    NSLog(@"%@", error.localizedDescription);
   }
   [self updateMenu];
 }
@@ -162,7 +162,7 @@
   [infoText setString:@"Do you want to delete the contents of folder \""];
   [infoText appendString:config.path];
   [infoText appendString:@"\" and the log-file as well?"];
-  NSAlert* info = [NSAlert alertWithMessageText:@"Delete Data?" defaultButton:@"Keep Data" alternateButton:@"Abort" otherButton:@"Delete Data" informativeTextWithFormat:infoText];
+  NSAlert* info = [NSAlert alertWithMessageText:@"Delete Data?" defaultButton:@"Keep Data" alternateButton:@"Abort" otherButton:@"Delete Data" informativeTextWithFormat:@"%@",infoText];
   [infoText release];
   [info beginSheetModalForWindow:nil modalDelegate:self didEndSelector:@selector(confirmedDialog:returnCode:contextInfo:) contextInfo: (void *)(config)];
 }
