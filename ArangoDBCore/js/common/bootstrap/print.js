@@ -53,7 +53,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief prints objects to standard output
 ///
-/// @FUN{print(@FA{arg1}, @FA{arg2}, @FA{arg3}, ...)}
+/// @FUN{internal.printShell(@FA{arg1}, @FA{arg2}, @FA{arg3}, ...)}
 ///
 /// Only available in shell mode.
 ///
@@ -80,7 +80,7 @@
       }
     }
 
-    if (typeof(internal.COLOR_OUTPUT) !== "undefined") {
+    if (internal.COLOR_OUTPUT) {
       internal.output(internal.COLOR_OUTPUT_RESET);
     }
 
@@ -270,8 +270,8 @@
 
         internal.printIndent(newLevel);
 
-        if (typeof(internal.COLOR_OUTPUT) !== "undefined") {
-          internal.output(internal.COLOR_OUTPUT,
+        if (internal.COLOR_OUTPUT) {
+          internal.output(internal.COLOR_OUTPUT_DEFAULT,
                           k,
                           internal.COLOR_OUTPUT_RESET, 
                           " : ");

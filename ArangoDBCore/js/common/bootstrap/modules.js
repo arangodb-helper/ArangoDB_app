@@ -10,7 +10,8 @@
  SYS_LOAD, SYS_LOG, SYS_LOG_LEVEL, SYS_OUTPUT,
  SYS_PROCESS_STAT, SYS_READ, SYS_SPRINTF, SYS_TIME,
  SYS_START_PAGER, SYS_STOP_PAGER, ARANGO_QUIET, MODULES_PATH,
- COLOR_OUTPUT, COLOR_OUTPUT_RESET, COLOR_BRIGHT, PRETTY_PRINT */
+ COLOR_OUTPUT, COLOR_OUTPUT_RESET, COLOR_BRIGHT, PRETTY_PRINT,
+ SYS_SHA256, SYS_WAIT, SYS_GETLINE */
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief JavaScript server functions
@@ -55,6 +56,12 @@
 ModuleCache = {};
 
 ////////////////////////////////////////////////////////////////////////////////
+/// @brief file exists cache
+////////////////////////////////////////////////////////////////////////////////
+
+ExistsCache = {};
+
+////////////////////////////////////////////////////////////////////////////////
 /// @brief module constructor
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -86,29 +93,33 @@ Module.prototype.require = function (path) {
   // locate file and read content
   raw = ModuleCache["/internal"].exports.readFile(path);
 
+  // test for parse errors first and fail early if a parse error detected
+  if (! SYS_PARSE(raw.content, path)) {
+    throw "Javascript parse error in file '" + path + "'";
+  }
+
   // create a new sandbox and execute
   module = ModuleCache[path] = new Module(path);
 
   content = "(function (module, exports, require, print) {"
           + raw.content 
           + "\n});";
-
-  try {
-    f = SYS_EXECUTE(content, undefined, path);
-  }
-  catch (err) {
-    require("console").error("in file %s: %o", path, err.stack);
-    throw err;
-  }
+  
+  f = SYS_EXECUTE(content, undefined, path);
 
   if (f === undefined) {
     throw "cannot create context function";
   }
-
-  f(module,
-    module.exports,
-    function(path) { return module.require(path); },
-    ModuleCache["/internal"].exports.print);
+ 
+  try {
+    f(module,
+      module.exports,
+      function(path) { return module.require(path); },
+      ModuleCache["/internal"].exports.print);
+  }
+  catch (err) {
+    throw "Javascript exception in file '" + path + "': " + err.stack;
+  }
 
   return module.exports;
 };
@@ -185,6 +196,20 @@ Module.prototype.unload = function (path) {
 };
 
 ////////////////////////////////////////////////////////////////////////////////
+/// @brief unloads module
+////////////////////////////////////////////////////////////////////////////////
+
+Module.prototype.unloadAll = function () {
+  var path;
+
+  for (path in ModuleCache) {
+    if (ModuleCache.hasOwnProperty(path)) {
+      this.unload(path);
+    }
+  }
+};
+
+////////////////////////////////////////////////////////////////////////////////
 /// @brief top-level module
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -197,11 +222,11 @@ module = ModuleCache["/"] = new Module("/");
 ///
 /// @FN{require} checks if the file specified by @FA{path} has already been
 /// loaded.  If not, the content of the file is executed in a new
-/// context. Within the context you can use the global variable @CODE{exports}
+/// context. Within the context you can use the global variable @LIT{exports}
 /// in order to export variables and functions. This variable is returned by
 /// @FN{require}.
 ///
-/// Assume that your module file is @CODE{test1.js} and contains
+/// Assume that your module file is @LIT{test1.js} and contains
 ///
 /// @verbinclude modules-require-1
 ///
@@ -231,7 +256,7 @@ function require (path) {
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief fs module
+/// @brief file-system module
 ////////////////////////////////////////////////////////////////////////////////
 
 ModuleCache["/fs"] = new Module("/fs");
@@ -281,6 +306,21 @@ ModuleCache["/internal"] = new Module("/internal");
   internal.wait = SYS_WAIT;
 
 
+  // password interface
+  internal.encodePassword = function (password) {
+    var salt;
+    var encoded;
+
+    salt = internal.sha256("time:" + SYS_TIME());
+    salt = salt.substr(0,8);
+
+    encoded = "$1$" + salt + "$" + internal.sha256(salt + password);
+    
+    return encoded;
+  }
+
+
+
   // command line parameter
   internal.MODULES_PATH = "";
 
@@ -290,12 +330,13 @@ ModuleCache["/internal"] = new Module("/internal");
 
 
   // output 
-  internal.start_pager = function() {};
-  internal.stop_pager = function() {};
+  internal.start_pager = function () {};
+  internal.stop_pager = function () {};
 
   internal.ARANGO_QUIET = false;
 
-  internal.COLOR_OUTPUT = undefined;
+  internal.COLOR_OUTPUT = false;
+  internal.COLOR_OUTPUT_DEFAULT = "";
   internal.COLOR_OUTPUT_RESET = "";
   internal.COLOR_BRIGHT = "";
 
@@ -325,19 +366,42 @@ ModuleCache["/internal"] = new Module("/internal");
     internal.PRETTY_PRINT = PRETTY_PRINT;
   }
 
+  if (internal.COLOR_OUTPUT) {
+    internal.COLOR_OUTPUT_DEFAULT = internal.COLOR_BRIGHT;
+
+    internal.COLOR_BLACK = COLOR_BLACK;
+    internal.COLOR_BOLD_BLACK = COLOR_BOLD_BLACK;
+    internal.COLOR_BLINK = COLOR_BLINK;
+    internal.COLOR_BLUE = COLOR_BLUE;
+    internal.COLOR_BOLD_BLUE = COLOR_BOLD_BLUE;
+    internal.COLOR_BRIGHT = COLOR_BRIGHT;
+    internal.COLOR_GREEN = COLOR_GREEN;
+    internal.COLOR_BOLD_GREEN = COLOR_BOLD_GREEN;
+    internal.COLOR_RED = COLOR_RED;
+    internal.COLOR_BOLD_RED = COLOR_BOLD_RED;
+    internal.COLOR_WHITE = COLOR_WHITE;
+    internal.COLOR_BOLD_WHITE = COLOR_BOLD_WHITE;
+    internal.COLOR_YELLOW = COLOR_YELLOW;
+    internal.COLOR_BOLD_YELLOW = COLOR_BOLD_YELLOW;
+    internal.COLOR_OUTPUT_RESET = COLOR_OUTPUT_RESET;
+  }
+
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief reads a file
+/// @brief reads a file from the module path or the database
 ////////////////////////////////////////////////////////////////////////////////
 
   internal.readFile = function (path) {
     var i;
+    var mc;
+    var n;
+
+    var existsCache = ExistsCache;
 
     // try to load the file
     var paths = internal.MODULES_PATH;
 
     for (i = 0;  i < paths.length;  ++i) {
       var p = paths[i];
-      var n;
 
       if (p === "") {
         n = "." + path + ".js";
@@ -347,10 +411,29 @@ ModuleCache["/internal"] = new Module("/internal");
       }
 
       if (fs.exists(n)) {
-        return { path : n, content : SYS_READ(n) };
+        existsCache[path] = true;
+        return { path : n, content : internal.read(n) };
       }
     }
 
+    // try to load the module from the database
+    mc = internal.db._collection("_modules");
+
+    if (mc !== null && ("firstExample" in mc)) {
+      n = mc.firstExample({ path: path });
+
+      if (n !== null) {
+        if (n.hasOwnProperty('content')) {
+          existsCache[path] = true;
+          return { path : "_collection/" + path, content : n.content };
+        }
+        else {
+	  require("console").error("found empty content in '%s'", JSON.stringify(n));
+        }
+      }
+    }
+
+    existsCache[path] = false;
     throw "cannot find a file named '"
         + path
         + "' using the module path(s) '" 
@@ -358,7 +441,7 @@ ModuleCache["/internal"] = new Module("/internal");
   };
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief loads a file
+/// @brief loads a file from the file-system
 ////////////////////////////////////////////////////////////////////////////////
 
   internal.loadFile = function (path) {
@@ -387,6 +470,35 @@ ModuleCache["/internal"] = new Module("/internal");
         + path 
         + "' using the module path(s) '" 
         + internal.MODULES_PATH + "'";
+  };
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief defines a module
+////////////////////////////////////////////////////////////////////////////////
+
+  internal.defineModule = function (path, file) {
+    var content;
+    var m;
+    var mc;
+
+    content = internal.read(file);
+
+    mc = internal.db._collection("_modules");
+
+    if (mc === null) {
+      mc = internal.db._create("_modules", { isSystem: true });
+    }
+
+    path = module.normalise(path);
+    m = mc.firstExample({ path: path });
+
+    if (m === null) {
+      mc.save({ path: path, module: content });
+    }
+    else {
+      m.module = content;
+      mc.replace(m, m);
+    }
   };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -538,6 +650,10 @@ ModuleCache["/console"] = new Module("/console");
 ////////////////////////////////////////////////////////////////////////////////
 
 }());
+
+// -----------------------------------------------------------------------------
+// --SECTION--                                                       END-OF-FILE
+// -----------------------------------------------------------------------------
 
 // Local Variables:
 // mode: outline-minor
