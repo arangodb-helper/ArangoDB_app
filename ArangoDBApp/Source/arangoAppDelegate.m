@@ -50,7 +50,7 @@ int version;
   NSArray* arguments = [NSArray arrayWithObjects:
                         @"--config", configPath,
                         @"--exit-on-parent-death", @"true",
-                        @"--server.http-port", config.port.stringValue,
+                        @"--server.endpoint", [NSString stringWithFormat:@"tcp://0.0.0.0:%@", config.port.stringValue],
                         @"--log.file", config.log,
                         @"--log.level", config.loglevel,
                         @"--server.admin-directory", adminDir,
