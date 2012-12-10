@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief ArangoDB application delegate
+/// @brief base controller
 ///
 /// @file
 ///
@@ -26,38 +26,78 @@
 /// @author Copyright 2012, triAGENS GmbH, Cologne, Germany
 ////////////////////////////////////////////////////////////////////////////////
 
-#import <Cocoa/Cocoa.h>
-
-@class ArangoToolbarMenu;
-@class ArangoManager;
+#import "ArangoBaseController.h"
 
 // -----------------------------------------------------------------------------
-// --SECTION--                                                 ArangoAppDelegate
+// --SECTION--                                              ArangoBaseController
 // -----------------------------------------------------------------------------
 
-@interface ArangoAppDelegate : NSObject <NSApplicationDelegate>
+@implementation ArangoBaseController
 
 // -----------------------------------------------------------------------------
-// --SECTION--                                                        properties
+// --SECTION--                                                    public methods
 // -----------------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief the underlying menu of the status-bar icon
+/// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) ArangoToolbarMenu* statusMenu;
+- (id) initWithArangoManager: (ArangoManager*) delegate
+                 andNibNamed: (NSString*) name
+        andReleasedWhenClose: (BOOL) releasedWhenClosed {
+  _tlo = nil;
+  
+  // loadNibNamed:owner:topLevelObjects was introduced in 10.8
+  if ([[NSBundle mainBundle] respondsToSelector:@selector(loadNibNamed:owner:topLevelObjects:)]) {
+    self = [super init];
+      
+    if (self) {
+      [[NSBundle mainBundle] loadNibNamed:name owner:self topLevelObjects:&_tlo];
+      [_tlo retain];
+    }
+  }
+  else {
+    self = [self initWithWindowNibName:name owner:self];
+  }
+
+  if (self) {
+    _delegate = [delegate retain];
+    _releaseWhenClosed = releasedWhenClosed;
+    
+    [self.window setDelegate:self];
+
+    [self.window setReleasedWhenClosed:releasedWhenClosed];
+    [self.window center];
+
+    [NSApp activateIgnoringOtherApps:YES];
+    
+    [self.window makeKeyWindow];
+    [self showWindow:self.window];
+  }
+  
+  return self;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief the icon as well as an accesspoint for the menu
+/// @brief destructor
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) NSStatusItem * statusItem;
+- (void) dealloc {
+  [_tlo release];
+  [_delegate release];
+
+  [super dealloc];
+}
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief the manager (model)
+/// @brief window should close
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) ArangoManager* manager;
+- (void) windowWillClose: (id) sender {
+  // if (_releaseWhenClosed) {
+  //   [self autorelease];
+  // }
+}
 
 @end
 

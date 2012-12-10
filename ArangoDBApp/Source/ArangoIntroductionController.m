@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief ArangoDB application delegate
+/// @brief introduction controller
 ///
 /// @file
 ///
@@ -26,38 +26,38 @@
 /// @author Copyright 2012, triAGENS GmbH, Cologne, Germany
 ////////////////////////////////////////////////////////////////////////////////
 
-#import <Cocoa/Cocoa.h>
+#import "ArangoIntroductionController.h"
 
-@class ArangoToolbarMenu;
-@class ArangoManager;
-
-// -----------------------------------------------------------------------------
-// --SECTION--                                                 ArangoAppDelegate
-// -----------------------------------------------------------------------------
-
-@interface ArangoAppDelegate : NSObject <NSApplicationDelegate>
+#import "ArangoInstanceController.h"
 
 // -----------------------------------------------------------------------------
-// --SECTION--                                                        properties
+// --SECTION--                                      ArangoIntroductionController
+// -----------------------------------------------------------------------------
+
+@implementation ArangoIntroductionController
+
+// -----------------------------------------------------------------------------
+// --SECTION--                                                    public methods
 // -----------------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief the underlying menu of the status-bar icon
+/// @brief constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) ArangoToolbarMenu* statusMenu;
+- (id) initWithArangoManager: (ArangoManager*) delegate {
+  return [self initWithArangoManager:delegate
+                         andNibNamed:@"ArangoIntroductionView"];
+}
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief the icon as well as an accesspoint for the menu
+/// @brief open web-site with more information
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) NSStatusItem * statusItem;
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief the manager (model)
-////////////////////////////////////////////////////////////////////////////////
-
-@property (nonatomic, assign, readonly) ArangoManager* manager;
+- (IBAction) createInstance: (id) sender {
+  // will autorelease on close
+  [[ArangoInstanceController alloc] initWithArangoManager:self.delegate];
+  [self.window orderOut:self.window];
+}
 
 @end
 

@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief ArangoDB application delegate
+/// @brief status information about ArangoDB instance / configuration
 ///
 /// @file
 ///
@@ -22,42 +22,80 @@
 /// Copyright holder is triAGENS GmbH, Cologne, Germany
 ///
 /// @author Dr. Frank Celler
-/// @author Michael Hackstein
 /// @author Copyright 2012, triAGENS GmbH, Cologne, Germany
 ////////////////////////////////////////////////////////////////////////////////
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 
-@class ArangoToolbarMenu;
-@class ArangoManager;
+@class User;
 
 // -----------------------------------------------------------------------------
-// --SECTION--                                                 ArangoAppDelegate
+// --SECTION--                                              ArangoBaseController
 // -----------------------------------------------------------------------------
 
-@interface ArangoAppDelegate : NSObject <NSApplicationDelegate>
+@interface ArangoStatus : NSObject
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                        properties
 // -----------------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief the underlying menu of the status-bar icon
+/// @brief name of the configuration
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) ArangoToolbarMenu* statusMenu;
+@property (nonatomic, assign, readonly) NSString* name;
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief the icon as well as an accesspoint for the menu
+/// @brief port to listen to
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) NSStatusItem * statusItem;
+@property (nonatomic, assign, readonly) int port;
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief the manager (model)
+/// @brief path of database files
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) ArangoManager* manager;
+@property (nonatomic, assign, readonly) NSString* path;
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief path of log file
+////////////////////////////////////////////////////////////////////////////////
+
+@property (nonatomic, assign, readonly) NSString* logPath;
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief path of log level
+////////////////////////////////////////////////////////////////////////////////
+
+@property (nonatomic, assign, readonly) NSString* logLevel;
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief run-on-startup
+////////////////////////////////////////////////////////////////////////////////
+
+@property (nonatomic, assign, readonly) BOOL runOnStartup;
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief is running
+////////////////////////////////////////////////////////////////////////////////
+
+@property (nonatomic, assign, readonly) BOOL isRunning;
+
+// -----------------------------------------------------------------------------
+// --SECTION--                                                    public methods
+// -----------------------------------------------------------------------------
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief default constructor
+////////////////////////////////////////////////////////////////////////////////
+
+- (ArangoStatus*) initWithName: (NSString*) name
+                       andPath: (NSString*) path
+                       andPort: (int) port
+                    andLogPath: (NSString*) logPath
+                   andLogLevel: (NSString*) logLevel
+               andRunOnStartup: (BOOL) runOnStartUp
+                    andRunning: (BOOL) isRunning;
 
 @end
 

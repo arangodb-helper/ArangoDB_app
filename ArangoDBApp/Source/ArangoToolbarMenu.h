@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief ArangoDB application delegate
+/// @brief ArangoDB toolbar menu (controller)
 ///
 /// @file
 ///
@@ -28,36 +28,47 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class ArangoToolbarMenu;
+@class ArangoConfiguration;
+@class ArangoHelpController;
 @class ArangoManager;
 
 // -----------------------------------------------------------------------------
-// --SECTION--                                                 ArangoAppDelegate
+// --SECTION--                                                 ArangoToolbarMenu
 // -----------------------------------------------------------------------------
 
-@interface ArangoAppDelegate : NSObject <NSApplicationDelegate>
+@interface ArangoToolbarMenu : NSMenu
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                        properties
 // -----------------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief the underlying menu of the status-bar icon
+/// @brief underlying delegate
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) ArangoToolbarMenu* statusMenu;
+@property (nonatomic, assign, readonly) ArangoManager* delegate;
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief the icon as well as an accesspoint for the menu
+/// @brief help controller
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) NSStatusItem * statusItem;
+@property (nonatomic, retain) ArangoHelpController* helpController;
+
+// -----------------------------------------------------------------------------
+// --SECTION--                                                    public methods
+// -----------------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief the manager (model)
+/// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) ArangoManager* manager;
+- (id) initWithArangoManager: (ArangoManager*) delegate;
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief updates the menu entries
+////////////////////////////////////////////////////////////////////////////////
+
+- (void) updateMenu;
 
 @end
 

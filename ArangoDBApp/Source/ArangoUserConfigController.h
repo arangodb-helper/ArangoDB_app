@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief ArangoDB application delegate
+/// @brief user configuration controller
 ///
 /// @file
 ///
@@ -26,38 +26,51 @@
 /// @author Copyright 2012, triAGENS GmbH, Cologne, Germany
 ////////////////////////////////////////////////////////////////////////////////
 
-#import <Cocoa/Cocoa.h>
-
-@class ArangoToolbarMenu;
-@class ArangoManager;
+#import "ArangoBaseController.h"
 
 // -----------------------------------------------------------------------------
-// --SECTION--                                                 ArangoAppDelegate
+// --SECTION--                                        ArangoUserConfigController
 // -----------------------------------------------------------------------------
 
-@interface ArangoAppDelegate : NSObject <NSApplicationDelegate>
+@interface ArangoUserConfigController : ArangoBaseController
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                        properties
 // -----------------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief the underlying menu of the status-bar icon
+/// @brief button "start on login"
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) ArangoToolbarMenu* statusMenu;
+@property (nonatomic, assign) IBOutlet NSButton *startOnLoginButton;
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief the icon as well as an accesspoint for the menu
+/// @brief combo "run on startup" options
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) NSStatusItem * statusItem;
+@property (nonatomic, assign) IBOutlet NSComboBox *runOnStartupOptions;
+
+// -----------------------------------------------------------------------------
+// --SECTION--                                                    public methods
+// -----------------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief the manager (model)
+/// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) ArangoManager* manager;
+- (id) initWithArangoManager: (ArangoManager*) delegate;
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief stores options
+////////////////////////////////////////////////////////////////////////////////
+
+- (IBAction) storeConfiguration: (id) sender;
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief aborts
+////////////////////////////////////////////////////////////////////////////////
+
+- (IBAction) abortConfiguration: (id) sender;
 
 @end
 

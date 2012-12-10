@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief ArangoDB application delegate
+/// @brief help controller
 ///
 /// @file
 ///
@@ -26,38 +26,54 @@
 /// @author Copyright 2012, triAGENS GmbH, Cologne, Germany
 ////////////////////////////////////////////////////////////////////////////////
 
-#import <Cocoa/Cocoa.h>
-
-@class ArangoToolbarMenu;
-@class ArangoManager;
+#import "ArangoHelpController.h"
 
 // -----------------------------------------------------------------------------
-// --SECTION--                                                 ArangoAppDelegate
+// --SECTION--                                      ArangoIntroductionController
 // -----------------------------------------------------------------------------
 
-@interface ArangoAppDelegate : NSObject <NSApplicationDelegate>
+@implementation ArangoHelpController
 
 // -----------------------------------------------------------------------------
-// --SECTION--                                                        properties
+// --SECTION--                                                    public methods
 // -----------------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief the underlying menu of the status-bar icon
+/// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) ArangoToolbarMenu* statusMenu;
+- (id) initWithArangoManager: (ArangoManager*) delegate
+                 andNibNamed: (NSString*) nib {
+  return [super initWithArangoManager:delegate
+                          andNibNamed:nib
+                andReleasedWhenClose:NO];
+}
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief the icon as well as an accesspoint for the menu
+/// @brief constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) NSStatusItem * statusItem;
+- (id) initWithArangoManager: (ArangoManager*) delegate {
+  return [self initWithArangoManager:delegate 
+                         andNibNamed:@"ArangoHelpView"];
+}
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief the manager (model)
+/// @brief close window
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) ArangoManager* manager;
+- (IBAction) closeHelp: (id) sender {
+  [self.window orderOut:self.window];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief open web-site with more information
+////////////////////////////////////////////////////////////////////////////////
+
+- (IBAction) learnMore: (id) sender {
+  [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://www.arangodb.org/appstore"]];
+  [self.window orderOut:self.window];
+}
 
 @end
 

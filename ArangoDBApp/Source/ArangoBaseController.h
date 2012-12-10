@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief ArangoDB application delegate
+/// @brief base controller
 ///
 /// @file
 ///
@@ -28,36 +28,48 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class ArangoToolbarMenu;
 @class ArangoManager;
 
 // -----------------------------------------------------------------------------
-// --SECTION--                                                 ArangoAppDelegate
+// --SECTION--                                              ArangoBaseController
 // -----------------------------------------------------------------------------
 
-@interface ArangoAppDelegate : NSObject <NSApplicationDelegate>
+@interface ArangoBaseController : NSWindowController<NSWindowDelegate>
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                        properties
 // -----------------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief the underlying menu of the status-bar icon
+/// @brief application delegate
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) ArangoToolbarMenu* statusMenu;
+@property (nonatomic, assign, readonly) ArangoManager* delegate;
+
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief the icon as well as an accesspoint for the menu
+/// @brief application delegate
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) NSStatusItem * statusItem;
+@property (nonatomic, assign, readonly) NSArray* tlo;
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief the manager (model)
+/// @brief release window and controller when closed
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) ArangoManager* manager;
+@property (nonatomic, assign, readonly) BOOL releaseWhenClosed;
+
+// -----------------------------------------------------------------------------
+// --SECTION--                                                    public methods
+// -----------------------------------------------------------------------------
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief default constructor
+////////////////////////////////////////////////////////////////////////////////
+
+- (id) initWithArangoManager: (ArangoManager*) delegate
+                 andNibNamed: (NSString*) name
+        andReleasedWhenClose: (BOOL) releasedWhenClosed;
 
 @end
 

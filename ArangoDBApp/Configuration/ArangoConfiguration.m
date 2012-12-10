@@ -20,6 +20,5 @@
 @dynamic path;
 @dynamic loglevel;
 @dynamic bookmarks;
-@synthesize instance;
 
 @end

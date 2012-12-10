@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief ArangoDB application delegate
+/// @brief introduction controller
 ///
 /// @file
 ///
@@ -26,38 +26,29 @@
 /// @author Copyright 2012, triAGENS GmbH, Cologne, Germany
 ////////////////////////////////////////////////////////////////////////////////
 
-#import <Cocoa/Cocoa.h>
-
-@class ArangoToolbarMenu;
-@class ArangoManager;
+#import "ArangoHelpController.h"
 
 // -----------------------------------------------------------------------------
-// --SECTION--                                                 ArangoAppDelegate
+// --SECTION--                                      ArangoIntroductionController
 // -----------------------------------------------------------------------------
 
-@interface ArangoAppDelegate : NSObject <NSApplicationDelegate>
+@interface ArangoIntroductionController : ArangoHelpController
 
 // -----------------------------------------------------------------------------
-// --SECTION--                                                        properties
+// --SECTION--                                                    public methods
 // -----------------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief the underlying menu of the status-bar icon
+/// @brief constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) ArangoToolbarMenu* statusMenu;
+- (id) initWithArangoManager: (ArangoManager*) delegate;
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief the icon as well as an accesspoint for the menu
+/// @brief "create instance" button
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) NSStatusItem * statusItem;
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief the manager (model)
-////////////////////////////////////////////////////////////////////////////////
-
-@property (nonatomic, assign, readonly) ArangoManager* manager;
+- (IBAction) createInstance: (id) sender;
 
 @end
 

@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief ArangoDB application delegate
+/// @brief status information about ArangoDB instance / configuration
 ///
 /// @file
 ///
@@ -26,38 +26,56 @@
 /// @author Copyright 2012, triAGENS GmbH, Cologne, Germany
 ////////////////////////////////////////////////////////////////////////////////
 
-#import <Cocoa/Cocoa.h>
-
-@class ArangoToolbarMenu;
-@class ArangoManager;
+#import "ArangoStatus.h"
 
 // -----------------------------------------------------------------------------
-// --SECTION--                                                 ArangoAppDelegate
+// --SECTION--                                              ArangoBaseController
 // -----------------------------------------------------------------------------
 
-@interface ArangoAppDelegate : NSObject <NSApplicationDelegate>
+@implementation ArangoStatus
 
 // -----------------------------------------------------------------------------
-// --SECTION--                                                        properties
+// --SECTION--                                                    public methods
 // -----------------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief the underlying menu of the status-bar icon
+/// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) ArangoToolbarMenu* statusMenu;
+- (ArangoStatus*) initWithName: (NSString*) name
+                       andPath: (NSString*) path
+                       andPort: (int) port
+                    andLogPath: (NSString*) logPath
+                   andLogLevel: (NSString*) logLevel
+               andRunOnStartup: (BOOL) runOnStartUp
+                    andRunning: (BOOL) isRunning {
+  self = [super init];
+  
+  if (self) {
+    _name = [name copy];
+    _port = port;
+    _path = [path copy];
+    _logPath = [logPath copy];
+    _logLevel = [logLevel copy];
+    _runOnStartup = runOnStartUp;
+    _isRunning = isRunning;
+  }
+  
+  return self;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief the icon as well as an accesspoint for the menu
+/// @brief destructor
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) NSStatusItem * statusItem;
+- (void) dealloc {
+  [_name release];
+  [_path release];
+  [_logPath release];
+  [_logLevel release];
 
-////////////////////////////////////////////////////////////////////////////////
-/// @brief the manager (model)
-////////////////////////////////////////////////////////////////////////////////
-
-@property (nonatomic, assign, readonly) ArangoManager* manager;
+  [super dealloc];
+}
 
 @end
 

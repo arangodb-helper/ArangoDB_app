@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief ArangoDB application delegate
+/// @brief user configuration controller
 ///
 /// @file
 ///
@@ -26,28 +26,58 @@
 /// @author Copyright 2012, triAGENS GmbH, Cologne, Germany
 ////////////////////////////////////////////////////////////////////////////////
 
-#import "ArangoAppDelegate.h"
+#import "ArangoUserConfigController.h"
 
-#import "ArangoToolbarMenu.h"
 #import "ArangoManager.h"
-#import "ArangoIntroductionController.h"
+#import "User.h"
 
 // -----------------------------------------------------------------------------
-// --SECTION--                                                 ArangoAppDelegate
+// --SECTION--                                        ArangoUserConfigController
 // -----------------------------------------------------------------------------
 
-@implementation ArangoAppDelegate
+@implementation ArangoUserConfigController
+
+static const NSString* RES = @"Restart all instances running at last shutdown";
+static const NSString* DEF = @"Define for each instance";
+static const NSString* ALL = @"Start all instances";
+static const NSString* NON = @"Do not start instances";
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                   private methods
 // -----------------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief destructor
+/// @brief aborts configuration dialog
 ////////////////////////////////////////////////////////////////////////////////
 
-- (void) configurationDidChange: (NSNotification*) notification {
-  [_statusMenu updateMenu];
+- (IBAction) abortConfiguration: (id) sender {
+  [self.window close];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief saves configuration
+////////////////////////////////////////////////////////////////////////////////
+
+- (IBAction) storeConfiguration: (id) sender {
+  int ros = 0;
+
+  if ([self.runOnStartupOptions.stringValue isEqual:RES]) {
+    ros = 1;
+  }
+  else if ([self.runOnStartupOptions.stringValue isEqual:DEF]) {
+    ros = 2;
+  }
+  else if ([self.runOnStartupOptions.stringValue isEqual:ALL]) {
+    ros = 3;
+  }
+  else if([self.runOnStartupOptions.stringValue isEqual:NON]) {
+    ros = 0;
+  }
+
+  [self.delegate setRunOnStartup:ros
+               setStartupOnLogin:(self.startOnLoginButton.state == NSOnState)];
+
+  [self.window close];
 }
 
 // -----------------------------------------------------------------------------
@@ -55,73 +85,46 @@
 // -----------------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief destructor
+/// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (void) dealloc {
-  [[NSNotificationCenter defaultCenter] removeObserver:self];
+- (id) initWithArangoManager: (ArangoManager*) delegate {
+  self = [super initWithArangoManager:delegate andNibNamed:@"ArangoUserConfigView" andReleasedWhenClose:YES];
   
-  [_statusItem release];
-  [_statusMenu release];
-  [_manager release];
+  if (self) {
+    switch ([self.delegate runOnStartup]) {
+      case 0:
+        [self.runOnStartupOptions selectItemWithObjectValue:NON];
+        break;
+        
+      case 1:
+        [self.runOnStartupOptions selectItemWithObjectValue:RES];
+        break;
+        
+      case 2:
+        [self.runOnStartupOptions selectItemWithObjectValue:DEF];
+        break;
+        
+      case 3:
+        [self.runOnStartupOptions selectItemWithObjectValue:ALL];
+        break;
+    }
+    
+    self.startOnLoginButton.state = [self.delegate startupOnLogin] ? NSOnState : NSOffState;
+  }
   
-  [super dealloc];
+  return self;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief called after application has been launched
+/// @brief awakes from nib
 ////////////////////////////////////////////////////////////////////////////////
 
-- (void) applicationDidFinishLaunching: (NSNotification *) notification {
-  
-  // create the ArangoDB manager
-  _manager = [[ArangoManager alloc] init];
-  
-  if (_manager == nil) {
-    NSAlert* info = [[[NSAlert alloc] init] autorelease];
-      
-    [info setMessageText:@"ArangoDB application failed to start!"];
-    [info setInformativeText:@"Cannot create or load the configuration. Please reinstall the application."];
-    
-    [info runModal];
-    [[NSApplication sharedApplication] terminate:nil];
-    
-    return;
-  }
-  
-  // check for changes in the configuration
-  [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector(configurationDidChange:)
-                                               name:ArangoConfigurationDidChange
-                                             object:_manager];
-
-  // create the menu
-  _statusMenu = [[ArangoToolbarMenu alloc] initWithArangoManager:_manager];
-  [_statusItem setMenu: _statusMenu];
-  [_statusMenu setAutoenablesItems: NO];
-
-  // we will have missed the first notification
-  [_statusMenu updateMenu];
-
-  // without any configuration, display some help
-  if (0 == _manager.configurations.count) {
-    // will autorelease on close
-    [[ArangoIntroductionController alloc] initWithArangoManager:_manager];
-  }
-  else {
-    [_manager startupInstances];
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief creates the status menu item with icon
-////////////////////////////////////////////////////////////////////////////////
-
--(void) awakeFromNib {
-  _statusItem = [[[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength] retain];
-
-  [_statusItem setImage: [NSImage imageNamed:@"IconColor"]];
-  [_statusItem setHighlightMode:YES];
+- (void) awakeFromNib {
+  [self.runOnStartupOptions addItemWithObjectValue:RES];
+  [self.runOnStartupOptions addItemWithObjectValue:DEF];
+  [self.runOnStartupOptions addItemWithObjectValue:ALL];
+  [self.runOnStartupOptions addItemWithObjectValue:NON];
 }
 
 @end
