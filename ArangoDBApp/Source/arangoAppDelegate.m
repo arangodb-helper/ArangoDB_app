@@ -13,6 +13,8 @@
 #import "User.h"
 #import "Bookmarks.h"
 #import "arangoUserConfigController.h"
+#import "ArangoManager.h"
+#import "ArangoIntroductionController.h"
 
 @implementation arangoAppDelegate
 
@@ -30,114 +32,11 @@ int version;
 
 // Method to start a new Arango with the given Configuration.
 - (void) startArango:(ArangoConfiguration*) config {
-  NSString* arangoPath = [[[[NSBundle mainBundle] resourcePath] stringByAppendingString:arangoVersion] retain];
-  NSString* configPath = [[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/arangod.conf"] retain];
-  NSTask* newArango = [[NSTask alloc]init];
-  [newArango setLaunchPath:arangoPath];
-  // Check for Sandboxed mode
-  if (config.bookmarks != nil  && version > 106) {
-    NSURL* bmPath = [self urlForBookmark:config.bookmarks.path];
-    config.path = [bmPath path];
-    if(![bmPath startAccessingSecurityScopedResource]) {
-      NSLog(@"Not allowed to open path.");
-    }
-    NSURL* bmLog = [self urlForBookmark:config.bookmarks.log];
-    config.log = [bmLog path];
-    if(![bmLog startAccessingSecurityScopedResource]) {
-      NSLog(@"Not allowed to open log.");
-    }
-  }
-  NSArray* arguments = [NSArray arrayWithObjects:
-                        @"--config", configPath,
-                        @"--exit-on-parent-death", @"true",
-                        @"--server.endpoint", [NSString stringWithFormat:@"tcp://0.0.0.0:%@", config.port.stringValue],
-                        @"--log.file", config.log,
-                        @"--log.level", config.loglevel,
-                        @"--server.admin-directory", adminDir,
-                        @"--javascript.action-directory", jsActionDir,
-                        @"--javascript.modules-path", jsModPath,
-                        config.path, nil];
-  [newArango setArguments:arguments];
-  // Callback if the Arango is terminated for whatever reason.
-  if ([newArango respondsToSelector:@selector(setTerminationHandler:)]) {
-    [newArango setTerminationHandler: ^(NSTask *task) {
-      config.isRunning = [NSNumber numberWithBool:NO];
-      config.instance = nil;
-      [self save];
-      [self.statusMenu updateMenu];
-    }];
-  }
-  [newArango launch];
-  config.isRunning = [NSNumber numberWithBool:YES];
-  config.instance = newArango;
-  [newArango release];
-  [arangoPath release];
-  [configPath release];
-  [self save];
+  [self.manager startArangoDB:config.alias];
+
   [self.statusMenu updateMenu];
 }
 
-// Function to run the javascript tests.
-// Should never be invoked by the enduser and is not linked in the UI.
-// Can be invoked after App-launch for testing purposes.
-/*
-- (NSTask*) testArangoWithPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath
-{
-  NSString* arangoPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:arangoVersion];
-  NSString* configPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/arangod.conf"];
-  NSTask* newArango = [[NSTask alloc]init];
-  [newArango setLaunchPath:arangoPath];
-  NSArray* arguments = [NSArray arrayWithObjects:
-                        @"--config", configPath,
-                        @"--exit-on-parent-death", @"true",
-                        @"--server.http-port", port.stringValue,
-                        @"--log.file", logPath,
-                        @"--server.admin-directory", adminDir,
-                        @"--javascript.action-directory", jsActionDir,
-                        @"--javascript.modules-path", jsModPath,
-                        @"--javascript.gc-interval", @"1",
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/common/tests/shell-document.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/common/tests/shell-edge.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/common/tests/shell-compactor.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/common/tests/shell-collection.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/common/tests/shell-simple-query.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/common/tests/shell-index.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/common/tests/shell-index-geo.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/common/tests/shell-cap-constraint.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/common/tests/shell-unique-constraint.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/common/tests/shell-hash-index.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/tests/ahuacatl-relational.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/tests/ahuacatl-complex.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/tests/ahuacatl-refaccess-attribute.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/tests/ahuacatl-queries-optimiser.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/tests/ahuacatl-variables.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/tests/ahuacatl-operators.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/tests/ahuacatl-queries-noncollection.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/tests/ahuacatl-refaccess-variable.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/tests/ahuacatl-escaping.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/tests/ahuacatl-skiplist.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/tests/ahuacatl-queries-simple.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/tests/ahuacatl-ranges.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/tests/ahuacatl-arithmetic.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/tests/ahuacatl-ternary.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/tests/ahuacatl-logical.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/tests/ahuacatl-bind.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/tests/ahuacatl-parse.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/tests/ahuacatl-hash.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/tests/ahuacatl-queries-collection.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/tests/ahuacatl-queries-variables.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/tests/ahuacatl-queries-geo.js"],
-                        @"--javascript.unit-tests", [[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/tests/ahuacatl-functions.js"],
-                        path, nil];
-  [newArango setArguments:arguments];
-  newArango.terminationHandler = ^(NSTask *task) {
-    NSLog(@"Terminated Arango");
-  };
-  [newArango launch];
-  [newArango release];
-  return newArango;
-}
-*/
 // Function to get the Context necessary for persistent storage.
 - (NSManagedObjectContext*) getArangoManagedObjectContext
 {
@@ -177,26 +76,14 @@ int version;
 // Public function to start a new Arango with all given informations.
 - (void) startNewArangoWithPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath andLogLevel:(NSString*) level andRunOnStartUp: (BOOL) ros andAlias:(NSString*) alias
 {
-  ArangoConfiguration* newArang = (ArangoConfiguration*) [NSEntityDescription insertNewObjectForEntityForName:@"ArangoConfiguration" inManagedObjectContext:[self getArangoManagedObjectContext]];
-  NSURL* pathURL = [NSURL fileURLWithPath:path];
-  if (version > 106) {
-    NSData* bookmarkPath = [self bookmarkForURL:pathURL];
-    NSURL* logURL = [NSURL fileURLWithPath:logPath];
-    NSData* bookmarkLog = [self bookmarkForURL:logURL];
-    Bookmarks* bookmarks = (Bookmarks*) [NSEntityDescription insertNewObjectForEntityForName:@"Bookmarks" inManagedObjectContext:[self getArangoManagedObjectContext]];
-    bookmarks.path = bookmarkPath;
-    bookmarks.log = bookmarkLog;
-    bookmarks.config = newArang;
-    newArang.bookmarks = bookmarks;
+  BOOL ok = [self.manager createConfiguration:alias withPath:path andPort:port andLog:logPath andLogLevel:level andRunOnStartUp:ros];
+
+  if (! ok) {
+    // TODO-fc error handling
+    return;
   }
-  newArang.path = path;
-  newArang.port = port;
-  newArang.log = logPath;
-  newArang.loglevel = level;
-  newArang.runOnStartUp = [NSNumber numberWithBool:ros];
-  newArang.alias = alias;
-  [self save];
-  [self startArango:newArang];
+
+  [self.manager startArangoDB:alias];
   [statusMenu updateMenu];
 }
 
@@ -329,6 +216,18 @@ int version;
 // This starts all Arangos according to the users decission.
 // If this is the first launch of the App also the Configuration will be shown.
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+  self.manager = [[ArangoManager alloc] init];
+  
+  if (self.manager == nil) {
+    return;
+  }
+                            
+  if (0 == self.manager.configurations.count) {
+    [[ArangoIntroductionController alloc] initWithAppDelegate:nil];
+  }
+  
+  
+  
   NSFetchRequest *userRequest = [[NSFetchRequest alloc] init];
   NSEntityDescription *userEntity = [[NSEntityDescription entityForName:@"User" inManagedObjectContext: [self getArangoManagedObjectContext]] retain];
   [userRequest setEntity:userEntity];

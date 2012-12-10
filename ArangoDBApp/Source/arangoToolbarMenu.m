@@ -11,11 +11,13 @@
 #import "arangoAppDelegate.h"
 #import "ArangoConfiguration.h"
 #import "arangoUserConfigController.h"
+#import "ArangoIntroductionController.h"
 
 @implementation arangoToolbarMenu
 
 @synthesize createDB;
 @synthesize configure;
+@synthesize help;
 @synthesize quit;
 @synthesize createNewWindowController;
 @synthesize configurationViewController;
@@ -28,25 +30,41 @@
   if (self) {
     self.createNewWindowController = nil;
     self.appDelegate = aD;
+    
+    // create instance
     self.createDB = [[NSMenuItem alloc] init];
     [self.createDB setEnabled:YES];
     [self.createDB setTitle:@"New..."];
     //[self.createDB setKey:@"N"];
     [self.createDB setTarget:self];
     [self.createDB setAction:@selector(createNewInstance)];
+    
+    // configuration
     self.configure = [[NSMenuItem alloc] init];
     [self.configure setEnabled:YES];
     [self.configure setTitle:@"Configure"];
     [self.configure setTarget:self];
     [self.configure setAction:@selector(showConfiguration)];
+    
+    // help
+    self.help = [[NSMenuItem alloc] init];
+    [self.help setEnabled:YES];
+    [self.help setTitle:@"Help"];
+    //[self.help setKey:@"Q"];
+    [self.help setTarget:self];
+    [self.help setAction:@selector(showIntroduction)];
+
+    // quit
     self.quit = [[NSMenuItem alloc] init];
     [self.quit setEnabled:YES];
     [self.quit setTitle:@"Quit"];
     //[self.quit setKey:@"Q"];
     [self.quit setTarget:self];
     [self.quit setAction:@selector(quitApplication)];
+    
     [self updateMenu];
   }
+
   return self;
 }
 
@@ -114,6 +132,7 @@
   [self addItem:[NSMenuItem separatorItem]];
   [self addItem:self.createDB];
   [self addItem:self.configure];
+  [self addItem:self.help];
   [self addItem:self.quit];
 }
 
@@ -142,6 +161,10 @@
 - (void) showConfiguration
 {
   self.configurationViewController = [[[arangoUserConfigController alloc] initWithAppDelegate:self.appDelegate] autorelease];
+}
+
+- (void) showIntroduction {
+  self.configurationViewController = [[[ArangoIntroductionController alloc] initWithAppDelegate:self.appDelegate] autorelease];
 }
 
 - (void) createNewInstance

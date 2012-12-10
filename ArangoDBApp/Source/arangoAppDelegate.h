@@ -14,6 +14,7 @@
 @class arangoToolbarMenu;
 @class ArangoConfiguration;
 @class arangoUserConfigController;
+@class ArangoManager;
 
 @interface arangoAppDelegate : NSObject <NSApplicationDelegate>
 
@@ -25,6 +26,8 @@
 @property (retain) NSStatusItem * statusItem;
 // The context of all objects for permanent storage.
 @property (retain) NSManagedObjectContext* managedObjectContext;
+
+@property (retain) ArangoManager* manager;
 
 // Function to start an Arango with the given configuration.
 - (void) startArango:(ArangoConfiguration*) config;

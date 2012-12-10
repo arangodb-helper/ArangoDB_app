@@ -19,10 +19,10 @@
 @synthesize delegate;
 @synthesize rosDefinition;
 
-const NSString* RES = @"Restart all instances running at last shutdown";
-const NSString* DEF = @"Define for each instance";
-const NSString* ALL = @"Start all instances";
-const NSString* NON = @"Do not start instaces";
+static const NSString* RES = @"Restart all instances running at last shutdown";
+static const NSString* DEF = @"Define for each instance";
+static const NSString* ALL = @"Start all instances";
+static const NSString* NON = @"Do not start instaces";
 
 - (id) initWithAppDelegate: (arangoAppDelegate*) aD
 {

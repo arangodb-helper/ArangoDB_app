@@ -16,6 +16,7 @@
 
 @property (assign) NSMenuItem* createDB;
 @property (assign) NSMenuItem* configure;
+@property (assign) NSMenuItem* help;
 @property (assign) NSMenuItem* quit;
 @property (retain) arangoCreateNewDBWindowController* createNewWindowController;
 @property (retain) arangoUserConfigController* configurationViewController;
@@ -24,6 +25,7 @@
 
 - (id) initWithAppDelegate:(arangoAppDelegate*) aD;
 - (void) showConfiguration;
+- (void) showIntroduction;
 - (void) updateMenu;
 - (void) quitApplication;
 - (void) createNewInstance;
