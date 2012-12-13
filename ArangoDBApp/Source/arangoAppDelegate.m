@@ -8,13 +8,13 @@
 
 #import "arangoAppDelegate.h"
 #import <Foundation/NSTask.h>
-#import "arangoToolbarMenu.h"
+#import "ArangoToolbarMenu.h"
 #import "ArangoConfiguration.h"
 #import "User.h"
 #import "Bookmarks.h"
-#import "arangoUserConfigController.h"
+#import "ArangoUserConfigController.h"
 #import "ArangoManager.h"
-#import "ArangoIntroductionController.h"
+#import "ArangoHelpController.h"
 
 @implementation arangoAppDelegate
 
@@ -32,7 +32,7 @@ int version;
 
 // Method to start a new Arango with the given Configuration.
 - (void) startArango:(ArangoConfiguration*) config {
-  [self.manager startArangoDB:config.alias];
+  // [self.manager startArangoDB:config.alias];
 
   [self.statusMenu updateMenu];
 }
@@ -83,8 +83,8 @@ int version;
     return;
   }
 
-  [self.manager startArangoDB:alias];
-  [statusMenu updateMenu];
+  // [self.manager startArangoDB:alias];
+  // [statusMenu updateMenu];
 }
 
 // Public function to update an given Arango with all given informations.
@@ -94,7 +94,7 @@ int version;
   if ([config.isRunning isEqualToNumber:[NSNumber numberWithBool:YES]]) {
     [config.instance terminate];
   }
-  if (config.bookmarks != nil && version > 106) {
+  if (config.bookmarks != nil && 106 < version) {
     NSURL* oldPath = [self urlForBookmark:config.bookmarks.path];
     if (oldPath != nil) {
       [oldPath stopAccessingSecurityScopedResource];
@@ -212,6 +212,15 @@ int version;
   }
 }
 
+- (void) dealloc {
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
+  [super dealloc];
+}
+
+- (void) configurationDidChange: (NSNotification*) notification {
+  [statusMenu updateMenu];
+}
+
 // Function called after the app finished lanching.
 // This starts all Arangos according to the users decission.
 // If this is the first launch of the App also the Configuration will be shown.
@@ -221,9 +230,14 @@ int version;
   if (self.manager == nil) {
     return;
   }
+
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(configurationDidChange:)
+                                               name:ArangoConfigurationDidChange
+                                             object:self.manager];
                             
   if (0 == self.manager.configurations.count) {
-    [[ArangoIntroductionController alloc] initWithAppDelegate:nil];
+    [[ArangoHelpController alloc] initWithAppDelegate:nil];
   }
   
   
@@ -244,7 +258,7 @@ int version;
         ros = u.runOnStartUp;
       }
     } else {
-      self.userConfigController = [[arangoUserConfigController alloc] initWithAppDelegate:self];
+      self.userConfigController = [[ArangoUserConfigController alloc] initWithAppDelegate:self];
     }
   }
   NSFetchRequest *request = [[NSFetchRequest alloc] init];
@@ -324,7 +338,7 @@ int version;
     }
     
   }
-  self.statusMenu = [[arangoToolbarMenu alloc] initWithAppDelegate:self];
+  self.statusMenu = [[ArangoToolbarMenu alloc] initWithAppDelegate:self];
   self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength];
   [self.statusItem setMenu: statusMenu];
   [self.statusItem setImage: [NSImage imageNamed:@"IconColor"]];

@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief base controller
+/// @brief help controller
 ///
 /// @file
 ///
@@ -29,10 +29,10 @@
 #import "ArangoBaseController.h"
 
 // -----------------------------------------------------------------------------
-// --SECTION--                                              ArangoBaseController
+// --SECTION--                                      ArangoIntroductionController
 // -----------------------------------------------------------------------------
 
-@implementation ArangoBaseController
+@interface ArangoHelpController : ArangoBaseController
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                    public methods
@@ -43,44 +43,19 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 - (id) initWithAppDelegate: (arangoAppDelegate*) delegate
-                  nibNamed: (NSString*) name {
-
-  // loadNibNamed:owner:topLevelObjects was introduced in 10.8
-  if ([[NSBundle mainBundle] respondsToSelector:@selector(loadNibNamed:owner:topLevelObjects:)]) {
-    self = [super init];
-      
-    if (self) {
-      [[NSBundle mainBundle] loadNibNamed:name owner:self topLevelObjects:nil];
-    }
-  }
-  else {
-    self = [self initWithWindowNibName:name owner:self];
-  }
-
-  if (self) {
-    _delegate = [delegate retain];
-
-    [self.window setReleasedWhenClosed:NO];
-    [self.window center];
-
-    [NSApp activateIgnoringOtherApps:YES];
-    
-    [self.window makeKeyWindow];
-    [self showWindow:self.window];
-  }
-  
-  return self;
-}
+               andNibNamed: (NSString*) nib;
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief destructor
+/// @brief "close" button
 ////////////////////////////////////////////////////////////////////////////////
 
-- dealloc {
-  [_delegate release];
+- (IBAction) close: (id) sender;
 
-  [super dealloc];
-}
+////////////////////////////////////////////////////////////////////////////////
+/// @brief "learn more" button
+////////////////////////////////////////////////////////////////////////////////
+
+- (IBAction) learnMore: (id) sender;
 
 @end
 

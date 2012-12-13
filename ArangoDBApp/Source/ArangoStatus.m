@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief introduction controller
+/// @brief status information about ArangoDB instance / configuration
 ///
 /// @file
 ///
@@ -26,13 +26,13 @@
 /// @author Copyright 2012, triAGENS GmbH, Cologne, Germany
 ////////////////////////////////////////////////////////////////////////////////
 
-#import "ArangoBaseController.h"
+#import "ArangoStatus.h"
 
 // -----------------------------------------------------------------------------
-// --SECTION--                                      ArangoIntroductionController
+// --SECTION--                                              ArangoBaseController
 // -----------------------------------------------------------------------------
 
-@interface ArangoIntroductionController : ArangoBaseController
+@implementation ArangoStatus
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                    public methods
@@ -42,19 +42,30 @@
 /// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (id) initWithAppDelegate: (arangoAppDelegate*) aD;
+- (ArangoStatus*) initWithName: (NSString*) name
+                       andPort: (NSNumber*) port
+                    andRunning: (BOOL) isRunning {
+  self = [super init];
+  
+  if (self) {
+    _name = [name copy];
+    _port = [port retain];
+    _isRunning = isRunning;
+  }
+  
+  return self;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief "close" button
+/// @brief destructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (IBAction) close: (id) sender;
+- (void) dealloc {
+  [_name release];
+  [_port release];
 
-////////////////////////////////////////////////////////////////////////////////
-/// @brief "learn more" button
-////////////////////////////////////////////////////////////////////////////////
-
-- (IBAction) learnMore:(id)sender;
+  [super dealloc];
+}
 
 @end
 

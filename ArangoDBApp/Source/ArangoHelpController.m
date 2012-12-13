@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief introduction controller
+/// @brief help controller
 ///
 /// @file
 ///
@@ -26,25 +26,13 @@
 /// @author Copyright 2012, triAGENS GmbH, Cologne, Germany
 ////////////////////////////////////////////////////////////////////////////////
 
-#import "ArangoIntroductionController.h"
-#import "arangoAppDelegate.h"
-#import "User.h"
+#import "ArangoHelpController.h"
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                      ArangoIntroductionController
 // -----------------------------------------------------------------------------
 
-@implementation ArangoIntroductionController
-
-// -----------------------------------------------------------------------------
-// --SECTION--                                                        properties
-// -----------------------------------------------------------------------------
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief application delegate
-////////////////////////////////////////////////////////////////////////////////
-
-@synthesize delegate;
+@implementation ArangoHelpController
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                    public methods
@@ -54,17 +42,16 @@
 /// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (id) initWithAppDelegate: (arangoAppDelegate*) aD
-{
-  return [super initWithAppDelegate:aD nibNamed:@"arangoIntroductionView"];
+- (id) initWithAppDelegate: (arangoAppDelegate*) delegate
+               andNibNamed: (NSString*) nib {
+  return [super initWithAppDelegate:delegate nibNamed:nib];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief close window
 ////////////////////////////////////////////////////////////////////////////////
 
-- (IBAction) close: (id) sender
-{
+- (IBAction) close: (id) sender {
   [self.window orderOut:self.window];
 }
 
@@ -72,8 +59,7 @@
 /// @brief open web-site with more information
 ////////////////////////////////////////////////////////////////////////////////
 
-- (IBAction) learnMore: (id) sender
-{
+- (IBAction) learnMore: (id) sender {
   [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://www.arangodb.org/appstore"]];
   [self.window orderOut:self.window];
 }

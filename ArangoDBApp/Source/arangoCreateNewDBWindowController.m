@@ -9,7 +9,7 @@
 #import "arangoCreateNewDBWindowController.h"
 #import "arangoAppDelegate.h"
 #import "ArangoConfiguration.h"
-#import "arangoToolbarMenu.h"
+#import "ArangoToolbarMenu.h"
 
 @interface arangoCreateNewDBWindowController ()
 

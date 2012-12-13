@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief base controller
+/// @brief ArangoDB toolbar menu (controller)
 ///
 /// @file
 ///
@@ -26,13 +26,49 @@
 /// @author Copyright 2012, triAGENS GmbH, Cologne, Germany
 ////////////////////////////////////////////////////////////////////////////////
 
-#import "ArangoBaseController.h"
+#import <Cocoa/Cocoa.h>
+
+@class arangoAppDelegate;
+@class ArangoHelpController;
+@class ArangoUserConfigController;
 
 // -----------------------------------------------------------------------------
-// --SECTION--                                              ArangoBaseController
+// --SECTION--                                                 ArangoToolbarMenu
 // -----------------------------------------------------------------------------
 
-@implementation ArangoBaseController
+@interface ArangoToolbarMenu : NSMenu
+
+// -----------------------------------------------------------------------------
+// --SECTION--                                                        properties
+// -----------------------------------------------------------------------------
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief underlying delegate
+////////////////////////////////////////////////////////////////////////////////
+
+@property (nonatomic, assign, readonly) arangoAppDelegate* delegate;
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief help controller
+////////////////////////////////////////////////////////////////////////////////
+
+@property (nonatomic, retain) ArangoHelpController* helpController;
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief add server controller
+////////////////////////////////////////////////////////////////////////////////
+
+@property (nonatomic, retain) ArangoUserConfigController* userConfigController;
+
+// -----------------------------------------------------------------------------
+// --SECTION--                                                   private methods
+// -----------------------------------------------------------------------------
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief updates the menu entries
+////////////////////////////////////////////////////////////////////////////////
+
+- (void) updateMenu;
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                    public methods
@@ -42,45 +78,7 @@
 /// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (id) initWithAppDelegate: (arangoAppDelegate*) delegate
-                  nibNamed: (NSString*) name {
-
-  // loadNibNamed:owner:topLevelObjects was introduced in 10.8
-  if ([[NSBundle mainBundle] respondsToSelector:@selector(loadNibNamed:owner:topLevelObjects:)]) {
-    self = [super init];
-      
-    if (self) {
-      [[NSBundle mainBundle] loadNibNamed:name owner:self topLevelObjects:nil];
-    }
-  }
-  else {
-    self = [self initWithWindowNibName:name owner:self];
-  }
-
-  if (self) {
-    _delegate = [delegate retain];
-
-    [self.window setReleasedWhenClosed:NO];
-    [self.window center];
-
-    [NSApp activateIgnoringOtherApps:YES];
-    
-    [self.window makeKeyWindow];
-    [self showWindow:self.window];
-  }
-  
-  return self;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief destructor
-////////////////////////////////////////////////////////////////////////////////
-
-- dealloc {
-  [_delegate release];
-
-  [super dealloc];
-}
+- (id) initWithAppDelegate: (arangoAppDelegate*) delegate;
 
 @end
 

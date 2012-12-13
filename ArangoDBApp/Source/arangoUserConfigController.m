@@ -6,15 +6,11 @@
 //  Copyright (c) 2012 triAgens. All rights reserved.
 //
 
-#import "arangoUserConfigController.h"
+#import "ArangoUserConfigController.h"
 #import "arangoAppDelegate.h"
 #import "User.h"
 
-@interface arangoUserConfigController ()
-
-@end
-
-@implementation arangoUserConfigController
+@implementation ArangoUserConfigController
 @synthesize putAsStartUp;
 @synthesize delegate;
 @synthesize rosDefinition;
@@ -29,9 +25,9 @@ static const NSString* NON = @"Do not start instaces";
   if([[NSBundle mainBundle] respondsToSelector:@selector(loadNibNamed:owner:topLevelObjects:)]) {
     self = [super init];
     self.delegate = aD;
-    [[NSBundle mainBundle] loadNibNamed:@"arangoUserConfigController" owner:self topLevelObjects:nil];
+    [[NSBundle mainBundle] loadNibNamed:@"ArangoUserConfigView" owner:self topLevelObjects:nil];
   } else {
-    self = [self initWithWindowNibName:@"arangoUserConfigController" owner:self];
+    self = [self initWithWindowNibName:@"ArangoUserConfigView" owner:self];
     self.delegate = aD;
   }
   if (self) {

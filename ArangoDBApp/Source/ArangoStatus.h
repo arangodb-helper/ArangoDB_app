@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief base controller
+/// @brief status information about ArangoDB instance / configuration
 ///
 /// @file
 ///
@@ -22,17 +22,40 @@
 /// Copyright holder is triAGENS GmbH, Cologne, Germany
 ///
 /// @author Dr. Frank Celler
-/// @author Michael Hackstein
 /// @author Copyright 2012, triAGENS GmbH, Cologne, Germany
 ////////////////////////////////////////////////////////////////////////////////
 
-#import "ArangoBaseController.h"
+#import <Foundation/Foundation.h>
+
+@class User;
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                              ArangoBaseController
 // -----------------------------------------------------------------------------
 
-@implementation ArangoBaseController
+@interface ArangoStatus : NSObject
+
+// -----------------------------------------------------------------------------
+// --SECTION--                                                        properties
+// -----------------------------------------------------------------------------
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief name of the configuration
+////////////////////////////////////////////////////////////////////////////////
+
+@property (nonatomic, assign, readonly) NSString* name;
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief port to listen to
+////////////////////////////////////////////////////////////////////////////////
+
+@property (nonatomic, assign, readonly) NSNumber* port;
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief is running
+////////////////////////////////////////////////////////////////////////////////
+
+@property (nonatomic, assign, readonly) BOOL isRunning;
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                    public methods
@@ -42,45 +65,9 @@
 /// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (id) initWithAppDelegate: (arangoAppDelegate*) delegate
-                  nibNamed: (NSString*) name {
-
-  // loadNibNamed:owner:topLevelObjects was introduced in 10.8
-  if ([[NSBundle mainBundle] respondsToSelector:@selector(loadNibNamed:owner:topLevelObjects:)]) {
-    self = [super init];
-      
-    if (self) {
-      [[NSBundle mainBundle] loadNibNamed:name owner:self topLevelObjects:nil];
-    }
-  }
-  else {
-    self = [self initWithWindowNibName:name owner:self];
-  }
-
-  if (self) {
-    _delegate = [delegate retain];
-
-    [self.window setReleasedWhenClosed:NO];
-    [self.window center];
-
-    [NSApp activateIgnoringOtherApps:YES];
-    
-    [self.window makeKeyWindow];
-    [self showWindow:self.window];
-  }
-  
-  return self;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief destructor
-////////////////////////////////////////////////////////////////////////////////
-
-- dealloc {
-  [_delegate release];
-
-  [super dealloc];
-}
+- (ArangoStatus*) initWithName: (NSString*) name
+                       andPort: (NSNumber*) port
+                    andRunning: (BOOL) isRunning;
 
 @end
 

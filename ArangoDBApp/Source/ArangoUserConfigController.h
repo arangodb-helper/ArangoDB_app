@@ -9,7 +9,7 @@
 #import <Cocoa/Cocoa.h>
 @class arangoAppDelegate;
 
-@interface arangoUserConfigController : NSWindowController
+@interface ArangoUserConfigController : NSWindowController
 @property (assign) IBOutlet NSButton *putAsStartUp;
 @property (assign) IBOutlet NSComboBox *rosDefinition;
 @property (assign) arangoAppDelegate* delegate;

@@ -30,7 +30,7 @@
 		</object>
 		<array class="NSMutableArray" key="IBDocument.RootObjects" id="1000">
 			<object class="NSCustomObject" id="1001">
-				<string key="NSClassName">ArangoIntroductionController</string>
+				<string key="NSClassName">ArangoHelpController</string>
 			</object>
 			<object class="NSCustomObject" id="1003">
 				<string key="NSClassName">FirstResponder</string>
@@ -48,7 +48,7 @@
 				<nil key="NSViewClass"/>
 				<nil key="NSUserInterfaceItemIdentifier"/>
 				<object class="NSView" key="NSWindowView" id="1006">
-					<nil key="NSNextResponder"/>
+					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<array class="NSMutableArray" key="NSSubviews">
 						<object class="NSImageView" id="469764715">
@@ -138,14 +138,14 @@
 						<object class="NSButton" id="275509041">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{349, 13}, {121, 32}}</string>
+							<string key="NSFrame">{{349, 13}, {122, 32}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="325886067">
 								<int key="NSCellFlags">67108864</int>
 								<int key="NSCellFlags2">134217728</int>
-								<string key="NSContents">Add Server...</string>
+								<string key="NSContents">Add Instance</string>
 								<reference key="NSSupport" ref="944676172"/>
 								<string key="NSCellIdentifier">_NS:9</string>
 								<reference key="NSControlView" ref="275509041"/>
@@ -173,11 +173,11 @@
 								<int key="NSCellFlags2">272629760</int>
 								<object class="NSMutableString" key="NSContents">
 									<bytes key="NS.bytes">Q29uZ3JhdHVsYXRpb25zISBZb3UgaGF2ZSBzdWNjZXNzZnVsbHkgaW5zdGFsbGVkIEFyYW5nb0RCLiBZ
-b3UgbXVzdCBub3cgY29uZmlndXJlIHRoZSBzZXJ2ZXIuIEluIG9yZGVyIHRvIGxlYXJuIG1vcmUsIGNo
-ZWNrb3V04oCo4oCoICAgIGh0dHA6Ly93d3cuYXJhbmdvZGIub3Jn4oCo4oCoQWZ0ZXIgdGhlIGNvbmZp
-Z3VyYXRpb24sIHlvdSBjYW4gdXNlIHlvdXIgZmF2b3JpdGUgd2ViIGJyb3dzZXIgdG8gYWNjZXNzIHRo
-ZSBhZG1pbmlzdHJhdGlvbiBpbnRlcmZhY2UuIElmIHlvdSBoYXZlIGFueSBxdWVzdGlvbnMsIHBsZWFz
-ZSBjb250YWN0IHVzIGF0CgogICAgaGFja2Vyc0BhcmFuZ29kYi5vcmc</bytes>
+b3UgbXVzdCBub3cgY29uZmlndXJlIHRoZSBpbnN0YW5jZXMuIEluIG9yZGVyIHRvIGxlYXJuIG1vcmUs
+IGNoZWNrb3V04oCo4oCoICAgIGh0dHA6Ly93d3cuYXJhbmdvZGIub3Jn4oCo4oCoQWZ0ZXIgdGhlIGNv
+bmZpZ3VyYXRpb24sIHlvdSBjYW4gdXNlIHlvdXIgZmF2b3JpdGUgd2ViIGJyb3dzZXIgdG8gYWNjZXNz
+IHRoZSBhZG1pbmlzdHJhdGlvbiBpbnRlcmZhY2UuIElmIHlvdSBoYXZlIGFueSBxdWVzdGlvbnMsIHBs
+ZWFzZSBjb250YWN0IHVzIGF0CgogICAgaGFja2Vyc0BhcmFuZ29kYi5vcmc</bytes>
 								</object>
 								<object class="NSFont" key="NSSupport">
 									<string key="NSName">LucidaGrande</string>
@@ -210,6 +210,7 @@ ZSBjb250YWN0IHVzIGF0CgogICAgaGFja2Vyc0BhcmFuZ29kYi5vcmc</bytes>
 						</object>
 					</array>
 					<string key="NSFrameSize">{480, 368}</string>
+					<reference key="NSSuperview"/>
 					<reference key="NSNextKeyView" ref="469764715"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1920, 1178}}</string>

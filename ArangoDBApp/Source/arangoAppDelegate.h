@@ -11,17 +11,17 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class arangoToolbarMenu;
+@class ArangoToolbarMenu;
 @class ArangoConfiguration;
-@class arangoUserConfigController;
+@class ArangoUserConfigController;
 @class ArangoManager;
 
 @interface arangoAppDelegate : NSObject <NSApplicationDelegate>
 
 // The underlying menu of the status-bar icon.
-@property (retain) arangoToolbarMenu* statusMenu;
+@property (retain) ArangoToolbarMenu* statusMenu;
 // A controller for user-configuration.
-@property (retain) arangoUserConfigController* userConfigController;
+@property (retain) ArangoUserConfigController* userConfigController;
 // The item in the statusbar, containing the icon as well as an accesspoint for the menu.
 @property (retain) NSStatusItem * statusItem;
 // The context of all objects for permanent storage.

@@ -44,7 +44,7 @@
 /// @brief application delegate
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (assign) arangoAppDelegate* delegate;
+@property (nonatomic, assign, readonly) arangoAppDelegate* delegate;
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                    public methods
@@ -54,7 +54,8 @@
 /// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (id) initWithAppDelegate: (arangoAppDelegate*) aD nibNamed: (NSString*) name;
+- (id) initWithAppDelegate: (arangoAppDelegate*) delegate
+                  nibNamed: (NSString*) name;
 
 @end
 

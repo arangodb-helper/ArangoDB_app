@@ -30,27 +30,47 @@
 
 #include <dirent.h>
 #include <sys/file.h>
+#include <sys/stat.h>
 
 #import "ArangoConfiguration.h"
+#import "ArangoStatus.h"
 #import "User.h"
 #import "Bookmarks.h"
 
 // -----------------------------------------------------------------------------
-// --SECTION--                                                 private functions
+// --SECTION--                                                     notifications
 // -----------------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief moves database files
+/// @brief configuration did change
 ////////////////////////////////////////////////////////////////////////////////
 
-static int TRI_MoveDatabaseFiles (NSString* src, NSString* dst) {
+NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
+
+// -----------------------------------------------------------------------------
+// --SECTION--                                              ArangoBaseController
+// -----------------------------------------------------------------------------
+
+@implementation ArangoManager
+
+// -----------------------------------------------------------------------------
+// --SECTION--                                                   private methods
+// -----------------------------------------------------------------------------
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief moves database files to new destination
+////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL) moveDatabaseFiles: (NSString*) src 
+             toDestination: (NSString*) dst {
   DIR * d;
   struct dirent * de;
 
   d = opendir([src fileSystemRepresentation]);
 
   if (d == 0) {
-    return errno;
+    self.lastError = [[[@"Cannot open database directory " stringByAppendingString:src] stringByAppendingString:@": "] stringByAppendingString:[NSString stringWithCString:strerror(errno) encoding:NSUTF8StringEncoding]];
+    return NO;
   }
 
   de = readdir(d);
@@ -68,9 +88,9 @@ static int TRI_MoveDatabaseFiles (NSString* src, NSString* dst) {
         NSLog(@"Renamed %@ to %@", from, to);
       }
       else {
-        NSLog(@"Cannot renamed %@ to %@: %@", from, to, err.localizedDescription);
+        self.lastError = [[[@"Cannot rename file " stringByAppendingString:from] stringByAppendingString:@": "] stringByAppendingString:err.localizedDescription];
         closedir(d);
-        return -1;
+        return NO;
       }
     }
 
@@ -78,31 +98,62 @@ static int TRI_MoveDatabaseFiles (NSString* src, NSString* dst) {
   }
 
   closedir(d);
-  return 0;
+  return YES;
 }
 
-// -----------------------------------------------------------------------------
-// --SECTION--                                              ArangoBaseController
-// -----------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////
+/// @brief creates the context necessary for persistent storage
+////////////////////////////////////////////////////////////////////////////////
 
-@implementation ArangoManager
+- (BOOL) createManagedObjectContext {
+  if (_managedObjectContext == nil) {
+    NSError* err = nil;
+    NSURL *storeURL = [[[[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"ArangoDB"];
 
-// -----------------------------------------------------------------------------
-// --SECTION--                                                   private methods
-// -----------------------------------------------------------------------------
+    // create storage path
+    if (! [[NSFileManager defaultManager] fileExistsAtPath:[storeURL path]]) {
+      if ([[NSFileManager defaultManager] respondsToSelector:@selector(createDirectoryAtURL:withIntermediateDirectories:attributes:error:)]) {
+        [[NSFileManager defaultManager] createDirectoryAtURL:storeURL withIntermediateDirectories:YES attributes:nil error:&err];
+      }
+      else {
+        [[NSFileManager defaultManager] createDirectoryAtPath:[storeURL path] withIntermediateDirectories:YES attributes:nil error:&err];
+      }
+      
+      if (err != nil) {
+        self.lastError = [@"failed to create SQLITE application storage: " stringByAppendingString:err.localizedDescription];
+        return NO;
+      }
+    }
+    
+    // create SQLITE
+    NSURL* sqliteURL = [storeURL URLByAppendingPathComponent:@"ArangoDB.sqlite"];
+    NSURL* modelURL = [[NSBundle mainBundle] URLForResource:@"configurationModel" withExtension:@"momd"];
+    NSManagedObjectModel* model = [[[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL] autorelease];
+    NSPersistentStoreCoordinator* coordinator = [[[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:model] autorelease];
+
+    if (! [coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:sqliteURL options:nil error:&err]) {
+      self.lastError = [@"cannot create SQLITE storage: " stringByAppendingString:err.localizedDescription];
+      return NO;
+    }
+    
+    _managedObjectContext = [[NSManagedObjectContext alloc] init];
+    [_managedObjectContext setPersistentStoreCoordinator:coordinator];
+  }
+  
+  return YES;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief saves all changes made to the configuration
 ////////////////////////////////////////////////////////////////////////////////
 
-- (BOOL) save
-{
+- (BOOL) saveConfigurations {
   NSError* error = nil;
 
-  [self.managedObjectContext save:&error];
+  [_managedObjectContext save:&error];
 
   if (error != nil) {
-    NSLog(@"Cannot save configuration: %@", error.localizedDescription);
+    self.lastError = [@"cannot save configuration: " stringByAppendingString: error.localizedDescription];
     return NO;
   }
 
@@ -110,23 +161,54 @@ static int TRI_MoveDatabaseFiles (NSString* src, NSString* dst) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// @brief creates bookmark for a configuration
+////////////////////////////////////////////////////////////////////////////////
+
+- (void) createBookmarks: (ArangoConfiguration*) config {
+  if (config.bookmarks != nil) {
+    [self deleteBookmarks:config];
+  }
+
+  NSURL* pathURL = [NSURL fileURLWithPath:config.path];
+  NSData* path = [self bookmarkForURL:pathURL];
+
+  NSURL* logURL = [NSURL fileURLWithPath:config.log];
+  NSData* log = [self bookmarkForURL:logURL];
+
+  Bookmarks* bookmarks = (Bookmarks*) [NSEntityDescription insertNewObjectForEntityForName:@"Bookmarks" inManagedObjectContext:_managedObjectContext];
+
+  bookmarks.path = path;
+  bookmarks.log = log;
+  bookmarks.config = config;
+
+  config.bookmarks = bookmarks;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief deletes bookmark from a configuration
+////////////////////////////////////////////////////////////////////////////////
+
+- (void) deleteBookmarks: (ArangoConfiguration*) config {
+  [_managedObjectContext deleteObject:config.bookmarks];
+  config.bookmarks = nil;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// @brief creates bookmark from url
 ////////////////////////////////////////////////////////////////////////////////
 
-- (NSData*)bookmarkForURL:(NSURL*)url {
-  if (self.version == 106) {
+- (NSData*) bookmarkForURL: (NSURL*) url {
+  if (_version <= 106) {
     return nil;
   }
 
-  NSError* error = nil;
+  NSError* err = nil;
   NSData* bookmark = [url bookmarkDataWithOptions:NSURLBookmarkCreationWithSecurityScope
                    includingResourceValuesForKeys:nil
                                     relativeToURL:nil
-                                            error:&error];
-  if (error || (bookmark == nil)) {
-    NSLog(@"Failed to create Bookmark");
-    NSLog(@"%@", error.localizedDescription);
-
+                                            error:&err];
+  if (err) {
+    self.lastError = [@"failed to create bookmark: " stringByAppendingString:err.localizedDescription];
     return nil;
   }
 
@@ -137,137 +219,152 @@ static int TRI_MoveDatabaseFiles (NSString* src, NSString* dst) {
 /// @brief extracts url from bookmark
 ////////////////////////////////////////////////////////////////////////////////
 
-- (NSURL*) urlForBookmark: (NSData*) bookmark
-{
-  if (self.version == 106) {
+- (NSURL*) urlForBookmark: (NSData*) bookmark {
+  if (_version <= 106) {
     return nil;
   }
 
-  BOOL bookmarkIsStale = NO;
-  NSError* error = nil;
-  NSURL* bookmarkURL = [NSURL URLByResolvingBookmarkData:bookmark
-                                                 options:(NSURLBookmarkResolutionWithoutUI|NSURLBookmarkResolutionWithSecurityScope)
-                                           relativeToURL:nil
-                                     bookmarkDataIsStale:&bookmarkIsStale
-                                                   error:&error];
+  BOOL isStale = NO;
+  NSError* err = nil;
+  NSURL* url = [NSURL URLByResolvingBookmarkData:bookmark
+                                         options:(NSURLBookmarkResolutionWithoutUI|NSURLBookmarkResolutionWithSecurityScope)
+                                   relativeToURL:nil
+                             bookmarkDataIsStale:&isStale
+                                           error:&err];
   
-  if (bookmarkIsStale || error != nil) {
-    NSLog(@"Failed to resolve URL");
-    NSLog(@"%@", error.localizedDescription);
+  if (err != nil) {
+    self.lastError = [@"failed to resolve URL: " stringByAppendingString:err.localizedDescription];
     return nil;
   }
 
-  return bookmarkURL;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief gets the Context necessary for persistent storage
-////////////////////////////////////////////////////////////////////////////////
-
-- (NSManagedObjectContext*) getArangoManagedObjectContext
-{
-  if (self.managedObjectContext == nil) {
-    NSURL *storeURL = [[[[[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"ArangoDB"] retain];
-
-    if (![[NSFileManager defaultManager] fileExistsAtPath:[storeURL path]]) {
-      NSError* error = nil;
-      
-      if ([[NSFileManager defaultManager] respondsToSelector:@selector(createDirectoryAtURL:withIntermediateDirectories:attributes:error:)]) {
-        [[NSFileManager defaultManager] createDirectoryAtURL:storeURL withIntermediateDirectories:YES attributes:nil error:&error];
-      }
-      else {
-        [[NSFileManager defaultManager] createDirectoryAtPath:[storeURL path] withIntermediateDirectories:YES attributes:nil error:&error];
-      }
-      
-      if (error != nil) {
-        NSLog(@"Failed to create sqlite");
-        return nil;
-      }
-    }
-    
-    storeURL = [[storeURL URLByAppendingPathComponent:@"ArangoDB.sqlite"] retain];
-
-    NSURL *modelURL = [[[NSBundle mainBundle] URLForResource:@"configurationModel" withExtension:@"momd"] retain];
-    NSError *error = nil;
-    NSPersistentStoreCoordinator* coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL]];
-
-    if (![coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:nil error:&error]) {
-      NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-      return nil;
-    }
-    
-    self.managedObjectContext = [[NSManagedObjectContext alloc] init];
-    [self.managedObjectContext setPersistentStoreCoordinator:coordinator];
-    
-    [storeURL release];
-    [modelURL release];
-    [coordinator release];
+  if (isStale) {
+    self.lastError = @"failed to resolve URL: bookmark is stale";
+    return nil;
   }
-  
-  return self.managedObjectContext;
+
+  return url;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief loads the configurations
+/// @brief loads all configurations
 ////////////////////////////////////////////////////////////////////////////////
 
-- (BOOL) loadConfigurations
-{
-  [self getArangoManagedObjectContext];
-  
-  if (self.managedObjectContext == nil) {
+- (BOOL) loadConfigurations {
+
+  // create managed context
+  BOOL ok = [self createManagedObjectContext];
+
+  if (! ok) {
     return NO;
   }
   
   // load the global user configuration
-  NSFetchRequest *request = [[NSFetchRequest alloc] init];
-  NSEntityDescription *entity = [[NSEntityDescription entityForName:@"User" inManagedObjectContext: self.managedObjectContext] retain];
+  NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
+  NSEntityDescription *entity = [NSEntityDescription entityForName:@"User" inManagedObjectContext: _managedObjectContext];
   [request setEntity:entity];
-  [entity release];
   
-  NSError *error = nil;
-  NSArray *fetchedResults = [self.managedObjectContext executeFetchRequest:request error:&error];
-  [request release];
+  NSError *err = nil;
+  NSArray *fetchedResults = [_managedObjectContext executeFetchRequest:request error:&err];
   
   if (fetchedResults == nil) {
-    NSLog(@"cannot load global user configuration: %@", error.localizedDescription);
+    self.lastError = [@"cannot load global user configuration: " stringByAppendingString:err.localizedDescription];
     return NO;
   }
   else {
     if (0 < fetchedResults.count) {
       for (User* u in fetchedResults) {
-        self.user = u;
+        _user = u;
       }
     }
     else {
-      self.user = (User*) [NSEntityDescription insertNewObjectForEntityForName:@"User" inManagedObjectContext:self.managedObjectContext];
+      _user = (User*) [NSEntityDescription insertNewObjectForEntityForName:@"User" inManagedObjectContext:_managedObjectContext];
     }
   }
   
   // load the configurations
-  request = [[NSFetchRequest alloc] init];
-  entity = [NSEntityDescription entityForName:@"ArangoConfiguration" inManagedObjectContext: self.managedObjectContext];
+  request = [[[NSFetchRequest alloc] init] autorelease];
+  entity = [NSEntityDescription entityForName:@"ArangoConfiguration" inManagedObjectContext: _managedObjectContext];
   [request setEntity:entity];
-  [entity release];
-  
-  error = nil;
-  self.configurations = [self.managedObjectContext executeFetchRequest:request error:&error];
-  [request release];
 
-  if (self.configurations == nil) {
-    NSLog(@"cannot load configurations: %@", error.localizedDescription);
+  err = nil;
+  NSArray* configurations = [_managedObjectContext executeFetchRequest:request error:&err];
+
+  if (err) {
+    self.lastError = [@"cannot load configurations: " stringByAppendingString:err.localizedDescription];
     return NO;
   }
-  
+
+  // update bookmarks if necessary
+  for (ArangoConfiguration* config in configurations) {
+    if (106 < _version) {
+      if (config.bookmarks == nil) {
+        [self createBookmarks:config];
+      }
+    }
+    else {
+      if (config.bookmarks != nil) {
+        [self deleteBookmarks:config];
+      }
+    }
+  }  
+
   // map names to configurations
-  self.namedConfigurations = [[NSMutableDictionary alloc] init];
+  _configurations = [[NSMutableDictionary alloc] init];
   
-  for (ArangoConfiguration* c in self.configurations) {
-    [self.namedConfigurations setValue:c forKey:c.alias];
+  for (ArangoConfiguration* c in configurations) {
+    [_configurations setValue:c forKey:c.alias];
   }
   
-  return YES;
+  // in case we changed the bookmarks
+  return [self saveConfigurations];
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief deletes database files XXXX
+////////////////////////////////////////////////////////////////////////////////
+
+/*
+- (void) deleteFiles: (NSTimer*) timer {
+  ArangoConfiguration* config = timer.userInfo;
+  NSError* error = nil;
+  if (config.bookmarks != nil  && version > 106) {
+    
+    NSURL* oldLogPath = [self urlForBookmark:config.bookmarks.log];
+    if (oldLogPath != nil) {
+      [oldLogPath stopAccessingSecurityScopedResource];
+    }
+    [[NSFileManager defaultManager] removeItemAtPath:config.log error:&error];
+    if (error != nil) {
+      NSLog(@"%@", error.localizedDescription);
+    }
+    error = nil;
+    NSURL* oldPath = [self urlForBookmark:config.bookmarks.path];
+    if (oldPath != nil) {
+      [oldPath stopAccessingSecurityScopedResource];
+    }
+    [[NSFileManager defaultManager] removeItemAtPath:config.path error:&error];
+    if (error != nil) {
+      NSLog(@"%@", error.localizedDescription);
+    }
+    [[self getArangoManagedObjectContext] deleteObject: config.bookmarks];
+    config.bookmarks = nil;
+  }
+  else {
+    [[NSFileManager defaultManager] removeItemAtPath:config.log error:&error];
+    if (error != nil) {
+      NSLog(@"%@", error.localizedDescription);
+    }
+    error = nil;
+    [[NSFileManager defaultManager] removeItemAtPath:config.path error:&error];
+    if (error != nil) {
+      NSLog(@"%@", error.localizedDescription);
+    }
+  }
+  [[self getArangoManagedObjectContext] deleteObject: config];
+  [self save];
+  [statusMenu updateMenu];
+}
+ */
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                    public methods
@@ -277,41 +374,63 @@ static int TRI_MoveDatabaseFiles (NSString* src, NSString* dst) {
 /// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (ArangoManager*) init
-{
+- (ArangoManager*) init {
   self = [super init];
 
   if (self) {
     if ([[NSBundle mainBundle] respondsToSelector:@selector(loadNibNamed:owner:topLevelObjects:)]) {
-      self.arangoDBVersion = @"/arangod_10_8";
-      self.version = 108;
+      _arangoDBVersion = @"/arangod_10_8";
+      _version = 108;
     } 
     else if ([[NSFileManager defaultManager] respondsToSelector:@selector(createDirectoryAtURL:withIntermediateDirectories:attributes:error:)]) {
-      self.arangoDBVersion = @"/arangod_10_7";
-      self.version = 107;
+      _arangoDBVersion = @"/arangod_10_7";
+      _version = 107;
     } 
     else {
-      self.arangoDBVersion = @"/arangod_10_6";
-      self.version = 106;
+      _arangoDBVersion = @"/arangod_10_6";
+      _version = 106;
     }
 
     NSString* path = [[NSBundle mainBundle] resourcePath];
 
-    self.arangoDBBinary = [path stringByAppendingString:self.arangoDBVersion];
-    self.arangoDBConfig = [path stringByAppendingString:@"/arangod.conf"];
-    self.arangoDBAdminDir = [path stringByAppendingString:@"/html/admin"];
-    self.arangoDBJsActionDir = [path stringByAppendingString:@"/js/actions/system"];
-    self.arangoDBJsModuleDir = [[path stringByAppendingString:@"/js/server/modules:"] stringByAppendingString:[path stringByAppendingString:@"/js/common/modules"]];
+    _arangoDBBinary = [path stringByAppendingString:_arangoDBVersion];
+    _arangoDBConfig = [path stringByAppendingString:@"/arangod.conf"];
+    _arangoDBAdminDir = [path stringByAppendingString:@"/html/admin"];
+    _arangoDBJsActionDir = [path stringByAppendingString:@"/js/actions/system"];
+    _arangoDBJsModuleDir = [[path stringByAppendingString:@"/js/server/modules:"] stringByAppendingString:[path stringByAppendingString:@"/js/common/modules"]];
 
     BOOL ok = [self loadConfigurations];
 
     if (! ok) {
+      // TODO-fc broadcast fatal error
       [self release];
       return nil;
     }
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ArangoConfigurationDidChange object:self];
   }
   
   return self;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief destructor
+////////////////////////////////////////////////////////////////////////////////
+
+- (void) dealloc {
+  [_arangoDBVersion release];
+  [_arangoDBBinary release];
+  [_arangoDBConfig release];
+  [_arangoDBAdminDir release];
+  [_arangoDBJsActionDir release];
+  [_arangoDBJsModuleDir release];
+
+  [_managedObjectContext release];
+
+  [_configurations release];
+  [_user release];
+
+  [super dealloc];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -323,28 +442,13 @@ static int TRI_MoveDatabaseFiles (NSString* src, NSString* dst) {
                      andPort: (NSNumber*) port
                       andLog: (NSString*) logPath
                  andLogLevel: (NSString*) logLevel
-             andRunOnStartUp: (BOOL) ros
-{
-  if ([self.namedConfigurations objectForKey:alias] != nil) {
-    NSLog(@"Configuration already exists: %@", alias);
+             andRunOnStartUp: (BOOL) ros {
+  if ([_configurations objectForKey:alias] != nil) {
+    self.lastError = [@"configuration already exists: " stringByAppendingString:alias];
     return NO;
   }
 
-  ArangoConfiguration* config = (ArangoConfiguration*) [NSEntityDescription insertNewObjectForEntityForName:@"ArangoConfiguration" inManagedObjectContext:self.managedObjectContext];
-
-  if (self.version > 106) {
-    NSURL* pathURL = [NSURL fileURLWithPath:path];
-    NSData* bookmarkPath = [self bookmarkForURL:pathURL];
-    NSURL* logURL = [NSURL fileURLWithPath:logPath];
-    NSData* bookmarkLog = [self bookmarkForURL:logURL];
-    Bookmarks* bookmarks = (Bookmarks*) [NSEntityDescription insertNewObjectForEntityForName:@"Bookmarks" inManagedObjectContext:self.managedObjectContext];
-
-    bookmarks.path = bookmarkPath;
-    bookmarks.log = bookmarkLog;
-    bookmarks.config = config;
-
-    config.bookmarks = bookmarks;
-  }
+  ArangoConfiguration* config = (ArangoConfiguration*) [NSEntityDescription insertNewObjectForEntityForName:@"ArangoConfiguration" inManagedObjectContext:_managedObjectContext];
 
   config.alias = alias;
   config.path = path;
@@ -353,18 +457,118 @@ static int TRI_MoveDatabaseFiles (NSString* src, NSString* dst) {
   config.loglevel = logLevel;
   config.runOnStartUp = [NSNumber numberWithBool:ros];
 
-  return [self save];
+  if (106 < _version) {
+    [self createBookmarks:config];
+  }
+
+  // save and broadcast change
+  BOOL ok = [self saveConfigurations];
+
+  if (ok) {
+    [_configurations setValue:config forKey:alias];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ArangoConfigurationDidChange object:self];
+  }
+
+  return ok;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief returns current status
+////////////////////////////////////////////////////////////////////////////////
+
+- (NSArray*) currentStatus {
+  NSMutableArray* result = [[[NSMutableArray alloc] init] autorelease];
+  NSArray* configurations = [_configurations allKeys];
+
+  for (NSString* name in configurations) {
+    ArangoConfiguration* config = [_configurations objectForKey:name];
+    ArangoStatus* status = [[ArangoStatus alloc] initWithName:config.alias
+                                                      andPort:config.port
+                                                   andRunning:false];
+    
+    [result addObject:status];
+    [status release];
+  }
+
+  return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief updates a configuration
+////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL) updateConfiguration: (NSString*) alias
+                    withPath: (NSString*) path
+                     andPort: (NSNumber*) port
+                      andLog: (NSString*) logPath
+                 andLogLevel: (NSString*) logLevel
+             andRunOnStartUp: (BOOL) ros {
+  ArangoConfiguration* config = [_configurations objectForKey:alias];
+
+  if (config == nil) {
+    self.lastError = [@"cannot update unknown configuration: " stringByAppendingString:alias];
+    return NO;
+  }
+
+  config.path = path;
+  config.port = port;
+  config.log = logPath;
+  config.loglevel = logLevel;
+  config.runOnStartUp = [NSNumber numberWithBool:ros];
+
+  if (106 < _version) {
+    [self createBookmarks:config];
+  }
+
+  // save and broadcast change
+  BOOL ok = [self saveConfigurations];
+
+  if (ok) {
+    [[NSNotificationCenter defaultCenter] postNotificationName:ArangoConfigurationDidChange object:self];
+  }
+
+  return ok;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief deletes a configuration
+////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL) deleteConfiguration: (NSString*) alias {
+  ArangoConfiguration* config = [_configurations objectForKey:alias];
+
+  if (config == nil) {
+    self.lastError = [@"cannot delete unknown configuration: " stringByAppendingString:alias];
+    return NO;
+  }
+
+  // delete bookmarks
+  [self deleteBookmarks:config];
+
+  // delete configuration
+  [_managedObjectContext deleteObject: config];
+
+  // save and broadcast change
+  BOOL ok = [self saveConfigurations];
+
+  if (ok) {
+    [_configurations removeObjectForKey:alias];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ArangoConfigurationDidChange object:self];
+  }
+
+  return ok;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief starts a new ArangoDB instance with the given name
 ////////////////////////////////////////////////////////////////////////////////
 
+/*
 - (BOOL) startArangoDB: (NSString*) name
 {
 
   // load configuration for name
-  ArangoConfiguration* config = [self.namedConfigurations objectForKey:name];
+  ArangoConfiguration* config = [self.configurations objectForKey:name];
   
   if (config == nil) {
     NSLog(@"Unkown configuration: %@, cannot start instance", name);
@@ -407,7 +611,7 @@ static int TRI_MoveDatabaseFiles (NSString* src, NSString* dst) {
       return NO;
     }
 
-    res = TRI_MoveDatabaseFiles(config.path, database);
+    res = [self moveDatabaseFiles:config.path toDestination:database];
 
     if (res != 0) {
       NSLog(@"Cannot move database directory to %@", database);
@@ -447,6 +651,7 @@ static int TRI_MoveDatabaseFiles (NSString* src, NSString* dst) {
 
   return YES;
 }
+ */
 
 @end
 
