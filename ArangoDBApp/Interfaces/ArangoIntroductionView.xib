@@ -30,7 +30,7 @@
 		</object>
 		<array class="NSMutableArray" key="IBDocument.RootObjects" id="1000">
 			<object class="NSCustomObject" id="1001">
-				<string key="NSClassName">ArangoHelpController</string>
+				<string key="NSClassName">ArangoIntroductionController</string>
 			</object>
 			<object class="NSCustomObject" id="1003">
 				<string key="NSClassName">FirstResponder</string>
@@ -62,8 +62,9 @@
 								<string>NeXT Encapsulated PostScript v1.2 pasteboard type</string>
 								<string>NeXT TIFF v4.0 pasteboard type</string>
 							</set>
-							<string key="NSFrame">{{17, 262}, {446, 86}}</string>
+							<string key="NSFrame">{{17, 282}, {446, 86}}</string>
 							<reference key="NSSuperview" ref="1006"/>
+							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="469345691"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<bool key="NSEnabled">YES</bool>
@@ -86,9 +87,10 @@
 						<object class="NSButton" id="527626992">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{237, 13}, {112, 32}}</string>
+							<string key="NSFrame">{{282, 13}, {112, 32}}</string>
 							<reference key="NSSuperview" ref="1006"/>
-							<reference key="NSNextKeyView" ref="275509041"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="378956044"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="717241772">
@@ -114,9 +116,9 @@
 						<object class="NSButton" id="378956044">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{162, 13}, {75, 32}}</string>
+							<string key="NSFrame">{{394, 13}, {75, 32}}</string>
 							<reference key="NSSuperview" ref="1006"/>
-							<reference key="NSNextKeyView" ref="527626992"/>
+							<reference key="NSWindow"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="730291054">
@@ -129,7 +131,7 @@
 								<int key="NSButtonFlags">-2038284288</int>
 								<int key="NSButtonFlags2">129</int>
 								<string key="NSAlternateContents"/>
-								<string key="NSKeyEquivalent"/>
+								<string type="base64-UTF8" key="NSKeyEquivalent">DQ</string>
 								<int key="NSPeriodicDelay">200</int>
 								<int key="NSPeriodicInterval">25</int>
 							</object>
@@ -138,14 +140,16 @@
 						<object class="NSButton" id="275509041">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{349, 13}, {122, 32}}</string>
+							<string key="NSFrame">{{14, 13}, {122, 32}}</string>
 							<reference key="NSSuperview" ref="1006"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="527626992"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="325886067">
 								<int key="NSCellFlags">67108864</int>
 								<int key="NSCellFlags2">134217728</int>
-								<string key="NSContents">Add Instance</string>
+								<string key="NSContents">New Instance</string>
 								<reference key="NSSupport" ref="944676172"/>
 								<string key="NSCellIdentifier">_NS:9</string>
 								<reference key="NSControlView" ref="275509041"/>
@@ -153,7 +157,7 @@
 								<int key="NSButtonFlags2">129</int>
 								<reference key="NSAlternateImage" ref="944676172"/>
 								<string key="NSAlternateContents"/>
-								<string type="base64-UTF8" key="NSKeyEquivalent">DQ</string>
+								<string key="NSKeyEquivalent"/>
 								<int key="NSPeriodicDelay">200</int>
 								<int key="NSPeriodicInterval">25</int>
 							</object>
@@ -164,7 +168,8 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{17, 58}, {446, 204}}</string>
 							<reference key="NSSuperview" ref="1006"/>
-							<reference key="NSNextKeyView" ref="378956044"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="275509041"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<string key="NSAntiCompressionPriority">{250, 750}</string>
 							<bool key="NSEnabled">YES</bool>
@@ -173,11 +178,11 @@
 								<int key="NSCellFlags2">272629760</int>
 								<object class="NSMutableString" key="NSContents">
 									<bytes key="NS.bytes">Q29uZ3JhdHVsYXRpb25zISBZb3UgaGF2ZSBzdWNjZXNzZnVsbHkgaW5zdGFsbGVkIEFyYW5nb0RCLiBZ
-b3UgbXVzdCBub3cgY29uZmlndXJlIHRoZSBpbnN0YW5jZXMuIEluIG9yZGVyIHRvIGxlYXJuIG1vcmUs
-IGNoZWNrb3V04oCo4oCoICAgIGh0dHA6Ly93d3cuYXJhbmdvZGIub3Jn4oCo4oCoQWZ0ZXIgdGhlIGNv
-bmZpZ3VyYXRpb24sIHlvdSBjYW4gdXNlIHlvdXIgZmF2b3JpdGUgd2ViIGJyb3dzZXIgdG8gYWNjZXNz
-IHRoZSBhZG1pbmlzdHJhdGlvbiBpbnRlcmZhY2UuIElmIHlvdSBoYXZlIGFueSBxdWVzdGlvbnMsIHBs
-ZWFzZSBjb250YWN0IHVzIGF0CgogICAgaGFja2Vyc0BhcmFuZ29kYi5vcmc</bytes>
+b3UgbXVzdCBjcmVhdGUgYW5kIGNvbmZpZ3VyZSBhIG5ldyBpbnN0YW5jZXMuIEluIG9yZGVyIHRvIGxl
+YXJuIG1vcmUsIGNoZWNrb3V04oCo4oCoICAgIGh0dHA6Ly93d3cuYXJhbmdvZGIub3Jn4oCo4oCoQWZ0
+ZXIgdGhlIGNvbmZpZ3VyYXRpb24sIHlvdSBjYW4gdXNlIHlvdXIgZmF2b3JpdGUgd2ViIGJyb3dzZXIg
+dG8gYWNjZXNzIHRoZSBhZG1pbmlzdHJhdGlvbiBpbnRlcmZhY2UuIElmIHlvdSBoYXZlIGFueSBxdWVz
+dGlvbnMsIHBsZWFzZSBjb250YWN0IHVzIGF0CgogICAgaGFja2Vyc0BhcmFuZ29kYi5vcmc</bytes>
 								</object>
 								<object class="NSFont" key="NSSupport">
 									<string key="NSName">LucidaGrande</string>
@@ -211,6 +216,7 @@ ZWFzZSBjb250YWN0IHVzIGF0CgogICAgaGFja2Vyc0BhcmFuZ29kYi5vcmc</bytes>
 					</array>
 					<string key="NSFrameSize">{480, 368}</string>
 					<reference key="NSSuperview"/>
+					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="469764715"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1920, 1178}}</string>
@@ -227,14 +233,6 @@ ZWFzZSBjb250YWN0IHVzIGF0CgogICAgaGFja2Vyc0BhcmFuZ29kYi5vcmc</bytes>
 						<reference key="destination" ref="1005"/>
 					</object>
 					<int key="connectionID">101</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">close:</string>
-						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="275509041"/>
-					</object>
-					<int key="connectionID">148</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -267,6 +265,14 @@ ZWFzZSBjb250YWN0IHVzIGF0CgogICAgaGFja2Vyc0BhcmFuZ29kYi5vcmc</bytes>
 						<reference key="destination" ref="378956044"/>
 					</object>
 					<int key="connectionID">161</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">createInstance:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="275509041"/>
+					</object>
+					<int key="connectionID">162</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -315,11 +321,11 @@ ZWFzZSBjb250YWN0IHVzIGF0CgogICAgaGFja2Vyc0BhcmFuZ29kYi5vcmc</bytes>
 						<int key="objectID">2</int>
 						<reference key="object" ref="1006"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="469764715"/>
 							<reference ref="469345691"/>
-							<reference ref="275509041"/>
-							<reference ref="527626992"/>
 							<reference ref="378956044"/>
+							<reference ref="527626992"/>
+							<reference ref="275509041"/>
+							<reference ref="469764715"/>
 						</array>
 						<reference key="parent" ref="1005"/>
 					</object>
@@ -413,9 +419,61 @@ ZWFzZSBjb250YWN0IHVzIGF0CgogICAgaGFja2Vyc0BhcmFuZ29kYi5vcmc</bytes>
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">161</int>
+			<int key="maxID">162</int>
 		</object>
-		<object class="IBClassDescriber" key="IBDocument.Classes"/>
+		<object class="IBClassDescriber" key="IBDocument.Classes">
+			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
+				<object class="IBPartialClassDescription">
+					<string key="className">ArangoBaseController</string>
+					<string key="superclassName">NSWindowController</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/ArangoBaseController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">ArangoHelpController</string>
+					<string key="superclassName">ArangoBaseController</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="close:">id</string>
+						<string key="learnMore:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="close:">
+							<string key="name">close:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="learnMore:">
+							<string key="name">learnMore:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/ArangoHelpController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">ArangoIntroductionController</string>
+					<string key="superclassName">ArangoHelpController</string>
+					<object class="NSMutableDictionary" key="actions">
+						<string key="NS.key.0">createInstance:</string>
+						<string key="NS.object.0">id</string>
+					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<string key="NS.key.0">createInstance:</string>
+						<object class="IBActionInfo" key="NS.object.0">
+							<string key="name">createInstance:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/ArangoIntroductionController.h</string>
+					</object>
+				</object>
+			</array>
+		</object>
 		<int key="IBDocument.localizationMode">0</int>
 		<string key="IBDocument.TargetRuntimeIdentifier">IBCocoaFramework</string>
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>

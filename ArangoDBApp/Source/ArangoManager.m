@@ -148,12 +148,12 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 ////////////////////////////////////////////////////////////////////////////////
 
 - (BOOL) saveConfigurations {
-  NSError* error = nil;
+  NSError* err = nil;
 
-  [_managedObjectContext save:&error];
+  [_managedObjectContext save:&err];
 
-  if (error != nil) {
-    self.lastError = [@"cannot save configuration: " stringByAppendingString: error.localizedDescription];
+  if (err != nil) {
+    self.lastError = [@"cannot save configuration: " stringByAppendingString:err.localizedDescription];
     return NO;
   }
 
@@ -189,8 +189,14 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 ////////////////////////////////////////////////////////////////////////////////
 
 - (void) deleteBookmarks: (ArangoConfiguration*) config {
-  [_managedObjectContext deleteObject:config.bookmarks];
-  config.bookmarks = nil;
+  Bookmarks* bookmarks = config.bookmarks;
+
+  if (bookmarks != nil) {
+    config.bookmarks = nil;
+    bookmarks.config = nil;
+
+    [_managedObjectContext deleteObject:bookmarks];
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -207,7 +213,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
                    includingResourceValuesForKeys:nil
                                     relativeToURL:nil
                                             error:&err];
-  if (err) {
+  if (err != nil) {
     self.lastError = [@"failed to create bookmark: " stringByAppendingString:err.localizedDescription];
     return nil;
   }
@@ -289,24 +295,38 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   err = nil;
   NSArray* configurations = [_managedObjectContext executeFetchRequest:request error:&err];
 
-  if (err) {
+  if (err != nil) {
     self.lastError = [@"cannot load configurations: " stringByAppendingString:err.localizedDescription];
     return NO;
   }
 
   // update bookmarks if necessary
+  BOOL changed = NO;
+  
   for (ArangoConfiguration* config in configurations) {
     if (106 < _version) {
       if (config.bookmarks == nil) {
         [self createBookmarks:config];
+        changed = YES;
       }
     }
     else {
       if (config.bookmarks != nil) {
         [self deleteBookmarks:config];
+        changed = YES;
       }
     }
-  }  
+  }
+  
+  if (changed) {
+    BOOL ok = [self saveConfigurations];
+    
+    if (! ok) {
+      return NO;
+    }
+    
+    return [self loadConfigurations];
+  }
 
   // map names to configurations
   _configurations = [[NSMutableDictionary alloc] init];
@@ -315,8 +335,9 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     [_configurations setValue:c forKey:c.alias];
   }
   
-  // in case we changed the bookmarks
-  return [self saveConfigurations];
+  [[NSNotificationCenter defaultCenter] postNotificationName:ArangoConfigurationDidChange object:self];
+
+  return YES;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -377,7 +398,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 - (ArangoManager*) init {
   self = [super init];
 
-  if (self) {
+  if (self != nil) {
     if ([[NSBundle mainBundle] respondsToSelector:@selector(loadNibNamed:owner:topLevelObjects:)]) {
       _arangoDBVersion = @"/arangod_10_8";
       _version = 108;
@@ -407,7 +428,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
       return nil;
     }
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ArangoConfigurationDidChange object:self];
+    _instances = [[NSMutableDictionary alloc] init];
   }
   
   return self;
@@ -430,6 +451,8 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   [_configurations release];
   [_user release];
 
+  [_instances release];
+
   [super dealloc];
 }
 
@@ -443,6 +466,8 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
                       andLog: (NSString*) logPath
                  andLogLevel: (NSString*) logLevel
              andRunOnStartUp: (BOOL) ros {
+  self.lastError = nil;
+
   if ([_configurations objectForKey:alias] != nil) {
     self.lastError = [@"configuration already exists: " stringByAppendingString:alias];
     return NO;
@@ -468,29 +493,174 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     [_configurations setValue:config forKey:alias];
     [[NSNotificationCenter defaultCenter] postNotificationName:ArangoConfigurationDidChange object:self];
   }
+  else {
+    [self loadConfigurations];
+  }
 
   return ok;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief returns current status
+/// @brief prepares directories
+////////////////////////////////////////////////////////////////////////////////
+
+- (ArangoStatus*) prepareConfiguration: (NSString*) alias
+                              withPath: (NSString*) path
+                               andPort: (NSNumber*) port
+                                andLog: (NSString*) logPath {
+  self.lastError = nil;
+
+  // check the port
+  if ([port intValue] < 1024) {
+    self.lastError = @"illegal or privileged port";
+    return nil;
+  }
+  
+  // check the instance name, remove spaces
+  alias = [alias stringByReplacingOccurrencesOfString:@" " withString: @"_"];
+
+  if ([alias isEqualToString:@""]) {
+    alias = @"ArangoDB";
+  }
+
+  // normalise database path
+  if ([path hasPrefix:@"~"]){
+    path = [NSHomeDirectory() stringByAppendingString:[path substringFromIndex:1]];
+  }
+  else if ([path isEqualToString:@""]) {
+    self.lastError = @"database path must not be empty";
+    return nil;
+  }
+
+  // try to create database directory
+  if (! [[NSFileManager defaultManager] fileExistsAtPath:path]) {
+    NSError* err = nil;
+
+    [[NSFileManager defaultManager] createDirectoryAtPath:path
+                              withIntermediateDirectories:YES
+                                               attributes:nil
+                                                    error:&err];
+
+    if (err != nil) {
+      self.lastError = [@"cannot create database path: " stringByAppendingString:err.localizedDescription];
+      return nil;
+    }
+  }
+
+  // database path must be a directory and writeable
+  BOOL isDir;
+  [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDir];
+
+  if (isDir) {
+    if (! [[NSFileManager defaultManager] isWritableFileAtPath:path]) {
+      self.lastError = @"cannot write into database directory";
+      return nil;
+    }
+  }
+  else {
+    self.lastError = @"database path is not a directory";
+    return nil;
+  }
+
+  // check the log path
+  if ([logPath isEqualToString:@""]) {
+    NSMutableString* logPath = [[[NSMutableString alloc] init] autorelease];
+    [logPath setString:path];
+    [logPath appendString:@"/"];
+    [logPath appendString:alias];
+    [logPath appendString:@".log"];
+
+    if (! [[NSFileManager defaultManager] fileExistsAtPath:logPath]) {
+      BOOL ok = [[NSFileManager defaultManager] createFileAtPath:logPath
+                                                        contents:nil
+                                                      attributes:nil];
+
+      if (! ok) {
+        self.lastError = [[@"cannot create log file '" stringByAppendingString:logPath] stringByAppendingString:@"'"];
+        return nil;
+      }
+    }
+  }
+  else {
+    if ([[NSFileManager defaultManager] fileExistsAtPath:logPath isDirectory:&isDir]) {
+      if (isDir) {
+        NSMutableString* tmp = [[[NSMutableString alloc] initWithString:logPath] autorelease];
+        [tmp appendString:@"/"];
+        [tmp appendString:alias];
+        [tmp appendString:@".log"];
+        logPath = tmp;
+
+        if (![[NSFileManager defaultManager] fileExistsAtPath:logPath]) {
+          BOOL ok = [[NSFileManager defaultManager] createFileAtPath:logPath
+                                                            contents:nil
+                                                          attributes:nil];
+
+          if (! ok) {
+            self.lastError = [[@"cannot create log file '" stringByAppendingString:logPath] stringByAppendingString:@"'"];
+            return nil;
+          }
+        }
+      }
+    }
+    else {
+      BOOL ok = [[NSFileManager defaultManager] createFileAtPath:logPath contents:nil attributes:nil];
+
+      if (! ok) {
+        self.lastError = [[@"cannot create log file '" stringByAppendingString:logPath] stringByAppendingString:@"'"];
+        return nil;
+      }
+    }
+  }
+
+  // everything ready to start
+  return [[ArangoStatus alloc] initWithName:alias
+                                    andPath:path
+                                    andPort:port
+                                 andLogPath:logPath
+                                 andRunning:NO];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief reads a configurations
+////////////////////////////////////////////////////////////////////////////////
+
+- (ArangoConfiguration*) configuration: (NSString*) alias {
+  return [_configurations objectForKey:alias];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief returns current status for all configurations
 ////////////////////////////////////////////////////////////////////////////////
 
 - (NSArray*) currentStatus {
   NSMutableArray* result = [[[NSMutableArray alloc] init] autorelease];
-  NSArray* configurations = [_configurations allKeys];
+  NSArray* configurations = [[_configurations allKeys] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
 
   for (NSString* name in configurations) {
-    ArangoConfiguration* config = [_configurations objectForKey:name];
-    ArangoStatus* status = [[ArangoStatus alloc] initWithName:config.alias
-                                                      andPort:config.port
-                                                   andRunning:false];
+    ArangoStatus* status = [self currentStatus:name];
     
     [result addObject:status];
-    [status release];
   }
 
   return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief returns current status for a configurations
+////////////////////////////////////////////////////////////////////////////////
+
+- (ArangoStatus*) currentStatus: (NSString*) alias {
+  ArangoConfiguration* config = [_configurations objectForKey:alias];
+
+  if (config == nil) {
+    return nil;
+  }
+
+  return [[[ArangoStatus alloc] initWithName:config.alias
+                                     andPath:config.path
+                                     andPort:config.port
+                                  andLogPath:config.log
+                                  andRunning:false] autorelease];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -503,6 +673,8 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
                       andLog: (NSString*) logPath
                  andLogLevel: (NSString*) logLevel
              andRunOnStartUp: (BOOL) ros {
+  self.lastError = nil;
+
   ArangoConfiguration* config = [_configurations objectForKey:alias];
 
   if (config == nil) {
@@ -526,6 +698,9 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   if (ok) {
     [[NSNotificationCenter defaultCenter] postNotificationName:ArangoConfigurationDidChange object:self];
   }
+  else {
+    [self loadConfigurations];
+  }
 
   return ok;
 }
@@ -535,6 +710,8 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 ////////////////////////////////////////////////////////////////////////////////
 
 - (BOOL) deleteConfiguration: (NSString*) alias {
+  self.lastError = nil;
+
   ArangoConfiguration* config = [_configurations objectForKey:alias];
 
   if (config == nil) {
@@ -546,7 +723,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   [self deleteBookmarks:config];
 
   // delete configuration
-  [_managedObjectContext deleteObject: config];
+  [_managedObjectContext deleteObject:config];
 
   // save and broadcast change
   BOOL ok = [self saveConfigurations];
@@ -554,6 +731,9 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   if (ok) {
     [_configurations removeObjectForKey:alias];
     [[NSNotificationCenter defaultCenter] postNotificationName:ArangoConfigurationDidChange object:self];
+  }
+  else {
+    [self loadConfigurations];
   }
 
   return ok;
@@ -563,39 +743,51 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 /// @brief starts a new ArangoDB instance with the given name
 ////////////////////////////////////////////////////////////////////////////////
 
-/*
-- (BOOL) startArangoDB: (NSString*) name
-{
+- (BOOL) stopArangoDBAndDelete: (NSString*) name {
+  NSLog(@"stop and delete arangodb");
+  return YES;
+}
+
+- (BOOL) stopArangoDB: (NSString*) name {
+  NSLog(@"stop arangodb");
+  return YES;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief starts a new ArangoDB instance with the given name
+////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL) startArangoDB: (NSString*) name {
 
   // load configuration for name
-  ArangoConfiguration* config = [self.configurations objectForKey:name];
+  ArangoConfiguration* config = [_configurations objectForKey:name];
   
   if (config == nil) {
-    NSLog(@"Unkown configuration: %@, cannot start instance", name);
+    self.lastError = [@"Cannot start instance for unknown configuration: " stringByAppendingString:name];
     return NO;
   }
   
   // check if a task with that name exists
-  if (config.instance != nil) {
-    NSLog(@"Tasks already exists for instance named %@", name);
+  NSTask* task = [_instances objectForKey:name];
+
+  if (task != nil) {
+    self.lastError = [@"Instance already running: " stringByAppendingString:name];
     return NO;
   }
 
   // check for sandboxed mode
-  if (config.bookmarks != nil  && self.version > 106) {
+  if (config.bookmarks != nil  && 106 < _version) {
     NSURL* bmPath = [self urlForBookmark:config.bookmarks.path];
-    config.path = [bmPath path];
 
     if (! [bmPath startAccessingSecurityScopedResource]) {
-      NSLog(@"Not allowed to open path.");
+      self.lastError = [@"Not allowed to open database path " stringByAppendingString:config.path];
       return NO;
     }
 
     NSURL* bmLog = [self urlForBookmark:config.bookmarks.log];
-    config.log = [bmLog path];
 
     if (! [bmLog startAccessingSecurityScopedResource]) {
-      NSLog(@"Not allowed to open log.");
+      self.lastError = [@"Not allowed to open log path " stringByAppendingString:config.log];
       return NO;
     }
   }
@@ -621,21 +813,19 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
   // prepare task
   task = [[NSTask alloc] init];
-  [task setLaunchPath:self.arangoDBBinary];
+  [task setLaunchPath:_arangoDBBinary];
 
   NSArray* arguments = [NSArray arrayWithObjects:
-                        @"--config", self.arangoDBConfig,
+                        @"--config", _arangoDBConfig,
                         @"--exit-on-parent-death", @"true",
                         @"--server.endpoint", [NSString stringWithFormat:@"tcp://0.0.0.0:%@", config.port.stringValue],
                         @"--log.file", config.log,
                         @"--log.level", config.loglevel,
-                        @"--server.admin-directory", self.arangoDBAdminDir,
-                        @"--javascript.action-directory", self.arangoDBJsActionDir,
-                        @"--javascript.modules-path", self.arangoDBJsModuleDir,
+                        @"--server.admin-directory", _arangoDBAdminDir,
+                        @"--javascript.action-directory", _arangoDBJsActionDir,
+                        @"--javascript.modules-path", _arangoDBJsModuleDir,
                         database, nil];
   [task setArguments:arguments];
-
-  config.instance = task;
 
   // callback if the ArangoDB is terminated for whatever reason.
   if ([task respondsToSelector:@selector(setTerminationHandler:)]) {
@@ -646,12 +836,14 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   }
 
   // and launch
-  NSLog(@"Preparing to start %@ with %@", self.arangoDBBinary, arguments);
+  NSLog(@"Preparing to start %@ with %@", _arangoDBBinary, arguments);
   [task launch];
+
+  // and store instance
+  [_instances setValue:task forKey:name];
 
   return YES;
 }
- */
 
 @end
 

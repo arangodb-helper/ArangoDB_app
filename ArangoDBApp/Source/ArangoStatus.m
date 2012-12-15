@@ -43,13 +43,17 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 - (ArangoStatus*) initWithName: (NSString*) name
+                       andPath: (NSString*) path
                        andPort: (NSNumber*) port
+                    andLogPath: (NSString*) logPath
                     andRunning: (BOOL) isRunning {
   self = [super init];
   
   if (self) {
     _name = [name copy];
     _port = [port retain];
+    _path = [path copy];
+    _logPath = [logPath copy];
     _isRunning = isRunning;
   }
   
@@ -63,6 +67,8 @@
 - (void) dealloc {
   [_name release];
   [_port release];
+  [_path release];
+  [_logPath release];
 
   [super dealloc];
 }

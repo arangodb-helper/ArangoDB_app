@@ -28,13 +28,12 @@
 
 #import "ArangoToolbarMenu.h"
 
-#import "ArangoConfiguration.h"
 #import "ArangoHelpController.h"
 #import "ArangoManager.h"
 #import "ArangoStatus.h"
-#import "arangoAppDelegate.h"
-#import "arangoCreateNewDBWindowController.h"
 #import "ArangoUserConfigController.h"
+#import "arangoAppDelegate.h"
+#import "ArangoNewInstanceController.h"
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                 ArangoToolbarMenu
@@ -56,6 +55,7 @@
   NSArray* entries = [self.delegate.manager currentStatus];
 
   [self removeAllItems];
+  [self setAutoenablesItems:NO];
   
   if (entries) {
     for (ArangoStatus* status in entries) {
@@ -65,7 +65,7 @@
       NSString* title = status.name;
 
       if (status.isRunning) {
-        title = [title stringByAppendingString:@" (Running)"];
+        title = [[[title stringByAppendingString:@" ("] stringByAppendingString:[status.port stringValue]] stringByAppendingString:@")"];
       }
       else {
         title = [title stringByAppendingString:@" (Stopped)"];
@@ -76,8 +76,70 @@
       [item setTarget:self];
       [item setRepresentedObject:status.name];
       [item setAction:@selector(toggleArango:)];
-      [self addItem:item];
 
+      // create submenu for each instance
+      NSMenu* subMenu = [[NSMenu alloc] init];
+      [subMenu setAutoenablesItems:NO];
+
+      // open a browser for the GUI
+      NSMenuItem* browser = [[NSMenuItem alloc] init];
+      [browser setEnabled:status.isRunning];
+      [browser setTitle:@"Admin Interface"];
+      [browser setTarget:self];
+      [browser setRepresentedObject:status.name];
+      [browser setAction:@selector(openBrowser:)];
+      [subMenu addItem:browser];
+      [browser release];
+
+      [subMenu addItem: [NSMenuItem separatorItem]];
+
+      // edit instance
+      NSMenuItem* edit = [[NSMenuItem alloc] init];
+      [edit setEnabled:YES];
+      [edit setTitle:@"Edit"];
+      [edit setTarget:self];
+      [edit setRepresentedObject:status.name];
+      [edit setAction:@selector(editInstance:)];
+      [subMenu addItem:edit];
+      [edit release];
+
+      // delete instance
+      NSMenuItem* delete = [[NSMenuItem alloc] init];
+      [delete setEnabled:YES];
+      [delete setTitle:@"Delete"];
+      [delete setTarget:self];
+      [delete setRepresentedObject:status.name];
+      [delete setAction:@selector(deleteInstance:)];
+      [subMenu addItem:delete];
+      [delete release];
+
+      [subMenu addItem: [NSMenuItem separatorItem]];
+
+      // start instance
+      NSMenuItem* start = [[NSMenuItem alloc] init];
+      [start setEnabled:(! status.isRunning)];
+      [start setTitle:@"Start"];
+      [start setTarget:self];
+      [start setRepresentedObject:status.name];
+      [start setAction:@selector(startInstance:)];
+      [subMenu addItem:start];
+      [start release];
+
+      // stop instance
+      NSMenuItem* stop = [[NSMenuItem alloc] init];
+      [stop setEnabled:status.isRunning];
+      [stop setTitle:@"Stop"];
+      [stop setTarget:self];
+      [stop setRepresentedObject:status.name];
+      [stop setAction:@selector(stopInstance:)];
+      [subMenu addItem:stop];
+      [stop release];
+
+      // add item, submenu and release
+      [item setSubmenu:subMenu];
+      [subMenu release];
+      
+      [self addItem:item];
       [item release];
     }
   }
@@ -92,7 +154,7 @@
   [createDB setEnabled:YES];
   [createDB setTitle:@"New Instance..."];
   [createDB setTarget:self];
-  [createDB setAction:@selector(createNewInstance)];
+  [createDB setAction:@selector(createNewInstance:)];
   [self addItem:createDB];
   [createDB release];
     
@@ -101,7 +163,7 @@
   [configure setEnabled:YES];
   [configure setTitle:@"Configuration"];
   [configure setTarget:self];
-  [configure setAction:@selector(showConfiguration)];
+  [configure setAction:@selector(showConfiguration:)];
   [self addItem:configure];
   [configure release];
   
@@ -112,7 +174,7 @@
   [help setEnabled:YES];
   [help setTitle:@"Help"];
   [help setTarget:self];
-  [help setAction:@selector(showHelp)];
+  [help setAction:@selector(showHelp:)];
   [self addItem:help];
   [help release];
   
@@ -123,7 +185,7 @@
   [quit setEnabled:YES];
   [quit setTitle:@"Quit"];
   [quit setTarget:self];
-  [quit setAction:@selector(quitApplication)];
+  [quit setAction:@selector(quitApplication:)];
   [self addItem:quit];
   [quit release];
 }
@@ -141,6 +203,9 @@
 
   if (self) {
     _delegate = delegate;
+    _helpController = nil;
+    _userConfigController = nil;
+
     [self updateMenu];
   }
 
@@ -152,6 +217,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 - (void) dealloc {
+  self.newInstanceController = nil;
   self.helpController = nil;
   self.userConfigController = nil;
 
@@ -159,10 +225,88 @@
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief show the help dialog
+/// @brief creates an instance
 ////////////////////////////////////////////////////////////////////////////////
 
-- (void) showConfiguration {
+- (void) createNewInstance: (id) sender {
+  [[ArangoNewInstanceController alloc] initWithAppDelegate:self.delegate];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief updates an instance
+////////////////////////////////////////////////////////////////////////////////
+
+- (void) editInstance: (id) sender {
+  ArangoConfiguration* config = [self.delegate.manager configuration:[sender representedObject]];
+
+  if (config == nil) {
+    return;
+  }
+
+  [[ArangoNewInstanceController alloc] initWithAppDelegate:self.delegate
+                                          andConfiguration:config];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief deletes an instance
+////////////////////////////////////////////////////////////////////////////////
+
+- (void) deleteInstance: (id) sender {
+  NSString* config = [sender representedObject];
+  ArangoStatus* status = [self.delegate.manager currentStatus:config];
+
+  // already deleted
+  if (! status) {
+    return;
+  }
+
+  // ask use if he wants the database files to be removed
+  NSMutableString* infoText = [[NSMutableString alloc] init];
+  [infoText setString:@"Do you want to delete the contents of folder \""];
+  [infoText appendString:status.path];
+  [infoText appendString:@"\" and the log-file as well?"];
+
+  NSAlert* info = [NSAlert alertWithMessageText:@"Delete Data?" defaultButton:@"Keep Data" alternateButton:@"Abort" otherButton:@"Delete Data" informativeTextWithFormat:@"%@",infoText];
+
+  [infoText release];
+  [info beginSheetModalForWindow:nil modalDelegate:self didEndSelector:@selector(confirmedDeleteInstance:returnCode:contextInfo:) contextInfo:config];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief confirms or rejects 
+////////////////////////////////////////////////////////////////////////////////
+
+- (void) confirmedDeleteInstance: (NSAlert*) dialog
+                      returnCode: (int) rc 
+                     contextInfo: (NSString*) config
+{
+  ArangoStatus* status = [self.delegate.manager currentStatus:config];
+
+  // already deleted
+  if (! status) {
+    return;
+  }
+
+  if (rc == -1 || rc == 1) {
+    [self.delegate.manager deleteConfiguration:config];
+  }
+  else {
+    return;
+  }
+
+  if (rc == -1) {
+    [self.delegate.manager stopArangoDBAndDelete:config];
+  }
+  else {
+    [self.delegate.manager stopArangoDB:config];
+  }  
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief shows the configuration dialog
+////////////////////////////////////////////////////////////////////////////////
+
+- (void) showConfiguration: (id) sender {
   if (self.userConfigController) {
     [NSApp activateIgnoringOtherApps:YES];
 
@@ -175,11 +319,10 @@
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief show the help dialog
+/// @brief shows the help dialog
 ////////////////////////////////////////////////////////////////////////////////
 
-- (void) showHelp {
-
+- (void) showHelp: (id) sender {
   if (self.helpController) {
     [NSApp activateIgnoringOtherApps:YES];
 
@@ -192,87 +335,47 @@
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief quites the application
+/// @brief deletes an instance
 ////////////////////////////////////////////////////////////////////////////////
 
-- (void) quitApplication {
+- (void) startInstance: (id) sender
+{
+  NSString* config = [sender representedObject];
+
+  ArangoStatus* status = [self.delegate.manager currentStatus:config];
+
+  // already deleted
+  if (! status) {
+    return;
+  }
+
+  // already running
+  if (status.isRunning) {
+    return;
+  }
+
+  // start the instance
+  [self.delegate.manager startArangoDB:config];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief quits the application
+////////////////////////////////////////////////////////////////////////////////
+
+- (void) quitApplication: (id) sender {
   [[NSApplication sharedApplication] terminate:nil];
 }
 
 /*
-- (void) updateMenu
+
+- (void) openBrowser:(id) sender
 {
-
-
-
-  // Request stored Arangos
-  NSFetchRequest *request = [[NSFetchRequest alloc] init];
-  NSEntityDescription *entity = [NSEntityDescription entityForName:@"ArangoConfiguration" inManagedObjectContext: [self.appDelegate getArangoManagedObjectContext]];
-  [request setEntity:entity];
-  NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"alias" ascending:YES];
-  [request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
-  [sortDescriptor release];
-  NSError *error = nil;
-  NSArray *fetchedResults = [[self.appDelegate getArangoManagedObjectContext] executeFetchRequest:request error:&error];
-  [request release];
-  if (fetchedResults == nil) {
-    NSLog(@"%@", error.localizedDescription);
-  } else {
-    for (ArangoConfiguration* c in fetchedResults) {
-      
-      NSMenuItem* item = [[NSMenuItem alloc] init];
-      [item setEnabled:YES];
-      NSString* itemTitle = @"%a (%p)";
-      itemTitle = [[itemTitle stringByReplacingOccurrencesOfString:@"%a" withString:c.alias] stringByReplacingOccurrencesOfString:@"%p" withString:[NSString stringWithFormat:@"%i",[c.port intValue]]];
-      [item setTitle: itemTitle];
-      if ([c.isRunning isEqualToNumber: [NSNumber numberWithBool:YES]]) {
-        [item setState:1];
-      } else {
-        [item setState:0];
-      }
-      [item setTarget:self];
-      [item setRepresentedObject:c];
-      [item setAction:@selector(toggleArango:)];
-      [self addItem:item];
-      [item release];
-      NSMenu* subMenu = [[NSMenu alloc] init];
-      NSMenuItem* browser = [[NSMenuItem alloc] init];
-      [browser setTitle:@"Browser"];
-      [browser setTarget:self];
-      [browser setRepresentedObject:c];
-      [browser setAction:@selector(openBrowser:)];
-      [subMenu addItem:browser];
-      [browser release];
-      [subMenu addItem: [NSMenuItem separatorItem]];
-      NSMenuItem* edit = [[NSMenuItem alloc] init];
-      [edit setTitle:@"Edit"];
-      [edit setTarget:self];
-      [edit setRepresentedObject:c];
-      [edit setAction:@selector(editInstance:)];
-      [subMenu addItem:edit];
-      [edit release];
-      NSMenuItem* delete = [[NSMenuItem alloc] init];
-      [delete setTitle:@"Delete"];
-      [delete setTarget:self];
-      [delete setRepresentedObject:c];
-      [delete setAction:@selector(deleteInstance:)];
-      [subMenu addItem:delete];
-      [delete release];
-      [item setSubmenu:subMenu];
-      [subMenu release];
-      
-    }
-  }
-
-  [self addItem:[NSMenuItem separatorItem]];
-  [self addItem:self.createDB];
-  [self addItem:self.configure];
-  [self addItem:self.help];
-  [self addItem:self.quit];
+  ArangoConfiguration* config = [sender representedObject];
+  NSNumberFormatter* f = [[NSNumberFormatter alloc] init];
+  [f setThousandSeparator:@""];
+  [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[@"http://localhost:" stringByAppendingString:[f stringFromNumber:config.port]]]];
+  [f release];
 }
- */
-
-/*
 
 - (void) toggleArango: (id) sender{
   ArangoConfiguration* arango = [sender representedObject];
@@ -292,47 +395,15 @@
 }
 
 
-- (void) createNewInstance
-{
-  self.createNewWindowController = [[[arangoCreateNewDBWindowController alloc] initWithAppDelegate:self.appDelegate] autorelease];
-}
-
-- (void) editInstance:(id) sender
-{
-  self.createNewWindowController = [[[arangoCreateNewDBWindowController alloc] initWithAppDelegate:self.appDelegate andArango:[sender representedObject]] autorelease];
-}
-
-// TODO: Ask user if data should be deleted also!
-- (void) deleteInstance:(id) sender
-{
-  ArangoConfiguration* config = [sender representedObject];
-  NSMutableString* infoText = [[NSMutableString alloc] init];
-  [infoText setString:@"Do you want to delete the contents of folder \""];
-  [infoText appendString:config.path];
-  [infoText appendString:@"\" and the log-file as well?"];
-  NSAlert* info = [NSAlert alertWithMessageText:@"Delete Data?" defaultButton:@"Keep Data" alternateButton:@"Abort" otherButton:@"Delete Data" informativeTextWithFormat:@"%@",infoText];
-  [infoText release];
-  [info beginSheetModalForWindow:nil modalDelegate:self didEndSelector:@selector(confirmedDialog:returnCode:contextInfo:) contextInfo: (void *)(config)];
-}
-
-- (void) confirmedDialog:(NSAlert*) dialog returnCode:(int) rC contextInfo: (ArangoConfiguration *) config
-{
-  if (rC == -1) {
-    [self.appDelegate deleteArangoConfig:config andFiles:YES];
-  } else if (rC == 1) {
-    [self.appDelegate deleteArangoConfig:config andFiles:NO];
-  }
-  
-}
-
-- (void) openBrowser:(id) sender
-{
-  ArangoConfiguration* config = [sender representedObject];
-  NSNumberFormatter* f = [[NSNumberFormatter alloc] init];
-  [f setThousandSeparator:@""];
-  [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[@"http://localhost:" stringByAppendingString:[f stringFromNumber:config.port]]]];
-  [f release];
-}
  */
 
 @end
+
+// -----------------------------------------------------------------------------
+// --SECTION--                                                       END-OF-FILE
+// -----------------------------------------------------------------------------
+
+// Local Variables:
+// mode: outline-minor
+// outline-regexp: "^\\(/// @brief\\|/// {@inheritDoc}\\|/// @addtogroup\\|/// @page\\|// --SECTION--\\|/// @\\}\\)"
+// End:

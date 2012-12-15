@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief ArangoDB instance manager
+/// @brief new instance controller
 ///
 /// @file
 ///
@@ -26,103 +26,104 @@
 /// @author Copyright 2012, triAGENS GmbH, Cologne, Germany
 ////////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import "ArangoBaseController.h"
 
+@class arangoAppDelegate;
 @class ArangoConfiguration;
-@class ArangoStatus;
-@class User;
 
 // -----------------------------------------------------------------------------
-// --SECTION--                                                     notifications
+// --SECTION--                                       ArangoNewInstanceController
 // -----------------------------------------------------------------------------
 
-////////////////////////////////////////////////////////////////////////////////
-/// @brief configuration did change
-////////////////////////////////////////////////////////////////////////////////
-
-extern NSString* ArangoConfigurationDidChange;
-
-// -----------------------------------------------------------------------------
-// --SECTION--                                              ArangoBaseController
-// -----------------------------------------------------------------------------
-
-@interface ArangoManager : NSObject
+@interface ArangoNewInstanceController : ArangoBaseController
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                        properties
 // -----------------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief last error message
+/// @brief input field "instance name"
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, retain) NSString* lastError;
+@property (nonatomic, assign) IBOutlet NSTextField* nameField;
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief version we are running under
+/// @brief button "browser database path"
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) int version;
+@property (nonatomic, assign) IBOutlet NSButton* browseDatabaseButton;
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief name of to ArangoDB binary
+/// @brief input field "database path"
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) NSString* arangoDBVersion;
+@property (nonatomic, assign) IBOutlet NSTextField* databaseField;
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief full paths to ArangoDB binary
+/// @brief input field "port"
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) NSString* arangoDBBinary;
+@property (nonatomic, assign) IBOutlet NSTextField* portField;
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief paths to ArangoDB configuration
+/// @brief button "ok" options
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) NSString* arangoDBConfig;
+@property (nonatomic, assign) IBOutlet NSButton* okButton;
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief paths to ArangoDB admin directory
+/// @brief button "abort" options
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) NSString* arangoDBAdminDir;
+@property (nonatomic, assign) IBOutlet NSButton* abortButton;
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief paths to ArangoDB JavaScript action directory
+/// @brief button "show advanced" options
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) NSString* arangoDBJsActionDir;
+@property (nonatomic, assign) IBOutlet NSButton* showAdvanced;
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief paths to ArangoDB JavaScript module directory
+/// @brief button "ok" options
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) NSString* arangoDBJsModuleDir;
+@property (nonatomic, assign) IBOutlet NSBox* advancedOptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief the context of all objects for permanent storage
+/// @brief input field "log path"
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) NSManagedObjectContext* managedObjectContext;
+@property (nonatomic, assign) IBOutlet NSTextField* logField;
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief name to configuration mapping
+/// @brief button "browser database path"
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) NSMutableDictionary* configurations;
+@property (nonatomic, assign) IBOutlet NSButton* browseLogButton;
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief user configuration
+/// @brief combo "log level"
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) User* user;
+@property (nonatomic, assign) IBOutlet NSComboBox* logLevelOptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief name to instance mapping
+/// @brief check box "run on startup"
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) NSMutableDictionary* instances;
+@property (nonatomic, assign) IBOutlet NSButton* runOnStartupButton;
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief number formatter
+////////////////////////////////////////////////////////////////////////////////
+
+@property (nonatomic, retain, readonly) NSNumberFormatter* portFormatter;
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief configuration to edit
+////////////////////////////////////////////////////////////////////////////////
+
+@property (nonatomic, retain, readonly) ArangoConfiguration* configuration;
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                    public methods
@@ -132,68 +133,44 @@ extern NSString* ArangoConfigurationDidChange;
 /// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (ArangoManager*) init;
+- (id) initWithAppDelegate: (arangoAppDelegate*) delegate;
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief creates a new configuration
+/// @brief constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (BOOL) createConfiguration: (NSString*) alias
-                    withPath: (NSString*) path
-                     andPort: (NSNumber*) port
-                      andLog: (NSString*) logPath
-                 andLogLevel: (NSString*) logLevel
-             andRunOnStartUp: (BOOL) ros;
+- (id) initWithAppDelegate: (arangoAppDelegate*) delegate
+          andConfiguration: (ArangoConfiguration*) config;
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief prepares directories
+/// @brief browse database path
 ////////////////////////////////////////////////////////////////////////////////
 
-- (ArangoStatus*) prepareConfiguration: (NSString*) alias
-                              withPath: (NSString*) path
-                               andPort: (NSNumber*) port
-                                andLog: (NSString*) logPath;
+- (IBAction) browseDatabase: (id) sender;
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief reads a configurations
+/// @brief browse log path
 ////////////////////////////////////////////////////////////////////////////////
 
-- (ArangoConfiguration*) configuration: (NSString*) alias;
+- (IBAction) browseLog: (id) sender;
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief returns current status for all configurations
+/// @brief create instance
 ////////////////////////////////////////////////////////////////////////////////
 
-- (NSArray*) currentStatus;
+- (IBAction) createInstance: (id) sender;
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief returns current status for a configurations
+/// @brief abort
 ////////////////////////////////////////////////////////////////////////////////
 
-- (ArangoStatus*) currentStatus: (NSString*) alias;
+- (IBAction) abortCreate: (id) sender;
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief updates a configuration
+/// @brief toggle advanced
 ////////////////////////////////////////////////////////////////////////////////
 
-- (BOOL) updateConfiguration: (NSString*) alias
-                    withPath: (NSString*) path
-                     andPort: (NSNumber*) port
-                      andLog: (NSString*) logPath
-                 andLogLevel: (NSString*) logLevel
-             andRunOnStartUp: (BOOL) ros;
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief deletes a configuration
-////////////////////////////////////////////////////////////////////////////////
-
-- (BOOL) deleteConfiguration: (NSString*) alias;
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief starts a new ArangoDB instance with the given name
-////////////////////////////////////////////////////////////////////////////////
-
-- (BOOL) startArangoDB: (NSString*) name;
+- (IBAction) toggleAdvanced: (id) sender;
 
 @end
 

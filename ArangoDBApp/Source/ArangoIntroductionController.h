@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief status information about ArangoDB instance / configuration
+/// @brief introduction controller
 ///
 /// @file
 ///
@@ -22,66 +22,33 @@
 /// Copyright holder is triAGENS GmbH, Cologne, Germany
 ///
 /// @author Dr. Frank Celler
+/// @author Michael Hackstein
 /// @author Copyright 2012, triAGENS GmbH, Cologne, Germany
 ////////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-
-@class User;
+#import "ArangoHelpController.h"
 
 // -----------------------------------------------------------------------------
-// --SECTION--                                              ArangoBaseController
+// --SECTION--                                      ArangoIntroductionController
 // -----------------------------------------------------------------------------
 
-@interface ArangoStatus : NSObject
-
-// -----------------------------------------------------------------------------
-// --SECTION--                                                        properties
-// -----------------------------------------------------------------------------
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief name of the configuration
-////////////////////////////////////////////////////////////////////////////////
-
-@property (nonatomic, assign, readonly) NSString* name;
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief port to listen to
-////////////////////////////////////////////////////////////////////////////////
-
-@property (nonatomic, assign, readonly) NSNumber* port;
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief path of database files
-////////////////////////////////////////////////////////////////////////////////
-
-@property (nonatomic, assign, readonly) NSString* path;
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief path of log file
-////////////////////////////////////////////////////////////////////////////////
-
-@property (nonatomic, assign, readonly) NSString* logPath;
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief is running
-////////////////////////////////////////////////////////////////////////////////
-
-@property (nonatomic, assign, readonly) BOOL isRunning;
+@interface ArangoIntroductionController : ArangoHelpController
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                    public methods
 // -----------------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief default constructor
+/// @brief constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (ArangoStatus*) initWithName: (NSString*) name
-                       andPath: (NSString*) path
-                       andPort: (NSNumber*) port
-                    andLogPath: (NSString*) logPath
-                    andRunning: (BOOL) isRunning;
+- (id) initWithAppDelegate: (arangoAppDelegate*) delegate;
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief "create instance" button
+////////////////////////////////////////////////////////////////////////////////
+
+- (IBAction) createInstance: (id) sender;
 
 @end
 

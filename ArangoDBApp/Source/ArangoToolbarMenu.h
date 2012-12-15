@@ -31,6 +31,7 @@
 @class arangoAppDelegate;
 @class ArangoHelpController;
 @class ArangoUserConfigController;
+@class ArangoNewInstanceController;
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                 ArangoToolbarMenu
@@ -47,6 +48,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 @property (nonatomic, assign, readonly) arangoAppDelegate* delegate;
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief instance controller
+////////////////////////////////////////////////////////////////////////////////
+
+@property (nonatomic, retain) ArangoNewInstanceController* newInstanceController;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief help controller

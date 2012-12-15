@@ -24,15 +24,11 @@
 @property (retain) ArangoUserConfigController* userConfigController;
 // The item in the statusbar, containing the icon as well as an accesspoint for the menu.
 @property (retain) NSStatusItem * statusItem;
-// The context of all objects for permanent storage.
-@property (retain) NSManagedObjectContext* managedObjectContext;
 
 @property (retain) ArangoManager* manager;
 
 // Function to start an Arango with the given configuration.
 - (void) startArango:(ArangoConfiguration*) config;
-// Function to request the context.
-- (NSManagedObjectContext*) getArangoManagedObjectContext;
 // Function to start an Arango giving all parameters individually.
 - (void) startNewArangoWithPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath andLogLevel:(NSString*) level andRunOnStartUp: (BOOL) ros andAlias:(NSString*) alias;
 // Function to update a given configuration to all given parameters.

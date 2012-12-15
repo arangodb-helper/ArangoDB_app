@@ -15,13 +15,13 @@
 #import "ArangoUserConfigController.h"
 #import "ArangoManager.h"
 #import "ArangoHelpController.h"
+#import "ArangoIntroductionController.h"
 
 @implementation arangoAppDelegate
 
 @synthesize statusMenu;
 @synthesize statusItem;
 @synthesize userConfigController;
-@synthesize managedObjectContext;
 
 NSString* adminDir;
 NSString* jsActionDir;
@@ -37,41 +37,6 @@ int version;
   [self.statusMenu updateMenu];
 }
 
-// Function to get the Context necessary for persistent storage.
-- (NSManagedObjectContext*) getArangoManagedObjectContext
-{
-  if (self.managedObjectContext == nil) {
-    NSURL *storeURL = [[[[[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"ArangoDB"] retain];
-    if (![[NSFileManager defaultManager] fileExistsAtPath:[storeURL path]]) {
-      NSError* error = nil;
-      if ([[NSFileManager defaultManager] respondsToSelector:@selector(createDirectoryAtURL:withIntermediateDirectories:attributes:error:)]) {
-        [[NSFileManager defaultManager] createDirectoryAtURL:storeURL withIntermediateDirectories:YES attributes:nil error:&error];
-      } else {
-        [[NSFileManager defaultManager] createDirectoryAtPath:[storeURL path] withIntermediateDirectories:YES attributes:nil error:&error];
-      }
-      if (error != nil) {
-        NSLog(@"Failed to create sqlite");
-      }
-    }
-    storeURL = [[storeURL URLByAppendingPathComponent:@"ArangoDB.sqlite"] retain];
-    NSURL *modelURL = [[[NSBundle mainBundle] URLForResource:@"configurationModel" withExtension:@"momd"] retain];
-    NSError *error = nil;
-    NSPersistentStoreCoordinator* coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL]];
-    if (![coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:nil error:&error])
-    {
-      // TODO Handle Error so the user can be informed.
-      // Although it should never occur anyways.
-      NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-      abort();
-    }
-    self.managedObjectContext = [[NSManagedObjectContext alloc] init];
-    [self.managedObjectContext setPersistentStoreCoordinator:coordinator];
-    [storeURL release];
-    [modelURL release];
-    [coordinator release];
-  }
-  return self.managedObjectContext;
-}
 
 // Public function to start a new Arango with all given informations.
 - (void) startNewArangoWithPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath andLogLevel:(NSString*) level andRunOnStartUp: (BOOL) ros andAlias:(NSString*) alias
@@ -218,103 +183,34 @@ int version;
 }
 
 - (void) configurationDidChange: (NSNotification*) notification {
-  [statusMenu updateMenu];
+  [self.statusMenu updateMenu];
 }
 
 // Function called after the app finished lanching.
 // This starts all Arangos according to the users decission.
 // If this is the first launch of the App also the Configuration will be shown.
-- (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+- (void) applicationDidFinishLaunching: (NSNotification *) notification {
+  
+  // create the ArangoDB manager
   self.manager = [[ArangoManager alloc] init];
   
   if (self.manager == nil) {
     return;
   }
-
+  
+  // check for changes in the configuration
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(configurationDidChange:)
                                                name:ArangoConfigurationDidChange
                                              object:self.manager];
-                            
-  if (0 == self.manager.configurations.count) {
-    [[ArangoHelpController alloc] initWithAppDelegate:nil];
-  }
-  
-  
-  
-  NSFetchRequest *userRequest = [[NSFetchRequest alloc] init];
-  NSEntityDescription *userEntity = [[NSEntityDescription entityForName:@"User" inManagedObjectContext: [self getArangoManagedObjectContext]] retain];
-  [userRequest setEntity:userEntity];
-  [userEntity release];
-  NSError *error = nil;
-  NSArray *fetchedResults = [[self getArangoManagedObjectContext] executeFetchRequest:userRequest error:&error];
-  [userRequest release];
-  NSNumber* ros = nil;
-  if (fetchedResults == nil) {
-    NSLog(@"%@", error.localizedDescription);
-  } else {
-    if (fetchedResults.count > 0) {
-      for (User* u in fetchedResults) {
-        ros = u.runOnStartUp;
-      }
-    } else {
-      self.userConfigController = [[ArangoUserConfigController alloc] initWithAppDelegate:self];
-    }
-  }
-  NSFetchRequest *request = [[NSFetchRequest alloc] init];
-  NSEntityDescription *entity = [NSEntityDescription entityForName:@"ArangoConfiguration" inManagedObjectContext: [self getArangoManagedObjectContext]];
-  [request setEntity:entity];
-  [entity release];
-  error = nil;
-  fetchedResults = [[self getArangoManagedObjectContext] executeFetchRequest:request error:&error];
-  [request release];
-  if (fetchedResults == nil) {
-    NSLog(@"%@", error.localizedDescription);
-  } else {
-    switch ([ros integerValue]) {
-      // Start no Arango.
-      case 0:
-        for (ArangoConfiguration* c in fetchedResults) {
-          c.isRunning = [NSNumber numberWithBool:NO];
-        }
-        [self save];
-        break;
-      // Start all Arangos running at last shutdown.
-      case 1:
-        for (ArangoConfiguration* c in fetchedResults) {
-          if ([c.isRunning isEqualToNumber: [NSNumber numberWithBool:YES]]) {
-            [self startArango:c];
-          }
-        }
-        break;
-      // Start all defined as Run on StartUp
-      case 2:
-        for (ArangoConfiguration* c in fetchedResults) {
-          if ([c.runOnStartUp isEqualToNumber: [NSNumber numberWithBool:YES]]) {
-            [self startArango:c];
-          } else {
-            c.isRunning = [NSNumber numberWithBool:NO];
-          }
-        }
-        [self save];
-        break;
-      // Start all
-      case 3:
-        for (ArangoConfiguration* c in fetchedResults) {
-          [self startArango:c];
-        }
-        break;
-        // Default: Start all Arangos running at last shutdown.
-      default:
-        for (ArangoConfiguration* c in fetchedResults) {
-          if ([c.isRunning isEqualToNumber: [NSNumber numberWithBool:YES]]) {
-            [self startArango:c];
-          }
-        }
-        break;
-    }
-  }
+
+  // we will have missed the first notification
   [self.statusMenu updateMenu];
+
+  // without any configuration, display some help
+  if (0 == self.manager.configurations.count) {
+    [[ArangoIntroductionController alloc] initWithAppDelegate:self];
+  }
 }
 
 // Function that gets called at App-launch.
