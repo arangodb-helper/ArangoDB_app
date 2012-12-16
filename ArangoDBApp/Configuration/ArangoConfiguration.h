@@ -21,6 +21,5 @@
 @property (nonatomic, retain) NSString * path;
 @property (nonatomic, retain) NSString * loglevel;
 @property (nonatomic, retain) Bookmarks *bookmarks;
-@property (nonatomic, retain) NSTask* instance;
 
 @end

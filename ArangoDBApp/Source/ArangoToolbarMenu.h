@@ -29,9 +29,9 @@
 #import <Cocoa/Cocoa.h>
 
 @class arangoAppDelegate;
+@class ArangoConfiguration;
 @class ArangoHelpController;
 @class ArangoUserConfigController;
-@class ArangoNewInstanceController;
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                 ArangoToolbarMenu
@@ -50,12 +50,6 @@
 @property (nonatomic, assign, readonly) arangoAppDelegate* delegate;
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief instance controller
-////////////////////////////////////////////////////////////////////////////////
-
-@property (nonatomic, retain) ArangoNewInstanceController* newInstanceController;
-
-////////////////////////////////////////////////////////////////////////////////
 /// @brief help controller
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -68,16 +62,6 @@
 @property (nonatomic, retain) ArangoUserConfigController* userConfigController;
 
 // -----------------------------------------------------------------------------
-// --SECTION--                                                   private methods
-// -----------------------------------------------------------------------------
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief updates the menu entries
-////////////////////////////////////////////////////////////////////////////////
-
-- (void) updateMenu;
-
-// -----------------------------------------------------------------------------
 // --SECTION--                                                    public methods
 // -----------------------------------------------------------------------------
 
@@ -86,6 +70,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 - (id) initWithAppDelegate: (arangoAppDelegate*) delegate;
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief constructor
+////////////////////////////////////////////////////////////////////////////////
+
+- (id) initWithAppDelegate: (arangoAppDelegate*) delegate
+          andConfiguration: (ArangoConfiguration*) config;
 
 @end
 

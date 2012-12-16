@@ -358,7 +358,7 @@
 						<object class="NSBox" id="660007320">
 							<reference key="NSNextResponder" ref="692756673"/>
 							<int key="NSvFlags">12</int>
-							<string key="NSFrame">{{182, 173}, {284, 5}}</string>
+							<string key="NSFrame">{{169, 173}, {297, 5}}</string>
 							<reference key="NSSuperview" ref="692756673"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="825934775"/>
@@ -461,7 +461,7 @@
 											<string key="NSFrame">{{173, 89}, {223, 22}}</string>
 											<reference key="NSSuperview" ref="90990351"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="552317001"/>
+											<reference key="NSNextKeyView" ref="561000229"/>
 											<string key="NSReuseIdentifierKey">_NS:9</string>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="27340526">
@@ -483,7 +483,7 @@
 											<string key="NSFrame">{{410, 83}, {65, 32}}</string>
 											<reference key="NSSuperview" ref="90990351"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="174106078"/>
+											<reference key="NSNextKeyView" ref="552317001"/>
 											<string key="NSReuseIdentifierKey">_NS:9</string>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="267499587">
@@ -508,7 +508,7 @@
 											<string key="NSFrame">{{173, 57}, {99, 26}}</string>
 											<reference key="NSSuperview" ref="90990351"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="561000229"/>
+											<reference key="NSNextKeyView" ref="174106078"/>
 											<string key="NSReuseIdentifierKey">_NS:9</string>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSComboBoxCell" key="NSCell" id="512167502">

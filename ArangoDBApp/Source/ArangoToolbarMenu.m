@@ -73,10 +73,6 @@
 
       [item setTitle: title];
 
-      [item setTarget:self];
-      [item setRepresentedObject:status.name];
-      [item setAction:@selector(toggleArango:)];
-
       // create submenu for each instance
       NSMenu* subMenu = [[NSMenu alloc] init];
       [subMenu setAutoenablesItems:NO];
@@ -190,40 +186,6 @@
   [quit release];
 }
 
-// -----------------------------------------------------------------------------
-// --SECTION--                                                    public methods
-// -----------------------------------------------------------------------------
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief default constructor
-////////////////////////////////////////////////////////////////////////////////
-
-- (id) initWithAppDelegate: (arangoAppDelegate*) delegate {
-  self = [super init];
-
-  if (self) {
-    _delegate = delegate;
-    _helpController = nil;
-    _userConfigController = nil;
-
-    [self updateMenu];
-  }
-
-  return self;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief destructor
-////////////////////////////////////////////////////////////////////////////////
-
-- (void) dealloc {
-  self.newInstanceController = nil;
-  self.helpController = nil;
-  self.userConfigController = nil;
-
-  [super dealloc];
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief creates an instance
 ////////////////////////////////////////////////////////////////////////////////
@@ -256,7 +218,7 @@
   ArangoStatus* status = [self.delegate.manager currentStatus:config];
 
   // already deleted
-  if (! status) {
+  if (status == nil) {
     return;
   }
 
@@ -283,7 +245,7 @@
   ArangoStatus* status = [self.delegate.manager currentStatus:config];
 
   // already deleted
-  if (! status) {
+  if (status == nil) {
     return;
   }
 
@@ -295,7 +257,7 @@
   }
 
   if (rc == -1) {
-    [self.delegate.manager stopArangoDBAndDelete:config];
+    [self.delegate.manager stopArangoDBAndDelete:status];
   }
   else {
     [self.delegate.manager stopArangoDB:config];
@@ -335,27 +297,56 @@
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief deletes an instance
+/// @brief starts an instance
 ////////////////////////////////////////////////////////////////////////////////
 
-- (void) startInstance: (id) sender
-{
+- (void) startInstance: (id) sender {
   NSString* config = [sender representedObject];
-
   ArangoStatus* status = [self.delegate.manager currentStatus:config];
 
   // already deleted
-  if (! status) {
-    return;
-  }
-
-  // already running
-  if (status.isRunning) {
+  if (status == nil) {
     return;
   }
 
   // start the instance
   [self.delegate.manager startArangoDB:config];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief stops an instance
+////////////////////////////////////////////////////////////////////////////////
+
+- (void) stopInstance: (id) sender {
+  NSString* config = [sender representedObject];
+  ArangoStatus* status = [self.delegate.manager currentStatus:config];
+
+  // already deleted
+  if (status == nil) {
+    return;
+  }
+
+  // start the instance
+  [self.delegate.manager stopArangoDB:config];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief quits the application
+////////////////////////////////////////////////////////////////////////////////
+
+- (void) openBrowser: (id) sender {
+  NSString* config = [sender representedObject];
+  ArangoStatus* status = [self.delegate.manager currentStatus:config];
+
+  // already deleted
+  if (status == nil) {
+    return;
+  }
+
+  NSNumberFormatter* f = [[NSNumberFormatter alloc] init];
+  [f setThousandSeparator:@""];
+  [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[@"http://localhost:" stringByAppendingString:[f stringFromNumber:status.port]]]];
+  [f release];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -366,36 +357,38 @@
   [[NSApplication sharedApplication] terminate:nil];
 }
 
-/*
+// -----------------------------------------------------------------------------
+// --SECTION--                                                    public methods
+// -----------------------------------------------------------------------------
 
-- (void) openBrowser:(id) sender
-{
-  ArangoConfiguration* config = [sender representedObject];
-  NSNumberFormatter* f = [[NSNumberFormatter alloc] init];
-  [f setThousandSeparator:@""];
-  [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[@"http://localhost:" stringByAppendingString:[f stringFromNumber:config.port]]]];
-  [f release];
+////////////////////////////////////////////////////////////////////////////////
+/// @brief default constructor
+////////////////////////////////////////////////////////////////////////////////
+
+- (id) initWithAppDelegate: (arangoAppDelegate*) delegate {
+  self = [super init];
+
+  if (self) {
+    _delegate = delegate;
+    _helpController = nil;
+    _userConfigController = nil;
+
+    [self updateMenu];
+  }
+
+  return self;
 }
 
-- (void) toggleArango: (id) sender{
-  ArangoConfiguration* arango = [sender representedObject];
-  if ([arango.isRunning isEqualToNumber: [NSNumber numberWithBool:NO]]) {
-    arango.isRunning = [NSNumber numberWithBool:YES];
-    [self.appDelegate startArango:arango];
-  } else {
-    arango.isRunning = [NSNumber numberWithBool:NO];
-    [arango.instance terminate];
-  }
-  NSError* error = nil;
-  [[self.appDelegate getArangoManagedObjectContext] save: &error];
-  if (error != nil) {
-    NSLog(@"%@", error.localizedDescription);
-  }
-  [self updateMenu];
+////////////////////////////////////////////////////////////////////////////////
+/// @brief destructor
+////////////////////////////////////////////////////////////////////////////////
+
+- (void) dealloc {
+  self.helpController = nil;
+  self.userConfigController = nil;
+
+  [super dealloc];
 }
-
-
- */
 
 @end
 

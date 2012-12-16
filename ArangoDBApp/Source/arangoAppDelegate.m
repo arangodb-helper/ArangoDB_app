@@ -57,7 +57,7 @@ int version;
 - (void) updateArangoConfig:(ArangoConfiguration*) config withPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath andLogLevel:(NSString*) level andRunOnStartUp: (BOOL) ros andAlias:(NSString*) alias
 {
   if ([config.isRunning isEqualToNumber:[NSNumber numberWithBool:YES]]) {
-    [config.instance terminate];
+    // [config.instance terminate];
   }
   if (config.bookmarks != nil && 106 < version) {
     NSURL* oldPath = [self urlForBookmark:config.bookmarks.path];
@@ -102,7 +102,7 @@ int version;
 - (void) deleteArangoConfig:(ArangoConfiguration*) config andFiles:(BOOL) deleteFiles
 {
   if ([config.isRunning isEqualToNumber:[NSNumber numberWithBool:YES]]) {
-    [config.instance terminate];
+    // [config.instance terminate];
   }
   if (deleteFiles) {
       [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(deleteFiles:) userInfo:config repeats:NO];

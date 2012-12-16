@@ -69,7 +69,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   d = opendir([src fileSystemRepresentation]);
 
   if (d == 0) {
-    self.lastError = [[[@"Cannot open database directory " stringByAppendingString:src] stringByAppendingString:@": "] stringByAppendingString:[NSString stringWithCString:strerror(errno) encoding:NSUTF8StringEncoding]];
+    self.lastError = [[[@"cannot open database directory '" stringByAppendingString:src] stringByAppendingString:@"': "] stringByAppendingString:[NSString stringWithCString:strerror(errno) encoding:NSUTF8StringEncoding]];
     return NO;
   }
 
@@ -88,7 +88,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
         NSLog(@"Renamed %@ to %@", from, to);
       }
       else {
-        self.lastError = [[[@"Cannot rename file " stringByAppendingString:from] stringByAppendingString:@": "] stringByAppendingString:err.localizedDescription];
+        self.lastError = [[[@"cannot rename file '" stringByAppendingString:from] stringByAppendingString:@"': "] stringByAppendingString:err.localizedDescription];
         closedir(d);
         return NO;
       }
@@ -341,51 +341,48 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief deletes database files XXXX
+/// @brief deletes database files
 ////////////////////////////////////////////////////////////////////////////////
 
-/*
 - (void) deleteFiles: (NSTimer*) timer {
-  ArangoConfiguration* config = timer.userInfo;
-  NSError* error = nil;
-  if (config.bookmarks != nil  && version > 106) {
-    
-    NSURL* oldLogPath = [self urlForBookmark:config.bookmarks.log];
-    if (oldLogPath != nil) {
-      [oldLogPath stopAccessingSecurityScopedResource];
-    }
-    [[NSFileManager defaultManager] removeItemAtPath:config.log error:&error];
-    if (error != nil) {
-      NSLog(@"%@", error.localizedDescription);
-    }
-    error = nil;
-    NSURL* oldPath = [self urlForBookmark:config.bookmarks.path];
-    if (oldPath != nil) {
-      [oldPath stopAccessingSecurityScopedResource];
-    }
-    [[NSFileManager defaultManager] removeItemAtPath:config.path error:&error];
-    if (error != nil) {
-      NSLog(@"%@", error.localizedDescription);
-    }
-    [[self getArangoManagedObjectContext] deleteObject: config.bookmarks];
-    config.bookmarks = nil;
+  ArangoStatus* status = timer.userInfo;
+
+  // check if the instance is still running
+  NSTask* task = [_instances objectForKey:status.name];
+
+  if (task != nil && [task isRunning]) {
+    [NSTimer scheduledTimerWithTimeInterval:1
+                                     target:self
+                                   selector:@selector(deleteFiles:)
+                                   userInfo:status
+                                    repeats:NO];
+    return;
   }
-  else {
-    [[NSFileManager defaultManager] removeItemAtPath:config.log error:&error];
-    if (error != nil) {
-      NSLog(@"%@", error.localizedDescription);
-    }
-    error = nil;
-    [[NSFileManager defaultManager] removeItemAtPath:config.path error:&error];
-    if (error != nil) {
-      NSLog(@"%@", error.localizedDescription);
-    }
+
+  NSLog(@"Starting to remove database files");
+
+  // remove security
+  if (106 < _version) {
+    [[NSURL fileURLWithPath:status.path] stopAccessingSecurityScopedResource];
+    [[NSURL fileURLWithPath:status.logPath] stopAccessingSecurityScopedResource];
   }
-  [[self getArangoManagedObjectContext] deleteObject: config];
-  [self save];
-  [statusMenu updateMenu];
+
+  // delete log file and database path
+  NSError* err = nil;
+
+  [[NSFileManager defaultManager] removeItemAtPath:status.logPath error:&err];
+
+  if (err != nil) {
+    NSLog(@"%@", err.localizedDescription);
+  }
+
+  err = nil;
+  [[NSFileManager defaultManager] removeItemAtPath:status.path error:&err];
+
+  if (err != nil) {
+    NSLog(@"%@", err.localizedDescription);
+  }
 }
- */
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                    public methods
@@ -414,11 +411,11 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
     NSString* path = [[NSBundle mainBundle] resourcePath];
 
-    _arangoDBBinary = [path stringByAppendingString:_arangoDBVersion];
-    _arangoDBConfig = [path stringByAppendingString:@"/arangod.conf"];
-    _arangoDBAdminDir = [path stringByAppendingString:@"/html/admin"];
-    _arangoDBJsActionDir = [path stringByAppendingString:@"/js/actions/system"];
-    _arangoDBJsModuleDir = [[path stringByAppendingString:@"/js/server/modules:"] stringByAppendingString:[path stringByAppendingString:@"/js/common/modules"]];
+    _arangoDBBinary = [[path stringByAppendingString:_arangoDBVersion] retain];
+    _arangoDBConfig = [[path stringByAppendingString:@"/arangod.conf"] retain];
+    _arangoDBAdminDir = [[path stringByAppendingString:@"/html/admin"] retain];
+    _arangoDBJsActionDir = [[path stringByAppendingString:@"/js/actions/system"] retain];
+    _arangoDBJsModuleDir = [[[path stringByAppendingString:@"/js/server/modules:"] stringByAppendingString:[path stringByAppendingString:@"/js/common/modules"]] retain];
 
     BOOL ok = [self loadConfigurations];
 
@@ -457,6 +454,35 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// @brief finds a free port
+////////////////////////////////////////////////////////////////////////////////
+
+- (NSNumber*) findFreePort {
+  NSMutableArray* ports = [[[NSMutableArray alloc] init] autorelease];
+
+  for (ArangoConfiguration* config in [_configurations allValues]) {
+    [ports addObject:config.port];
+  }
+
+  [ports sortedArrayUsingComparator: ^(id obj1, id obj2) {return [obj1 compare:obj2];}];
+  
+  NSNumber* port = [NSNumber numberWithInt:8000];
+  
+  for (NSNumber* used in ports) {
+    NSComparisonResult cmp = [port compare:used];
+    
+    if (cmp == NSOrderedAscending) {
+      return port;
+    }
+    else if (cmp == NSOrderedSame) {
+      port = [NSNumber numberWithInt:[port intValue] + 1];
+    }
+  }
+
+  return port;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// @brief creates a new configuration
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -481,6 +507,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   config.log = logPath;
   config.loglevel = logLevel;
   config.runOnStartUp = [NSNumber numberWithBool:ros];
+  config.isRunning = [NSNumber numberWithBool:YES];
 
   if (106 < _version) {
     [self createBookmarks:config];
@@ -564,11 +591,12 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
   // check the log path
   if ([logPath isEqualToString:@""]) {
-    NSMutableString* logPath = [[[NSMutableString alloc] init] autorelease];
-    [logPath setString:path];
-    [logPath appendString:@"/"];
-    [logPath appendString:alias];
-    [logPath appendString:@".log"];
+    NSMutableString* tmp = [[[NSMutableString alloc] init] autorelease];
+    [tmp setString:path];
+    [tmp appendString:@"/"];
+    [tmp appendString:alias];
+    [tmp appendString:@".log"];
+    logPath = tmp;
 
     if (! [[NSFileManager defaultManager] fileExistsAtPath:logPath]) {
       BOOL ok = [[NSFileManager defaultManager] createFileAtPath:logPath
@@ -656,11 +684,19 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     return nil;
   }
 
+  BOOL isRunning = NO;
+
+  NSTask* task = [_instances objectForKey:alias];
+
+  if (task != nil) {
+    isRunning = [task isRunning];
+  }
+
   return [[[ArangoStatus alloc] initWithName:config.alias
                                      andPath:config.path
                                      andPort:config.port
                                   andLogPath:config.log
-                                  andRunning:false] autorelease];
+                                  andRunning:isRunning] autorelease];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -743,27 +779,13 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 /// @brief starts a new ArangoDB instance with the given name
 ////////////////////////////////////////////////////////////////////////////////
 
-- (BOOL) stopArangoDBAndDelete: (NSString*) name {
-  NSLog(@"stop and delete arangodb");
-  return YES;
-}
-
-- (BOOL) stopArangoDB: (NSString*) name {
-  NSLog(@"stop arangodb");
-  return YES;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief starts a new ArangoDB instance with the given name
-////////////////////////////////////////////////////////////////////////////////
-
 - (BOOL) startArangoDB: (NSString*) name {
 
   // load configuration for name
   ArangoConfiguration* config = [_configurations objectForKey:name];
   
   if (config == nil) {
-    self.lastError = [@"Cannot start instance for unknown configuration: " stringByAppendingString:name];
+    self.lastError = [@"cannot start instance for unknown configuration: " stringByAppendingString:name];
     return NO;
   }
   
@@ -771,8 +793,10 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   NSTask* task = [_instances objectForKey:name];
 
   if (task != nil) {
-    self.lastError = [@"Instance already running: " stringByAppendingString:name];
-    return NO;
+    if ([task isRunning]) {
+      self.lastError = [@"instance already running: " stringByAppendingString:name];
+      return NO;
+    }
   }
 
   // check for sandboxed mode
@@ -780,14 +804,14 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     NSURL* bmPath = [self urlForBookmark:config.bookmarks.path];
 
     if (! [bmPath startAccessingSecurityScopedResource]) {
-      self.lastError = [@"Not allowed to open database path " stringByAppendingString:config.path];
+      self.lastError = [@"not allowed to open database path " stringByAppendingString:config.path];
       return NO;
     }
 
     NSURL* bmLog = [self urlForBookmark:config.bookmarks.log];
 
     if (! [bmLog startAccessingSecurityScopedResource]) {
-      self.lastError = [@"Not allowed to open log path " stringByAppendingString:config.log];
+      self.lastError = [@"not allowed to open log path " stringByAppendingString:config.log];
       return NO;
     }
   }
@@ -803,9 +827,9 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
       return NO;
     }
 
-    res = [self moveDatabaseFiles:config.path toDestination:database];
+    BOOL ok = [self moveDatabaseFiles:config.path toDestination:database];
 
-    if (res != 0) {
+    if (! ok) {
       NSLog(@"Cannot move database directory to %@", database);
       return NO;
     }
@@ -831,7 +855,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   if ([task respondsToSelector:@selector(setTerminationHandler:)]) {
     [task setTerminationHandler: ^(NSTask *task) {
         NSLog(@"ArangoDB instance '%@' has terminated", name);
-        // TODO-FC send notification
+        [[NSNotificationCenter defaultCenter] postNotificationName:ArangoConfigurationDidChange object:self];
     }];
   }
 
@@ -842,6 +866,62 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   // and store instance
   [_instances setValue:task forKey:name];
 
+  config.isRunning = [NSNumber numberWithBool:YES];
+  [self saveConfigurations];
+
+  [[NSNotificationCenter defaultCenter] postNotificationName:ArangoConfigurationDidChange object:self];
+
+  return YES;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief stops an ArangoDB instance
+////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL) stopArangoDB: (NSString*) name {
+  NSLog(@"Stopping ArangoDB instance '%@'", name);
+
+  // load configuration for name (might already be deleted)
+  ArangoConfiguration* config = [_configurations objectForKey:name];
+  
+  if (config != nil) {
+    config.isRunning = [NSNumber numberWithBool:NO];
+    [self saveConfigurations];
+  }
+  
+  // check if task exists
+  NSTask* task = [_instances objectForKey:name];
+
+  if (task == nil) {
+    return YES;
+  }
+
+  // terminate
+  if ([task isRunning]) {
+    [task terminate];
+  }
+  
+  return YES;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief starts a new ArangoDB instance with the given name
+////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL) stopArangoDBAndDelete: (ArangoStatus*) status {
+  NSString* name = status.name;
+  BOOL ok = [self stopArangoDB:name];
+
+  if (! ok) {
+    return ok;
+  }
+
+  [NSTimer scheduledTimerWithTimeInterval:1
+                                   target:self
+                                 selector:@selector(deleteFiles:)
+                                 userInfo:status
+                                  repeats:NO];
+  
   return YES;
 }
 

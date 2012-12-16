@@ -188,6 +188,8 @@ static const double HeightCorrection = 10;
     [_portFormatter setThousandSeparator:@""];
     [_portField setFormatter:self.portFormatter];
 
+    self.portField.stringValue = [self.portFormatter stringFromNumber:[self.delegate.manager findFreePort]];
+
     _configuration = nil;
   }
 
@@ -244,7 +246,7 @@ static const double HeightCorrection = 10;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief browse log file
+/// @brief browse database path
 ////////////////////////////////////////////////////////////////////////////////
 
 - (IBAction) browseDatabase: (id) sender {
