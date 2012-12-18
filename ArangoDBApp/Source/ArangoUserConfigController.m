@@ -28,7 +28,7 @@
 
 #import "ArangoUserConfigController.h"
 
-#import "arangoAppDelegate.h"
+#import "ArangoManager.h"
 #import "User.h"
 
 // -----------------------------------------------------------------------------
@@ -43,6 +43,44 @@ static const NSString* ALL = @"Start all instances";
 static const NSString* NON = @"Do not start instaces";
 
 // -----------------------------------------------------------------------------
+// --SECTION--                                                   private methods
+// -----------------------------------------------------------------------------
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief aborts configuration dialog
+////////////////////////////////////////////////////////////////////////////////
+
+- (IBAction) abortConfiguration: (id) sender {
+  [self.window close];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief saves configuration
+////////////////////////////////////////////////////////////////////////////////
+
+- (IBAction) storeConfiguration: (id) sender {
+  NSNumber* ros = [NSNumber numberWithInt:0];
+
+  if ([self.runOnStartupOptions.stringValue isEqual:RES]) {
+    ros = [NSNumber numberWithInt:1];
+  }
+  else if ([self.runOnStartupOptions.stringValue isEqual:DEF]) {
+    ros = [NSNumber numberWithInt:2];
+  }
+  else if ([self.runOnStartupOptions.stringValue isEqual:ALL]) {
+    ros = [NSNumber numberWithInt:3];
+  }
+  else if([self.runOnStartupOptions.stringValue isEqual:NON]) {
+    ros = [NSNumber numberWithInt:0];
+  }
+
+  [self.delegate setRunOnStartupOptions:ros
+                          setRunOnLogin:(self.runOnStartupButton.state == NSOnState)];
+
+  [self.window close];
+}
+
+// -----------------------------------------------------------------------------
 // --SECTION--                                                    public methods
 // -----------------------------------------------------------------------------
 
@@ -51,7 +89,13 @@ static const NSString* NON = @"Do not start instaces";
 ////////////////////////////////////////////////////////////////////////////////
 
 - (id) initWithArangoManager: (ArangoManager*) delegate {
-  return [super initWithArangoManager:delegate];
+  self = [super initWithArangoManager:delegate nibNamed:@"ArangoUserConfigView"];
+
+  if (self) {
+    [self.window setReleasedWhenClosed:YES];
+  }
+
+  return self;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -64,7 +108,7 @@ static const NSString* NON = @"Do not start instaces";
   [self.runOnStartupOptions addItemWithObjectValue:ALL];
   [self.runOnStartupOptions addItemWithObjectValue:NON];
 
-  switch ([_delegate.user.runOnStartUp intValue]) {
+  switch ([[self.delegate runOnStartUp] intValue]) {
     case 0:
       [self.runOnStartupOptions selectItemWithObjectValue:NON];
       break;
@@ -82,89 +126,16 @@ static const NSString* NON = @"Do not start instaces";
       break;
   }
 
-  LSSharedFileListRef autostart = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems, nil);
-  if (autostart) {
-    UInt32 seedValue;
-    NSArray  *loginItemsArray = (NSArray *) LSSharedFileListCopySnapshot(autostart, &seedValue);
-    for(int i = 0; i< [loginItemsArray count]; i++){
-      LSSharedFileListItemRef itemRef = (LSSharedFileListItemRef) [loginItemsArray objectAtIndex:i];
-      CFURLRef url = (CFURLRef) [NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]];
-      if (LSSharedFileListItemResolve(itemRef, 0, &url, nil) == noErr) {
-        NSString * urlPath = [(NSURL*)url path];
-        if ([urlPath compare:[[NSBundle mainBundle] bundlePath]] == NSOrderedSame){
-          self.runOnStartupButton.state = NSOnState;
-        }
-      }
-    }
-    [loginItemsArray release];
-  }
-}
-
-
-- (IBAction) abortConfiguration: (id) sender
-{
-  [self.window orderOut:self.window];
-}
-
-
-- (IBAction) storeConfiguration: (id) sender
-{
-  NSFetchRequest *userRequest = [[NSFetchRequest alloc] init];
-  NSEntityDescription *userEntity = [NSEntityDescription entityForName:@"User" inManagedObjectContext: [self.delegate getArangoManagedObjectContext]];
-  [userRequest setEntity:userEntity];
-  NSError *error = nil;
-  NSArray *fetchedResults = [[self.delegate getArangoManagedObjectContext] executeFetchRequest:userRequest error:&error];
-  [userRequest release];
-  NSNumber* ros = [NSNumber numberWithInt:0];
-  if([self.runOnStartupOptions.stringValue isEqual:RES]) {
-    ros = [NSNumber numberWithInt:1];
-  } else if([self.runOnStartupOptions.stringValue isEqual:DEF]) {
-    ros = [NSNumber numberWithInt:2];
-  } else if([self.runOnStartupOptions.stringValue isEqual:ALL]) {
-    ros = [NSNumber numberWithInt:3];
-  } else if([self.runOnStartupOptions.stringValue isEqual:NON]) {
-    ros = [NSNumber numberWithInt:0];
-  }
-  if (fetchedResults == nil) {
-    NSLog(@"%@", error.localizedDescription);
-  } else {
-    if (fetchedResults.count > 0) {
-      for (User* u in fetchedResults) {
-        u.runOnStartUp = ros;
-      }
-      [self.delegate save];
-    } else {
-      User* u = (User*) [NSEntityDescription insertNewObjectForEntityForName:@"User" inManagedObjectContext:[self.delegate getArangoManagedObjectContext]];
-      u.runOnStartUp = ros;
-      [self.delegate save];
-    }
-  }
-  LSSharedFileListRef autostart = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems, nil);
-  if (autostart) {
-    if (self.runOnStartupButton.state == NSOnState) {
-      LSSharedFileListItemRef arangoStarter = LSSharedFileListInsertItemURL(autostart, kLSSharedFileListItemLast, nil, nil, (CFURLRef)[NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]], nil, nil);
-      if (arangoStarter) {
-        CFRelease(arangoStarter);
-      }
-      CFRelease(autostart);
-    } else {
-      UInt32 seedValue;
-      NSArray  *loginItemsArray = (NSArray *) LSSharedFileListCopySnapshot(autostart, &seedValue);
-      for(int i = 0; i< [loginItemsArray count]; i++){
-        LSSharedFileListItemRef itemRef = (LSSharedFileListItemRef) [loginItemsArray objectAtIndex:i];
-        CFURLRef url = (CFURLRef) [NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]];
-        if (LSSharedFileListItemResolve(itemRef, 0, &url, nil) == noErr) {
-          NSString * urlPath = [(NSURL*)url path];
-          if ([urlPath compare:[[NSBundle mainBundle] bundlePath]] == NSOrderedSame){
-            LSSharedFileListItemRemove(autostart,itemRef);
-          }
-        }
-      }
-      [loginItemsArray release];
-    }
-  }
-  
-  [self.window orderOut:self.window];
+  self.runOnStartupButton.state = [self.delegate runOnLogin] ? NSOnState : NSOffState;
 }
 
 @end
+
+// -----------------------------------------------------------------------------
+// --SECTION--                                                       END-OF-FILE
+// -----------------------------------------------------------------------------
+
+// Local Variables:
+// mode: outline-minor
+// outline-regexp: "^\\(/// @brief\\|/// {@inheritDoc}\\|/// @addtogroup\\|/// @page\\|// --SECTION--\\|/// @\\}\\)"
+// End:

@@ -46,147 +46,6 @@
 // -----------------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief updates the menu entries
-////////////////////////////////////////////////////////////////////////////////
-
-- (void) updateMenu {
-
-  // create the menu entries for the instances
-  NSArray* entries = [self.delegate currentStatus];
-
-  [self removeAllItems];
-  [self setAutoenablesItems:NO];
-  
-  if (entries) {
-    for (ArangoStatus* status in entries) {
-      NSMenuItem* item = [[NSMenuItem alloc] init];
-      [item setEnabled:YES];
-
-      NSString* title = status.name;
-
-      if (status.isRunning) {
-        title = [[[title stringByAppendingString:@" ("] stringByAppendingString:[status.port stringValue]] stringByAppendingString:@")"];
-      }
-      else {
-        title = [title stringByAppendingString:@" (Stopped)"];
-      }
-
-      [item setTitle: title];
-
-      // create submenu for each instance
-      NSMenu* subMenu = [[NSMenu alloc] init];
-      [subMenu setAutoenablesItems:NO];
-
-      // open a browser for the GUI
-      NSMenuItem* browser = [[NSMenuItem alloc] init];
-      [browser setEnabled:status.isRunning];
-      [browser setTitle:@"Admin Interface"];
-      [browser setTarget:self];
-      [browser setRepresentedObject:status.name];
-      [browser setAction:@selector(openBrowser:)];
-      [subMenu addItem:browser];
-      [browser release];
-
-      [subMenu addItem: [NSMenuItem separatorItem]];
-
-      // edit instance
-      NSMenuItem* edit = [[NSMenuItem alloc] init];
-      [edit setEnabled:YES];
-      [edit setTitle:@"Edit"];
-      [edit setTarget:self];
-      [edit setRepresentedObject:status.name];
-      [edit setAction:@selector(editInstance:)];
-      [subMenu addItem:edit];
-      [edit release];
-
-      // delete instance
-      NSMenuItem* delete = [[NSMenuItem alloc] init];
-      [delete setEnabled:YES];
-      [delete setTitle:@"Delete"];
-      [delete setTarget:self];
-      [delete setRepresentedObject:status.name];
-      [delete setAction:@selector(deleteInstance:)];
-      [subMenu addItem:delete];
-      [delete release];
-
-      [subMenu addItem: [NSMenuItem separatorItem]];
-
-      // start instance
-      NSMenuItem* start = [[NSMenuItem alloc] init];
-      [start setEnabled:(! status.isRunning)];
-      [start setTitle:@"Start"];
-      [start setTarget:self];
-      [start setRepresentedObject:status.name];
-      [start setAction:@selector(startInstance:)];
-      [subMenu addItem:start];
-      [start release];
-
-      // stop instance
-      NSMenuItem* stop = [[NSMenuItem alloc] init];
-      [stop setEnabled:status.isRunning];
-      [stop setTitle:@"Stop"];
-      [stop setTarget:self];
-      [stop setRepresentedObject:status.name];
-      [stop setAction:@selector(stopInstance:)];
-      [subMenu addItem:stop];
-      [stop release];
-
-      // add item, submenu and release
-      [item setSubmenu:subMenu];
-      [subMenu release];
-      
-      [self addItem:item];
-      [item release];
-    }
-  }
-
-  // create the standard menu entries
-  if (entries && 0 < entries.count) {
-    [self addItem:[NSMenuItem separatorItem]];
-  }
-  
-  // create instance
-  NSMenuItem* createDB = [[NSMenuItem alloc] init];
-  [createDB setEnabled:YES];
-  [createDB setTitle:@"New Instance..."];
-  [createDB setTarget:self];
-  [createDB setAction:@selector(createNewInstance:)];
-  [self addItem:createDB];
-  [createDB release];
-    
-  // configuration
-  NSMenuItem* configure = [[NSMenuItem alloc] init];
-  [configure setEnabled:YES];
-  [configure setTitle:@"Configuration"];
-  [configure setTarget:self];
-  [configure setAction:@selector(showConfiguration:)];
-  [self addItem:configure];
-  [configure release];
-  
-  [self addItem:[NSMenuItem separatorItem]];
-  
-  // help
-  NSMenuItem* help = [[NSMenuItem alloc] init];
-  [help setEnabled:YES];
-  [help setTitle:@"Help"];
-  [help setTarget:self];
-  [help setAction:@selector(showHelp:)];
-  [self addItem:help];
-  [help release];
-  
-  [self addItem:[NSMenuItem separatorItem]];
-  
-  // quit
-  NSMenuItem* quit = [[NSMenuItem alloc] init];
-  [quit setEnabled:YES];
-  [quit setTitle:@"Quit"];
-  [quit setTarget:self];
-  [quit setAction:@selector(quitApplication:)];
-  [self addItem:quit];
-  [quit release];
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// @brief creates an instance
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -388,6 +247,147 @@
   self.userConfigController = nil;
 
   [super dealloc];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief updates the menu entries
+////////////////////////////////////////////////////////////////////////////////
+
+- (void) updateMenu {
+  
+  // create the menu entries for the instances
+  NSArray* entries = [self.delegate currentStatus];
+  
+  [self removeAllItems];
+  [self setAutoenablesItems:NO];
+  
+  if (entries) {
+    for (ArangoStatus* status in entries) {
+      NSMenuItem* item = [[NSMenuItem alloc] init];
+      [item setEnabled:YES];
+      
+      NSString* title = status.name;
+      
+      if (status.isRunning) {
+        title = [[[title stringByAppendingString:@" ("] stringByAppendingString:[status.port stringValue]] stringByAppendingString:@")"];
+      }
+      else {
+        title = [title stringByAppendingString:@" (Stopped)"];
+      }
+      
+      [item setTitle: title];
+      
+      // create submenu for each instance
+      NSMenu* subMenu = [[NSMenu alloc] init];
+      [subMenu setAutoenablesItems:NO];
+      
+      // open a browser for the GUI
+      NSMenuItem* browser = [[NSMenuItem alloc] init];
+      [browser setEnabled:status.isRunning];
+      [browser setTitle:@"Admin Interface"];
+      [browser setTarget:self];
+      [browser setRepresentedObject:status.name];
+      [browser setAction:@selector(openBrowser:)];
+      [subMenu addItem:browser];
+      [browser release];
+      
+      [subMenu addItem: [NSMenuItem separatorItem]];
+      
+      // edit instance
+      NSMenuItem* edit = [[NSMenuItem alloc] init];
+      [edit setEnabled:YES];
+      [edit setTitle:@"Edit"];
+      [edit setTarget:self];
+      [edit setRepresentedObject:status.name];
+      [edit setAction:@selector(editInstance:)];
+      [subMenu addItem:edit];
+      [edit release];
+      
+      // delete instance
+      NSMenuItem* delete = [[NSMenuItem alloc] init];
+      [delete setEnabled:YES];
+      [delete setTitle:@"Delete"];
+      [delete setTarget:self];
+      [delete setRepresentedObject:status.name];
+      [delete setAction:@selector(deleteInstance:)];
+      [subMenu addItem:delete];
+      [delete release];
+      
+      [subMenu addItem: [NSMenuItem separatorItem]];
+      
+      // start instance
+      NSMenuItem* start = [[NSMenuItem alloc] init];
+      [start setEnabled:(! status.isRunning)];
+      [start setTitle:@"Start"];
+      [start setTarget:self];
+      [start setRepresentedObject:status.name];
+      [start setAction:@selector(startInstance:)];
+      [subMenu addItem:start];
+      [start release];
+      
+      // stop instance
+      NSMenuItem* stop = [[NSMenuItem alloc] init];
+      [stop setEnabled:status.isRunning];
+      [stop setTitle:@"Stop"];
+      [stop setTarget:self];
+      [stop setRepresentedObject:status.name];
+      [stop setAction:@selector(stopInstance:)];
+      [subMenu addItem:stop];
+      [stop release];
+      
+      // add item, submenu and release
+      [item setSubmenu:subMenu];
+      [subMenu release];
+      
+      [self addItem:item];
+      [item release];
+    }
+  }
+  
+  // create the standard menu entries
+  if (entries && 0 < entries.count) {
+    [self addItem:[NSMenuItem separatorItem]];
+  }
+  
+  // create instance
+  NSMenuItem* createDB = [[NSMenuItem alloc] init];
+  [createDB setEnabled:YES];
+  [createDB setTitle:@"New Instance..."];
+  [createDB setTarget:self];
+  [createDB setAction:@selector(createNewInstance:)];
+  [self addItem:createDB];
+  [createDB release];
+  
+  // configuration
+  NSMenuItem* configure = [[NSMenuItem alloc] init];
+  [configure setEnabled:YES];
+  [configure setTitle:@"Configuration"];
+  [configure setTarget:self];
+  [configure setAction:@selector(showConfiguration:)];
+  [self addItem:configure];
+  [configure release];
+  
+  [self addItem:[NSMenuItem separatorItem]];
+  
+  // help
+  NSMenuItem* help = [[NSMenuItem alloc] init];
+  [help setEnabled:YES];
+  [help setTitle:@"Help"];
+  [help setTarget:self];
+  [help setAction:@selector(showHelp:)];
+  [self addItem:help];
+  [help release];
+  
+  [self addItem:[NSMenuItem separatorItem]];
+  
+  // quit
+  NSMenuItem* quit = [[NSMenuItem alloc] init];
+  [quit setEnabled:YES];
+  [quit setTitle:@"Quit"];
+  [quit setTarget:self];
+  [quit setAction:@selector(quitApplication:)];
+  [self addItem:quit];
+  [quit release];
 }
 
 @end

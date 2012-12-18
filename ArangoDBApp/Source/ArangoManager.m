@@ -286,7 +286,27 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
       _user = (User*) [NSEntityDescription insertNewObjectForEntityForName:@"User" inManagedObjectContext:_managedObjectContext];
     }
   }
-  
+
+  /*
+  // check the start on login
+  LSSharedFileListRef autostart = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems, nil);
+  if (autostart) {
+    UInt32 seedValue;
+    NSArray  *loginItemsArray = (NSArray *) LSSharedFileListCopySnapshot(autostart, &seedValue);
+    for(int i = 0; i< [loginItemsArray count]; i++){
+      LSSharedFileListItemRef itemRef = (LSSharedFileListItemRef) [loginItemsArray objectAtIndex:i];
+      CFURLRef url = (CFURLRef) [NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]];
+      if (LSSharedFileListItemResolve(itemRef, 0, &url, nil) == noErr) {
+        NSString * urlPath = [(NSURL*)url path];
+        if ([urlPath compare:[[NSBundle mainBundle] bundlePath]] == NSOrderedSame){
+          self.runOnStartupButton.state = NSOnState;
+        }
+      }
+    }
+    [loginItemsArray release];
+  }
+   */
+
   // load the configurations
   request = [[[NSFetchRequest alloc] init] autorelease];
   entity = [NSEntityDescription entityForName:@"ArangoConfiguration" inManagedObjectContext: _managedObjectContext];
@@ -339,6 +359,58 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
   return YES;
 }
+
+/*
+- (IBAction) storeConfiguration: (id) sender {
+  NSFetchRequest *userRequest = [[NSFetchRequest alloc] init];
+  NSEntityDescription *userEntity = [NSEntityDescription entityForName:@"User" inManagedObjectContext: [self.delegate getArangoManagedObjectContext]];
+  [userRequest setEntity:userEntity];
+  NSError *error = nil;
+  NSArray *fetchedResults = [[self.delegate getArangoManagedObjectContext] executeFetchRequest:userRequest error:&error];
+  [userRequest release];
+
+  if (fetchedResults == nil) {
+    NSLog(@"%@", error.localizedDescription);
+  } else {
+    if (fetchedResults.count > 0) {
+      for (User* u in fetchedResults) {
+        u.runOnStartUp = ros;
+      }
+      [self.delegate save];
+    } else {
+      User* u = (User*) [NSEntityDescription insertNewObjectForEntityForName:@"User" inManagedObjectContext:[self.delegate getArangoManagedObjectContext]];
+      u.runOnStartUp = ros;
+      [self.delegate save];
+    }
+  }
+  LSSharedFileListRef autostart = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems, nil);
+  if (autostart) {
+    if (self.runOnStartupButton.state == NSOnState) {
+      LSSharedFileListItemRef arangoStarter = LSSharedFileListInsertItemURL(autostart, kLSSharedFileListItemLast, nil, nil, (CFURLRef)[NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]], nil, nil);
+      if (arangoStarter) {
+        CFRelease(arangoStarter);
+      }
+      CFRelease(autostart);
+    } else {
+      UInt32 seedValue;
+      NSArray  *loginItemsArray = (NSArray *) LSSharedFileListCopySnapshot(autostart, &seedValue);
+      for(int i = 0; i< [loginItemsArray count]; i++){
+        LSSharedFileListItemRef itemRef = (LSSharedFileListItemRef) [loginItemsArray objectAtIndex:i];
+        CFURLRef url = (CFURLRef) [NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]];
+        if (LSSharedFileListItemResolve(itemRef, 0, &url, nil) == noErr) {
+          NSString * urlPath = [(NSURL*)url path];
+          if ([urlPath compare:[[NSBundle mainBundle] bundlePath]] == NSOrderedSame){
+            LSSharedFileListItemRemove(autostart,itemRef);
+          }
+        }
+      }
+      [loginItemsArray release];
+    }
+  }
+  
+  [self.window orderOut:self.window];
+}
+*/
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief deletes database files

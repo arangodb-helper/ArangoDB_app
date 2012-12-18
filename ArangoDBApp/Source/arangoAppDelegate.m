@@ -1,139 +1,83 @@
-//
-//  arangoAppDelegate.m
-//  Arango
-//
-//  Created by Michael Hackstein on 28.08.12.
-//  Copyright (c) 2012 triAgens. All rights reserved.
-//
+////////////////////////////////////////////////////////////////////////////////
+/// @brief ArangoDB application delegate
+///
+/// @file
+///
+/// DISCLAIMER
+///
+/// Copyright 2012 triAGENS GmbH, Cologne, Germany
+///
+/// Licensed under the Apache License, Version 2.0 (the "License");
+/// you may not use this file except in compliance with the License.
+/// You may obtain a copy of the License at
+///
+///     http://www.apache.org/licenses/LICENSE-2.0
+///
+/// Unless required by applicable law or agreed to in writing, software
+/// distributed under the License is distributed on an "AS IS" BASIS,
+/// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+/// See the License for the specific language governing permissions and
+/// limitations under the License.
+///
+/// Copyright holder is triAGENS GmbH, Cologne, Germany
+///
+/// @author Dr. Frank Celler
+/// @author Michael Hackstein
+/// @author Copyright 2012, triAGENS GmbH, Cologne, Germany
+////////////////////////////////////////////////////////////////////////////////
 
-#import "arangoAppDelegate.h"
-#import <Foundation/NSTask.h>
+#import "ArangoAppDelegate.h"
+
 #import "ArangoToolbarMenu.h"
-#import "ArangoConfiguration.h"
-#import "User.h"
-#import "Bookmarks.h"
-#import "ArangoUserConfigController.h"
 #import "ArangoManager.h"
-#import "ArangoHelpController.h"
 #import "ArangoIntroductionController.h"
 
-@implementation arangoAppDelegate
+// -----------------------------------------------------------------------------
+// --SECTION--                                                 ArangoAppDelegate
+// -----------------------------------------------------------------------------
 
-@synthesize statusMenu;
-@synthesize statusItem;
-@synthesize userConfigController;
+@implementation ArangoAppDelegate
 
-NSString* adminDir;
-NSString* jsActionDir;
-NSString* jsModPath;
-NSString* arangoVersion;
-int version;
+// -----------------------------------------------------------------------------
+// --SECTION--                                                   private methods
+// -----------------------------------------------------------------------------
 
+////////////////////////////////////////////////////////////////////////////////
+/// @brief destructor
+////////////////////////////////////////////////////////////////////////////////
 
-// Public function to update an given Arango with all given informations.
-// If the given Arango is still running it is shutdown, updated and afterwards restarted.
-/*
-- (void) updateArangoConfig:(ArangoConfiguration*) config withPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath andLogLevel:(NSString*) level andRunOnStartUp: (BOOL) ros andAlias:(NSString*) alias
-{
-  if ([config.isRunning isEqualToNumber:[NSNumber numberWithBool:YES]]) {
-    // [config.instance terminate];
-  }
-  if (config.bookmarks != nil && 106 < version) {
-    NSURL* oldPath = [self urlForBookmark:config.bookmarks.path];
-    if (oldPath != nil) {
-      [oldPath stopAccessingSecurityScopedResource];
-    }
-    NSURL* oldLogPath = [self urlForBookmark:config.bookmarks.log];
-    if (oldLogPath != nil) {
-      [oldLogPath stopAccessingSecurityScopedResource];
-    }
-    if (![config.path isEqualToString:path]) {
-      NSURL* newPath = [NSURL fileURLWithPath:path];
-      NSData* bookmarkPath = [self bookmarkForURL:newPath];
-      if (bookmarkPath != nil) {
-        config.bookmarks.path = bookmarkPath;
-      }
-    }
-    if (![config.log isEqualToString:logPath]) {
-      NSURL* newLog = [NSURL fileURLWithPath:path];
-      NSData* bookmarkLog = [self bookmarkForURL:newLog];
-      if (bookmarkLog != nil) {
-        config.bookmarks.log = bookmarkLog;
-      }
-    }
-  }
-  config.path = path;
-  config.port = port;
-  config.log = logPath;
-  config.loglevel = level;
-  config.runOnStartUp = [NSNumber numberWithBool:ros];
-  config.alias = alias;
-  [self save];
-  [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(timedStart:) userInfo:config repeats:NO];
-  [statusMenu updateMenu];
-}
- */
-
-- (void) timedStart: (NSTimer*) timer {
-  [self startArango:timer.userInfo];
+- (void) configurationDidChange: (NSNotification*) notification {
+  [_statusMenu updateMenu];
 }
 
-// Public funcntion to delete the given Arango.
-- (void) deleteArangoConfig:(ArangoConfiguration*) config andFiles:(BOOL) deleteFiles
-{
-  if ([config.isRunning isEqualToNumber:[NSNumber numberWithBool:YES]]) {
-    // [config.instance terminate];
-  }
-  if (deleteFiles) {
-      [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(deleteFiles:) userInfo:config repeats:NO];
-  } else {
-    if (config.bookmarks != nil  && version > 106) {
-      NSURL* oldPath = [self urlForBookmark:config.bookmarks.path];
-      if (oldPath != nil) {
-        [oldPath stopAccessingSecurityScopedResource];
-      }
-      NSURL* oldLogPath = [self urlForBookmark:config.bookmarks.log];
-      if (oldLogPath != nil) {
-        [oldLogPath stopAccessingSecurityScopedResource];
-      }
-      [[self getArangoManagedObjectContext] deleteObject: config.bookmarks];
-      config.bookmarks = nil;
-    }
-    [[self getArangoManagedObjectContext] deleteObject: config];
-    [self save];
-    [statusMenu updateMenu];
-  }
-}
+// -----------------------------------------------------------------------------
+// --SECTION--                                                    public methods
+// -----------------------------------------------------------------------------
 
-// Public function to save all changes made to persistent objects.
-// Like all ArangoConfigs and the UserConfig.
-- (void) save
-{
-  NSError* error = nil;
-  [[self getArangoManagedObjectContext] save:&error];
-  if (error != nil) {
-    NSLog(@"%@", error.localizedDescription);
-  }
-}
+////////////////////////////////////////////////////////////////////////////////
+/// @brief destructor
+////////////////////////////////////////////////////////////////////////////////
 
 - (void) dealloc {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
+  
+  [_statusItem release];
+  [_statusMenu release];
+  [_manager release];
+  
   [super dealloc];
 }
 
-- (void) configurationDidChange: (NSNotification*) notification {
-  [self.statusMenu updateMenu];
-}
+////////////////////////////////////////////////////////////////////////////////
+/// @brief called after application has been launched
+////////////////////////////////////////////////////////////////////////////////
 
-// Function called after the app finished lanching.
-// This starts all Arangos according to the users decission.
-// If this is the first launch of the App also the Configuration will be shown.
 - (void) applicationDidFinishLaunching: (NSNotification *) notification {
   
   // create the ArangoDB manager
-  self.manager = [[ArangoManager alloc] init];
+  _manager = [[ArangoManager alloc] init];
   
-  if (self.manager == nil) {
+  if (_manager == nil) {
     return;
   }
   
@@ -141,82 +85,40 @@ int version;
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(configurationDidChange:)
                                                name:ArangoConfigurationDidChange
-                                             object:self.manager];
+                                             object:_manager];
+
+  // create the menu
+  _statusMenu = [[ArangoToolbarMenu alloc] initWithArangoManager:_manager];
+  [_statusItem setMenu: _statusMenu];
+  [_statusMenu setAutoenablesItems: NO];
 
   // we will have missed the first notification
-  [self.statusMenu updateMenu];
+  [_statusMenu updateMenu];
 
   // without any configuration, display some help
-  if (0 == self.manager.configurations.count) {
-    [[ArangoIntroductionController alloc] initWithArangoManager:self];
+  if (0 == _manager.configurations.count) {
+    [[ArangoIntroductionController alloc] initWithArangoManager:_manager];
   }
 }
 
-// Function that gets called at App-launch.
-// Sets some constants and creates the status menu with icon.
-// Currently only the green logo is allowed.
--(void) awakeFromNib
-{
-  adminDir = [[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/html/admin"] retain];
-  jsActionDir = [[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/actions/system"] retain];
-  jsModPath = [[[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/server/modules:"] stringByAppendingString:[[[NSBundle mainBundle] resourcePath] stringByAppendingString:@"/js/common/modules"]] retain];
-  if ([[NSBundle mainBundle] respondsToSelector:@selector(loadNibNamed:owner:topLevelObjects:)]) {
-    arangoVersion = @"/arangod_10_8";
-    version = 108;
-  } else {
-    if ([[NSFileManager defaultManager] respondsToSelector:@selector(createDirectoryAtURL:withIntermediateDirectories:attributes:error:)]) {
-      arangoVersion = @"/arangod_10_7";
-      version = 107;
-    } else {
-      arangoVersion = @"/arangod_10_6";
-      version = 106;
-    }
-    
-  }
-  self.statusMenu = [[ArangoToolbarMenu alloc] initWithArangoManager:self];
-  self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength];
-  [self.statusItem setMenu: statusMenu];
-  [self.statusItem setImage: [NSImage imageNamed:@"IconColor"]];
-  [self.statusItem setHighlightMode:YES];
-  [self.statusMenu setAutoenablesItems: NO];
-}
+////////////////////////////////////////////////////////////////////////////////
+/// @brief creates the status menu with icon
+////////////////////////////////////////////////////////////////////////////////
 
-- (NSData*)bookmarkForURL:(NSURL*)url {
-  if (version == 106) {
-    return nil;
-  }
-  NSError* theError = nil;
-  NSData* bookmark = [url bookmarkDataWithOptions:NSURLBookmarkCreationWithSecurityScope
-                   includingResourceValuesForKeys:nil
-                                    relativeToURL:nil
-                                            error:&theError];
-  if (theError || (bookmark == nil)) {
-    
-    NSLog(@"Failed to create Bookmark");
-    NSLog(@"%@", theError.localizedDescription);
-    return nil;
-  }
-  return bookmark;
-}
+-(void) awakeFromNib {
+  _statusItem = [[[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength] retain];
 
-- (NSURL*)urlForBookmark:(NSData*)bookmark {
-  if (version == 106) {
-    return nil;
-  }
-  BOOL bookmarkIsStale = NO;
-  NSError* theError = nil;
-  NSURL* bookmarkURL = [NSURL URLByResolvingBookmarkData:bookmark
-                                                 options:(NSURLBookmarkResolutionWithoutUI|NSURLBookmarkResolutionWithSecurityScope)
-                                           relativeToURL:nil
-                                     bookmarkDataIsStale:&bookmarkIsStale
-                                                   error:&theError];
-  
-  if (bookmarkIsStale || (theError != nil)) {
-    NSLog(@"Failed to resolve URL");
-    NSLog(@"%@", theError.localizedDescription);
-  }
-  return bookmarkURL;
+  [_statusItem setImage: [NSImage imageNamed:@"IconColor"]];
+  [_statusItem setHighlightMode:YES];
 }
-
 
 @end
+
+// -----------------------------------------------------------------------------
+// --SECTION--                                                       END-OF-FILE
+// -----------------------------------------------------------------------------
+
+// Local Variables:
+// mode: outline-minor
+// outline-regexp: "^\\(/// @brief\\|/// {@inheritDoc}\\|/// @addtogroup\\|/// @page\\|// --SECTION--\\|/// @\\}\\)"
+// End:
