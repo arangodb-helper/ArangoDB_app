@@ -28,9 +28,9 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class arangoAppDelegate;
 @class ArangoConfiguration;
 @class ArangoHelpController;
+@class ArangoManager;
 @class ArangoUserConfigController;
 
 // -----------------------------------------------------------------------------
@@ -47,7 +47,7 @@
 /// @brief underlying delegate
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) arangoAppDelegate* delegate;
+@property (nonatomic, assign, readonly) ArangoManager* delegate;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief help controller
@@ -69,14 +69,7 @@
 /// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (id) initWithAppDelegate: (arangoAppDelegate*) delegate;
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief constructor
-////////////////////////////////////////////////////////////////////////////////
-
-- (id) initWithAppDelegate: (arangoAppDelegate*) delegate
-          andConfiguration: (ArangoConfiguration*) config;
+- (id) initWithArangoManager: (ArangoManager*) delegate;
 
 @end
 

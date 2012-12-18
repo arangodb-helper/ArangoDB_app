@@ -27,16 +27,5 @@
 
 @property (retain) ArangoManager* manager;
 
-// Function to start an Arango with the given configuration.
-- (void) startArango:(ArangoConfiguration*) config;
-// Function to start an Arango giving all parameters individually.
-- (void) startNewArangoWithPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath andLogLevel:(NSString*) level andRunOnStartUp: (BOOL) ros andAlias:(NSString*) alias;
-// Function to update a given configuration to all given parameters.
-- (void) updateArangoConfig:(ArangoConfiguration*) config withPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath andLogLevel:(NSString*) level andRunOnStartUp: (BOOL) ros andAlias:(NSString*) alias;
-// Function to delete a given configuration.
-// Will ask the user if data should be deleted as well.
-- (void) deleteArangoConfig:(ArangoConfiguration*) config andFiles:(BOOL) deleteFiles;
-// Function to save all changes made to permanent objects.
-- (void) save;
 
 @end

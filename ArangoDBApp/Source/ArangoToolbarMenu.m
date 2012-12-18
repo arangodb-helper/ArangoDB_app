@@ -52,7 +52,7 @@
 - (void) updateMenu {
 
   // create the menu entries for the instances
-  NSArray* entries = [self.delegate.manager currentStatus];
+  NSArray* entries = [self.delegate currentStatus];
 
   [self removeAllItems];
   [self setAutoenablesItems:NO];
@@ -191,7 +191,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 - (void) createNewInstance: (id) sender {
-  [[ArangoNewInstanceController alloc] initWithAppDelegate:self.delegate];
+  [[ArangoNewInstanceController alloc] initWithArangoManager:self.delegate];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -199,14 +199,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 - (void) editInstance: (id) sender {
-  ArangoConfiguration* config = [self.delegate.manager configuration:[sender representedObject]];
+  ArangoConfiguration* config = [self.delegate configuration:[sender representedObject]];
 
   if (config == nil) {
     return;
   }
 
-  [[ArangoNewInstanceController alloc] initWithAppDelegate:self.delegate
-                                          andConfiguration:config];
+  [[ArangoNewInstanceController alloc] initWithArangoManager:self.delegate
+                                            andConfiguration:config];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -215,7 +215,7 @@
 
 - (void) deleteInstance: (id) sender {
   NSString* config = [sender representedObject];
-  ArangoStatus* status = [self.delegate.manager currentStatus:config];
+  ArangoStatus* status = [self.delegate currentStatus:config];
 
   // already deleted
   if (status == nil) {
@@ -242,7 +242,7 @@
                       returnCode: (int) rc 
                      contextInfo: (NSString*) config
 {
-  ArangoStatus* status = [self.delegate.manager currentStatus:config];
+  ArangoStatus* status = [self.delegate currentStatus:config];
 
   // already deleted
   if (status == nil) {
@@ -250,17 +250,17 @@
   }
 
   if (rc == -1 || rc == 1) {
-    [self.delegate.manager deleteConfiguration:config];
+    [self.delegate deleteConfiguration:config];
   }
   else {
     return;
   }
 
   if (rc == -1) {
-    [self.delegate.manager stopArangoDBAndDelete:status];
+    [self.delegate stopArangoDBAndDelete:status];
   }
   else {
-    [self.delegate.manager stopArangoDB:config];
+    [self.delegate stopArangoDB:config];
   }  
 }
 
@@ -276,7 +276,7 @@
     [self.userConfigController showWindow:self.userConfigController.window];
   }
   else {
-    self.userConfigController = [[[ArangoUserConfigController alloc] initWithAppDelegate:self.delegate] autorelease];
+    self.userConfigController = [[[ArangoUserConfigController alloc] initWithArangoManager:self.delegate] autorelease];
   }
 }
 
@@ -292,7 +292,7 @@
     [self.helpController showWindow:self.helpController.window];
   }
   else {
-    self.helpController = [[[ArangoHelpController alloc] initWithAppDelegate:self.delegate andNibNamed:@"ArangoHelpView"] autorelease];
+    self.helpController = [[[ArangoHelpController alloc] initWithArangoManager:self.delegate andNibNamed:@"ArangoHelpView"] autorelease];
   }
 }
 
@@ -302,7 +302,7 @@
 
 - (void) startInstance: (id) sender {
   NSString* config = [sender representedObject];
-  ArangoStatus* status = [self.delegate.manager currentStatus:config];
+  ArangoStatus* status = [self.delegate currentStatus:config];
 
   // already deleted
   if (status == nil) {
@@ -310,7 +310,7 @@
   }
 
   // start the instance
-  [self.delegate.manager startArangoDB:config];
+  [self.delegate startArangoDB:config];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -319,7 +319,7 @@
 
 - (void) stopInstance: (id) sender {
   NSString* config = [sender representedObject];
-  ArangoStatus* status = [self.delegate.manager currentStatus:config];
+  ArangoStatus* status = [self.delegate currentStatus:config];
 
   // already deleted
   if (status == nil) {
@@ -327,7 +327,7 @@
   }
 
   // start the instance
-  [self.delegate.manager stopArangoDB:config];
+  [self.delegate stopArangoDB:config];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -336,7 +336,7 @@
 
 - (void) openBrowser: (id) sender {
   NSString* config = [sender representedObject];
-  ArangoStatus* status = [self.delegate.manager currentStatus:config];
+  ArangoStatus* status = [self.delegate currentStatus:config];
 
   // already deleted
   if (status == nil) {
@@ -365,7 +365,7 @@
 /// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (id) initWithAppDelegate: (arangoAppDelegate*) delegate {
+- (id) initWithArangoManager: (ArangoManager*) delegate {
   self = [super init];
 
   if (self) {

@@ -42,17 +42,17 @@
 /// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (id) initWithAppDelegate: (arangoAppDelegate*) delegate
-               andNibNamed: (NSString*) nib {
-  return [super initWithAppDelegate:delegate nibNamed:nib];
+- (id) initWithArangoManager: (ArangoManager*) delegate
+                 andNibNamed: (NSString*) nib {
+  return [super initWithArangoManager:delegate nibNamed:nib];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (id) initWithAppDelegate: (arangoAppDelegate*) delegate {
-  return [self initWithAppDelegate:delegate nibNamed:@"ArangoHelpView"];
+- (id) initWithArangoManager: (ArangoManager*) delegate {
+  return [self initWithArangoManager:delegate nibNamed:@"ArangoHelpView"];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

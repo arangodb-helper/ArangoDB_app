@@ -44,8 +44,8 @@
 /// @brief constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (id) initWithAppDelegate: (arangoAppDelegate*) delegate {
-  return [self initWithAppDelegate:delegate nibNamed:@"ArangoIntroductionView"];
+- (id) initWithArangoManager: (ArangoManager*) delegate {
+  return [self initWithArangoManager:delegate nibNamed:@"ArangoIntroductionView"];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -53,7 +53,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 - (IBAction) createInstance: (id) sender {
-  [[ArangoNewInstanceController alloc] initWithAppDelegate:self.delegate];
+  [[ArangoNewInstanceController alloc] initWithArangoManager:self.delegate];
   [self.window orderOut:self.window];
 }
 

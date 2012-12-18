@@ -42,8 +42,8 @@
 /// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (id) initWithAppDelegate: (arangoAppDelegate*) delegate
-                  nibNamed: (NSString*) name {
+- (id) initWithArangoManager: (ArangoManager*) delegate
+                    nibNamed: (NSString*) name {
 
   // loadNibNamed:owner:topLevelObjects was introduced in 10.8
   if ([[NSBundle mainBundle] respondsToSelector:@selector(loadNibNamed:owner:topLevelObjects:)]) {

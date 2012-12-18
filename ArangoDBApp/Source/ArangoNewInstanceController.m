@@ -174,8 +174,8 @@ static const double HeightCorrection = 10;
 /// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (id) initWithAppDelegate: (arangoAppDelegate*) delegate {
-  self = [super initWithAppDelegate:delegate nibNamed:@"ArangoNewInstanceView"];
+- (id) initWithArangoManager: (ArangoManager*) delegate {
+  self = [super initWithArangoManager:delegate nibNamed:@"ArangoNewInstanceView"];
 
   if (self) {
     [self.window setReleasedWhenClosed:YES];
@@ -188,7 +188,7 @@ static const double HeightCorrection = 10;
     [_portFormatter setThousandSeparator:@""];
     [_portField setFormatter:self.portFormatter];
 
-    self.portField.stringValue = [self.portFormatter stringFromNumber:[self.delegate.manager findFreePort]];
+    self.portField.stringValue = [self.portFormatter stringFromNumber:[self.delegate findFreePort]];
 
     _configuration = nil;
   }
@@ -200,9 +200,9 @@ static const double HeightCorrection = 10;
 /// @brief constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (id) initWithAppDelegate: (arangoAppDelegate*) delegate
-          andConfiguration: (ArangoConfiguration*) config {
-  self = [self initWithAppDelegate: delegate];
+- (id) initWithArangoManager: (ArangoManager*) delegate
+            andConfiguration: (ArangoConfiguration*) config {
+  self = [self initWithArangoManager: delegate];
 
   if (self) {
     _configuration = config;
@@ -281,16 +281,16 @@ static const double HeightCorrection = 10;
 - (IBAction) createInstance: (id) sender {
 
   // prepare configuration
-  ArangoStatus* status = [self.delegate.manager prepareConfiguration:self.nameField.stringValue
-                                                            withPath:self.databaseField.stringValue
-                                                             andPort:[self.portFormatter numberFromString:_portField.stringValue]
-                                                              andLog:self.logField.stringValue];
+  ArangoStatus* status = [self.delegate prepareConfiguration:self.nameField.stringValue
+                                                    withPath:self.databaseField.stringValue
+                                                     andPort:[self.portFormatter numberFromString:_portField.stringValue]
+                                                      andLog:self.logField.stringValue];
 
   if (status == nil) {
     NSAlert* info = [[NSAlert alloc] init];
 
     [info setMessageText:@"Cannot create new ArangoDB instance!"];
-    [info setInformativeText:[[@"Encountered error: " stringByAppendingString:self.delegate.manager.lastError] stringByAppendingString:@", please correct and try again."]];
+    [info setInformativeText:[[@"Encountered error: " stringByAppendingString:self.delegate.lastError] stringByAppendingString:@", please correct and try again."]];
 
     [info beginSheetModalForWindow:self.window
                      modalDelegate:self
@@ -300,18 +300,18 @@ static const double HeightCorrection = 10;
   }
 
   // create configuration
-  BOOL ok = [self.delegate.manager createConfiguration:status.name
-                                              withPath:status.path
-                                               andPort:status.port
-                                                andLog:status.logPath
-                                           andLogLevel:self.logLevelOptions.stringValue
-                                       andRunOnStartUp:self.runOnStartupButton.state == NSOnState];
+  BOOL ok = [self.delegate createConfiguration:status.name
+                                      withPath:status.path
+                                       andPort:status.port
+                                        andLog:status.logPath
+                                   andLogLevel:self.logLevelOptions.stringValue
+                               andRunOnStartUp:self.runOnStartupButton.state == NSOnState];
 
   if (! ok) {
     NSAlert* info = [[NSAlert alloc] init];
 
     [info setMessageText:@"Cannot create new ArangoDB instance!"];
-    [info setInformativeText:[[@"Encountered error: " stringByAppendingString:self.delegate.manager.lastError] stringByAppendingString:@", please correct and try again."]];
+    [info setInformativeText:[[@"Encountered error: " stringByAppendingString:self.delegate.lastError] stringByAppendingString:@", please correct and try again."]];
 
     [info beginSheetModalForWindow:self.window
                      modalDelegate:self

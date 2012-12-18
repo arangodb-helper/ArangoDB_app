@@ -28,7 +28,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class arangoAppDelegate;
+@class ArangoManager;
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                              ArangoBaseController
@@ -44,7 +44,7 @@
 /// @brief application delegate
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) arangoAppDelegate* delegate;
+@property (nonatomic, assign, readonly) ArangoManager* delegate;
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                    public methods
@@ -54,8 +54,8 @@
 /// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (id) initWithAppDelegate: (arangoAppDelegate*) delegate
-                  nibNamed: (NSString*) name;
+- (id) initWithArangoManager: (ArangoManager*) delegate
+                    nibNamed: (NSString*) name;
 
 @end
 

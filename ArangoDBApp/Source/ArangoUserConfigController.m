@@ -1,100 +1,87 @@
-//
-//  arangoUserConfigController.m
-//  Arango
-//
-//  Created by Michael Hackstein on 17.09.12.
-//  Copyright (c) 2012 triAgens. All rights reserved.
-//
+////////////////////////////////////////////////////////////////////////////////
+/// @brief user configuration controller
+///
+/// @file
+///
+/// DISCLAIMER
+///
+/// Copyright 2012 triAGENS GmbH, Cologne, Germany
+///
+/// Licensed under the Apache License, Version 2.0 (the "License");
+/// you may not use this file except in compliance with the License.
+/// You may obtain a copy of the License at
+///
+///     http://www.apache.org/licenses/LICENSE-2.0
+///
+/// Unless required by applicable law or agreed to in writing, software
+/// distributed under the License is distributed on an "AS IS" BASIS,
+/// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+/// See the License for the specific language governing permissions and
+/// limitations under the License.
+///
+/// Copyright holder is triAGENS GmbH, Cologne, Germany
+///
+/// @author Dr. Frank Celler
+/// @author Michael Hackstein
+/// @author Copyright 2012, triAGENS GmbH, Cologne, Germany
+////////////////////////////////////////////////////////////////////////////////
 
 #import "ArangoUserConfigController.h"
+
 #import "arangoAppDelegate.h"
 #import "User.h"
 
+// -----------------------------------------------------------------------------
+// --SECTION--                                        ArangoUserConfigController
+// -----------------------------------------------------------------------------
+
 @implementation ArangoUserConfigController
-@synthesize putAsStartUp;
-@synthesize delegate;
-@synthesize rosDefinition;
 
 static const NSString* RES = @"Restart all instances running at last shutdown";
 static const NSString* DEF = @"Define for each instance";
 static const NSString* ALL = @"Start all instances";
 static const NSString* NON = @"Do not start instaces";
 
-- (id) initWithAppDelegate: (arangoAppDelegate*) aD
-{
-  if([[NSBundle mainBundle] respondsToSelector:@selector(loadNibNamed:owner:topLevelObjects:)]) {
-    self = [super init];
-    self.delegate = aD;
-    [[NSBundle mainBundle] loadNibNamed:@"ArangoUserConfigView" owner:self topLevelObjects:nil];
-  } else {
-    self = [self initWithWindowNibName:@"ArangoUserConfigView" owner:self];
-    self.delegate = aD;
-  }
-  if (self) {
-    
-    [self.window setReleasedWhenClosed:NO];
-    [self.window center];
-    [NSApp activateIgnoringOtherApps:YES];
-    [self.window makeKeyWindow];
-    [self showWindow:self.window];
-  }
-  return self;
+// -----------------------------------------------------------------------------
+// --SECTION--                                                    public methods
+// -----------------------------------------------------------------------------
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief default constructor
+////////////////////////////////////////////////////////////////////////////////
+
+- (id) initWithArangoManager: (ArangoManager*) delegate {
+  return [super initWithArangoManager:delegate];
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// @brief awakes from nib
+////////////////////////////////////////////////////////////////////////////////
 
-- (id)initWithWindow:(NSWindow *)window
-{
-    self = [super initWithWindow:window];
-    if (self) {
-        // Initialization code here.
-    }
-    
-    return self;
-}
+- (void) awakeFromNib {
+  [self.runOnStartupOptions addItemWithObjectValue:RES];
+  [self.runOnStartupOptions addItemWithObjectValue:DEF];
+  [self.runOnStartupOptions addItemWithObjectValue:ALL];
+  [self.runOnStartupOptions addItemWithObjectValue:NON];
 
-- (void)windowDidLoad
-{
-    [super windowDidLoad];
-    
-    // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
-}
+  switch ([_delegate.user.runOnStartUp intValue]) {
+    case 0:
+      [self.runOnStartupOptions selectItemWithObjectValue:NON];
+      break;
 
-- (void)awakeFromNib
-{
-  [self.rosDefinition addItemWithObjectValue:RES];
-  [self.rosDefinition addItemWithObjectValue:DEF];
-  [self.rosDefinition addItemWithObjectValue:ALL];
-  [self.rosDefinition addItemWithObjectValue:NON];
-  NSFetchRequest *userRequest = [[NSFetchRequest alloc] init];
-  NSEntityDescription *userEntity = [NSEntityDescription entityForName:@"User" inManagedObjectContext: [self.delegate getArangoManagedObjectContext]];
-  [userRequest setEntity:userEntity];
-  NSError *error = nil;
-  NSArray *fetchedResults = [[self.delegate getArangoManagedObjectContext] executeFetchRequest:userRequest error:&error];
-  [userRequest release];
-  if (fetchedResults == nil) {
-    NSLog(@"%@", error.localizedDescription);
-  } else {
-    if (fetchedResults.count > 0) {
-      for (User* u in fetchedResults) {
-        switch ([u.runOnStartUp intValue]) {
-          case 0:
-            [self.rosDefinition selectItemWithObjectValue:NON];
-            break;
-          case 1:
-            [self.rosDefinition selectItemWithObjectValue:RES];
-            break;
-          case 2:
-            [self.rosDefinition selectItemWithObjectValue:DEF];
-            break;
-          case 3:
-            [self.rosDefinition selectItemWithObjectValue:ALL];
-            break;
-        }
-      }
-    } else {
-      [self.rosDefinition selectItemWithObjectValue:RES];
-    }
+    case 1:
+      [self.runOnStartupOptions selectItemWithObjectValue:RES];
+      break;
+
+    case 2:
+      [self.runOnStartupOptions selectItemWithObjectValue:DEF];
+      break;
+
+    case 3:
+      [self.runOnStartupOptions selectItemWithObjectValue:ALL];
+      break;
   }
+
   LSSharedFileListRef autostart = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems, nil);
   if (autostart) {
     UInt32 seedValue;
@@ -105,7 +92,7 @@ static const NSString* NON = @"Do not start instaces";
       if (LSSharedFileListItemResolve(itemRef, 0, &url, nil) == noErr) {
         NSString * urlPath = [(NSURL*)url path];
         if ([urlPath compare:[[NSBundle mainBundle] bundlePath]] == NSOrderedSame){
-          self.putAsStartUp.state = NSOnState;
+          self.runOnStartupButton.state = NSOnState;
         }
       }
     }
@@ -114,13 +101,13 @@ static const NSString* NON = @"Do not start instaces";
 }
 
 
-- (IBAction) abort: (id) sender
+- (IBAction) abortConfiguration: (id) sender
 {
   [self.window orderOut:self.window];
 }
 
 
-- (IBAction) store: (id) sender
+- (IBAction) storeConfiguration: (id) sender
 {
   NSFetchRequest *userRequest = [[NSFetchRequest alloc] init];
   NSEntityDescription *userEntity = [NSEntityDescription entityForName:@"User" inManagedObjectContext: [self.delegate getArangoManagedObjectContext]];
@@ -129,13 +116,13 @@ static const NSString* NON = @"Do not start instaces";
   NSArray *fetchedResults = [[self.delegate getArangoManagedObjectContext] executeFetchRequest:userRequest error:&error];
   [userRequest release];
   NSNumber* ros = [NSNumber numberWithInt:0];
-  if([self.rosDefinition.stringValue isEqual:RES]) {
+  if([self.runOnStartupOptions.stringValue isEqual:RES]) {
     ros = [NSNumber numberWithInt:1];
-  } else if([self.rosDefinition.stringValue isEqual:DEF]) {
+  } else if([self.runOnStartupOptions.stringValue isEqual:DEF]) {
     ros = [NSNumber numberWithInt:2];
-  } else if([self.rosDefinition.stringValue isEqual:ALL]) {
+  } else if([self.runOnStartupOptions.stringValue isEqual:ALL]) {
     ros = [NSNumber numberWithInt:3];
-  } else if([self.rosDefinition.stringValue isEqual:NON]) {
+  } else if([self.runOnStartupOptions.stringValue isEqual:NON]) {
     ros = [NSNumber numberWithInt:0];
   }
   if (fetchedResults == nil) {
@@ -154,7 +141,7 @@ static const NSString* NON = @"Do not start instaces";
   }
   LSSharedFileListRef autostart = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems, nil);
   if (autostart) {
-    if (self.putAsStartUp.state == NSOnState) {
+    if (self.runOnStartupButton.state == NSOnState) {
       LSSharedFileListItemRef arangoStarter = LSSharedFileListInsertItemURL(autostart, kLSSharedFileListItemLast, nil, nil, (CFURLRef)[NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]], nil, nil);
       if (arangoStarter) {
         CFRelease(arangoStarter);

@@ -30,30 +30,9 @@ NSString* arangoVersion;
 int version;
 
 
-// Method to start a new Arango with the given Configuration.
-- (void) startArango:(ArangoConfiguration*) config {
-  // [self.manager startArangoDB:config.alias];
-
-  [self.statusMenu updateMenu];
-}
-
-
-// Public function to start a new Arango with all given informations.
-- (void) startNewArangoWithPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath andLogLevel:(NSString*) level andRunOnStartUp: (BOOL) ros andAlias:(NSString*) alias
-{
-  BOOL ok = [self.manager createConfiguration:alias withPath:path andPort:port andLog:logPath andLogLevel:level andRunOnStartUp:ros];
-
-  if (! ok) {
-    // TODO-fc error handling
-    return;
-  }
-
-  // [self.manager startArangoDB:alias];
-  // [statusMenu updateMenu];
-}
-
 // Public function to update an given Arango with all given informations.
 // If the given Arango is still running it is shutdown, updated and afterwards restarted.
+/*
 - (void) updateArangoConfig:(ArangoConfiguration*) config withPath:(NSString*) path andPort: (NSNumber*) port andLog: (NSString*) logPath andLogLevel:(NSString*) level andRunOnStartUp: (BOOL) ros andAlias:(NSString*) alias
 {
   if ([config.isRunning isEqualToNumber:[NSNumber numberWithBool:YES]]) {
@@ -93,6 +72,7 @@ int version;
   [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(timedStart:) userInfo:config repeats:NO];
   [statusMenu updateMenu];
 }
+ */
 
 - (void) timedStart: (NSTimer*) timer {
   [self startArango:timer.userInfo];
@@ -124,47 +104,6 @@ int version;
     [statusMenu updateMenu];
   }
 }
-
-- (void) deleteFiles: (NSTimer*) timer {
-  ArangoConfiguration* config = timer.userInfo;
-  NSError* error = nil;
-  if (config.bookmarks != nil  && version > 106) {
-    
-    NSURL* oldLogPath = [self urlForBookmark:config.bookmarks.log];
-    if (oldLogPath != nil) {
-      [oldLogPath stopAccessingSecurityScopedResource];
-    }
-    [[NSFileManager defaultManager] removeItemAtPath:config.log error:&error];
-    if (error != nil) {
-      NSLog(@"%@", error.localizedDescription);
-    }
-    error = nil;
-    NSURL* oldPath = [self urlForBookmark:config.bookmarks.path];
-    if (oldPath != nil) {
-      [oldPath stopAccessingSecurityScopedResource];
-    }
-    [[NSFileManager defaultManager] removeItemAtPath:config.path error:&error];
-    if (error != nil) {
-      NSLog(@"%@", error.localizedDescription);
-    }
-    [[self getArangoManagedObjectContext] deleteObject: config.bookmarks];
-    config.bookmarks = nil;
-  } else {
-    [[NSFileManager defaultManager] removeItemAtPath:config.log error:&error];
-    if (error != nil) {
-      NSLog(@"%@", error.localizedDescription);
-    }
-    error = nil;
-    [[NSFileManager defaultManager] removeItemAtPath:config.path error:&error];
-    if (error != nil) {
-      NSLog(@"%@", error.localizedDescription);
-    }
-  }
-  [[self getArangoManagedObjectContext] deleteObject: config];
-  [self save];
-  [statusMenu updateMenu];
-}
-
 
 // Public function to save all changes made to persistent objects.
 // Like all ArangoConfigs and the UserConfig.
@@ -209,7 +148,7 @@ int version;
 
   // without any configuration, display some help
   if (0 == self.manager.configurations.count) {
-    [[ArangoIntroductionController alloc] initWithAppDelegate:self];
+    [[ArangoIntroductionController alloc] initWithArangoManager:self];
   }
 }
 
@@ -234,7 +173,7 @@ int version;
     }
     
   }
-  self.statusMenu = [[ArangoToolbarMenu alloc] initWithAppDelegate:self];
+  self.statusMenu = [[ArangoToolbarMenu alloc] initWithArangoManager:self];
   self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength];
   [self.statusItem setMenu: statusMenu];
   [self.statusItem setImage: [NSImage imageNamed:@"IconColor"]];
