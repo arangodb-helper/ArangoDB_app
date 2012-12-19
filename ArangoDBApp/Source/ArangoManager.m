@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 /// @brief ArangoDB instance manager
 ///
 /// @file
@@ -369,14 +369,6 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     return;
   }
 
-  NSLog(@"Starting to remove database files");
-
-  // remove security
-  if (106 < _version) {
-    [[NSURL fileURLWithPath:status.path] stopAccessingSecurityScopedResource];
-    [[NSURL fileURLWithPath:status.logPath] stopAccessingSecurityScopedResource];
-  }
-
   // delete log file and database path
   NSError* err = nil;
   [[NSFileManager defaultManager] removeItemAtPath:status.logPath error:&err];
@@ -678,14 +670,6 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief reads a configurations
-////////////////////////////////////////////////////////////////////////////////
-
-- (ArangoConfiguration*) configuration: (NSString*) alias {
-  return [_configurations objectForKey:alias];
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// @brief returns current status for all configurations
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -714,7 +698,6 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   }
 
   BOOL isRunning = NO;
-
   NSTask* task = [_instances objectForKey:alias];
 
   if (task != nil) {
@@ -826,6 +809,74 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
       NSError* err;
       [[NSFileManager defaultManager] moveItemAtPath:path toPath:config.path error:&err];
     }
+  }
+
+  return ok;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief updates a configuration
+////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL) updateConfiguration: (NSString*) alias
+               withIsRunning: (BOOL) isRunning {
+
+  // extract configuration
+  ArangoConfiguration* config = [_configurations objectForKey:alias];
+
+  if (config == nil) {
+    self.lastError = [@"cannot update unknown configuration: " stringByAppendingString:alias];
+    return NO;
+  }
+
+  // update config
+  config.isRunning = [NSNumber numberWithBool:isRunning];
+
+  // save and broadcast change
+  BOOL ok = [self saveConfigurations];
+
+  if (ok) {
+    [[NSNotificationCenter defaultCenter] postNotificationName:ArangoConfigurationDidChange object:self];
+  }
+  else {
+    [self loadConfigurations];
+  }
+
+  return ok;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief deletes database and log files
+////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL) deleteDatabasePath: (NSString*) path
+                 andLogFile: (NSString*) logPath {
+
+  NSLog(@"Starting to remove database files");
+
+  // remove security
+  if (106 < _version) {
+    [[NSURL fileURLWithPath:path] stopAccessingSecurityScopedResource];
+
+    if (! [logPath isEqualToString:@""]) {
+      [[NSURL fileURLWithPath:logPath] stopAccessingSecurityScopedResource];
+    }
+  }
+
+  // delete log file and database path
+  NSError* err = nil;
+  BOOL ok = [[NSFileManager defaultManager] removeItemAtPath:logPath error:&err];
+
+  if (! ok) {
+    NSLog(@"cannot log file %@", err.localizedDescription);
+    self.lastError = [NSString stringWithFormat:"cannot remove database files: %@",err.localizedDescription];
+  }
+
+  ok = [[NSFileManager defaultManager] removeItemAtPath:path error:&err];
+
+  if (! ok) {
+    NSLog(@"cannot remove database files %@", err.localizedDescription);
+    self.lastError = [NSString stringWithFormat:"cannot remove database files: %@",err.localizedDescription];
   }
 
   return ok;
@@ -1019,27 +1070,6 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   if (waitForTerminate) {
     [task waitUntilExit];
   }
-  
-  return YES;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief starts a new ArangoDB instance with the given name
-////////////////////////////////////////////////////////////////////////////////
-
-- (BOOL) stopArangoDBAndDelete: (ArangoStatus*) status {
-  NSString* name = status.name;
-  BOOL ok = [self stopArangoDB:name];
-
-  if (! ok) {
-    return ok;
-  }
-
-  [NSTimer scheduledTimerWithTimeInterval:1
-                                   target:self
-                                 selector:@selector(deleteFiles:)
-                                 userInfo:status
-                                  repeats:NO];
   
   return YES;
 }

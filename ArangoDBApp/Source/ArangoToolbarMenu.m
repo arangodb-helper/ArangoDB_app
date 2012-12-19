@@ -58,14 +58,62 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 - (void) editInstance: (id) sender {
-  ArangoStatus* config = [self.delegate currentStatus:[sender representedObject]];
+  ArangoStatus* status = [self.delegate currentStatus:[sender representedObject]];
 
-  if (config == nil) {
+  if (status == nil) {
     return;
   }
 
   [[ArangoInstanceController alloc] initWithArangoManager:self.delegate
-                                            andStatus:config];
+                                                andStatus:status];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief ignores confirmed errors
+////////////////////////////////////////////////////////////////////////////////
+
+- (void) stopAlertDidEnd: (NSAlert*) alert
+              returnCode: (NSInteger) returnCode
+             contextInfo: (void*) contextInfo {
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief confirms or rejects 
+////////////////////////////////////////////////////////////////////////////////
+
+- (void) confirmedDeleteInstance: (NSAlert*) dialog
+                      returnCode: (int) returnCode
+                     contextInfo: (NSString*) config
+{
+  ArangoStatus* status = [self.delegate currentStatus:config];
+
+  // already deleted
+  if (status == nil) {
+    return;
+  }
+
+  if (returnCode == NSAlertThirdButtonReturn) {
+    return;
+  }
+
+  BOOL ok = [self.delegate deleteConfiguration:config];
+
+  if (ok) {
+    NSAlert* info = [[[NSAlert alloc] init] autorelease];
+      
+    [info setMessageText:@"Cannot delete ArangoDB instance!"];
+    [info setInformativeText:[NSString stringWithFormat:@"Encountered error: \"%@\", please correct and try again.",self.delegate.lastError]];
+
+    [info runModal];
+    return;
+  }
+
+  [self.delegate stopArangoDB:config andWait:YES];
+
+  if (returnCode == NSAlertSecondButtonReturn) {
+    [self.delegate deleteDatabasePath:status.path
+                           andLogFile:status.logPath];
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -81,46 +129,29 @@
     return;
   }
 
-  // ask use if he wants the database files to be removed
-  NSMutableString* infoText = [[NSMutableString alloc] init];
-  [infoText setString:@"Do you want to delete the contents of folder \""];
-  [infoText appendString:status.path];
-  [infoText appendString:@"\" and the log-file as well?"];
+  if (status.isRunning) {
+    NSAlert* info = [[[NSAlert alloc] init] autorelease];
+      
+    [info setMessageText:@"ArangoDB instance must be stopped!"];
+    [info setInformativeText:@"The ArangoDB instance must be stopped before deleting it."];
 
-  NSAlert* info = [NSAlert alertWithMessageText:@"Delete Data?" defaultButton:@"Keep Data" alternateButton:@"Abort" otherButton:@"Delete Data" informativeTextWithFormat:@"%@",infoText];
-
-  [infoText release];
-  [info beginSheetModalForWindow:nil modalDelegate:self didEndSelector:@selector(confirmedDeleteInstance:returnCode:contextInfo:) contextInfo:config];
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief confirms or rejects 
-////////////////////////////////////////////////////////////////////////////////
-
-- (void) confirmedDeleteInstance: (NSAlert*) dialog
-                      returnCode: (int) rc 
-                     contextInfo: (NSString*) config
-{
-  ArangoStatus* status = [self.delegate currentStatus:config];
-
-  // already deleted
-  if (status == nil) {
+    [info runModal];
     return;
   }
 
-  if (rc == -1 || rc == 1) {
-    [self.delegate deleteConfiguration:config];
-  }
-  else {
-    return;
-  }
+  // ask user if s/he wants the database files to be removed
+  NSAlert* info = [[[NSAlert alloc] init] autorelease];
+      
+  [info setMessageText:@"Delete ArangoDB instance data!"];
+  [info setInformativeText:[NSString stringWithFormat:@"Do you want to delete the contents of folder \"%@\" and the log-file as well?",status.path]];
+  [info addButtonWithTitle:@"Keep Data"];
+  [info addButtonWithTitle:@"Delete Data"];
+  [info addButtonWithTitle:@"Cancel"];
 
-  if (rc == -1) {
-    [self.delegate stopArangoDBAndDelete:status];
-  }
-  else {
-    [self.delegate stopArangoDB:config];
-  }  
+  [info beginSheetModalForWindow:nil
+                   modalDelegate:self
+                  didEndSelector:@selector(confirmedDeleteInstance:returnCode:contextInfo:)
+                     contextInfo:config];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -171,7 +202,10 @@
   // start the instance
   BOOL ok = [self.delegate startArangoDB:config];
 
-  if (! ok) {
+  if (ok) {
+    [self.delegate updateConfiguration:config withIsRunning:YES];
+  }
+  else {
     NSAlert* info = [[[NSAlert alloc] init] autorelease];
       
     [info setMessageText:@"Cannot start ArangoDB instance!"];
@@ -196,6 +230,7 @@
 
   // start the instance
   [self.delegate stopArangoDB:config andWait:NO];
+  [self.delegate updateConfiguration:config withIsRunning:YES];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -304,7 +339,7 @@
       
       // edit instance
       NSMenuItem* edit = [[NSMenuItem alloc] init];
-      [edit setEnabled:YES];
+      [edit setEnabled:! status.isRunning];
       [edit setTitle:@"Edit"];
       [edit setTarget:self];
       [edit setRepresentedObject:status.name];
@@ -314,7 +349,7 @@
       
       // delete instance
       NSMenuItem* delete = [[NSMenuItem alloc] init];
-      [delete setEnabled:YES];
+      [delete setEnabled:! status.isRunning];
       [delete setTitle:@"Delete"];
       [delete setTarget:self];
       [delete setRepresentedObject:status.name];

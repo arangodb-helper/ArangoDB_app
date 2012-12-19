@@ -50,7 +50,7 @@
 				<nil key="NSViewClass"/>
 				<nil key="NSUserInterfaceItemIdentifier"/>
 				<object class="NSView" key="NSWindowView" id="1006">
-					<nil key="NSNextResponder"/>
+					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<array class="NSMutableArray" key="NSSubviews">
 						<object class="NSComboBox" id="617885393">
@@ -317,14 +317,14 @@
 							<object class="NSButtonCell" key="NSCell" id="717241772">
 								<int key="NSCellFlags">67108864</int>
 								<int key="NSCellFlags2">134217728</int>
-								<string key="NSContents">Abort</string>
+								<string key="NSContents">Cancel</string>
 								<reference key="NSSupport" ref="944676172"/>
 								<string key="NSCellIdentifier">_NS:9</string>
 								<reference key="NSControlView" ref="527626992"/>
 								<int key="NSButtonFlags">-2038284288</int>
 								<int key="NSButtonFlags2">129</int>
 								<string key="NSAlternateContents"/>
-								<string key="NSKeyEquivalent"/>
+								<string type="base64-UTF8" key="NSKeyEquivalent">Gw</string>
 								<int key="NSPeriodicDelay">200</int>
 								<int key="NSPeriodicInterval">25</int>
 							</object>
@@ -332,6 +332,7 @@
 						</object>
 					</array>
 					<string key="NSFrameSize">{480, 230}</string>
+					<reference key="NSSuperview"/>
 					<reference key="NSNextKeyView" ref="469764715"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1920, 1178}}</string>
@@ -428,13 +429,13 @@
 						<int key="objectID">2</int>
 						<reference key="object" ref="1006"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="115217345"/>
 							<reference ref="527626992"/>
 							<reference ref="617885393"/>
 							<reference ref="881327510"/>
 							<reference ref="672949567"/>
 							<reference ref="305990378"/>
 							<reference ref="469764715"/>
+							<reference ref="115217345"/>
 						</array>
 						<reference key="parent" ref="1005"/>
 					</object>

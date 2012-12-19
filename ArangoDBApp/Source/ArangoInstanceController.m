@@ -54,8 +54,7 @@ static const double HeightCorrection = 10;
 /// @brief shows the file browser
 ////////////////////////////////////////////////////////////////////////////////
 
-- (NSURL*) showFileBrowser: (BOOL) directories
-{
+- (NSURL*) showFileBrowser: (BOOL) directories {
   NSOpenPanel* browser = [NSOpenPanel openPanel];
   [browser setCanChooseFiles:(! directories)];
   [browser setCanChooseDirectories:YES];
@@ -205,23 +204,6 @@ static const double HeightCorrection = 10;
 - (void) stopAlertDidEnd: (NSAlert*) alert
               returnCode: (NSInteger) returnCode
              contextInfo: (void*) contextInfo {
-
-  // stop and update
-  if (returnCode == NSAlertFirstButtonReturn) {
-    [self.delegate stopArangoDB:_status.name andWait:YES];
-    [self updateInstance];
-  }
-
-  // change config
-  else if (returnCode == NSAlertSecondButtonReturn) {
-    return;
-  }
-
-  // keep directory
-  else {
-    _databaseField.stringValue = _status.path;
-    [self updateInstance];
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -229,33 +211,25 @@ static const double HeightCorrection = 10;
 ////////////////////////////////////////////////////////////////////////////////
 
 - (BOOL) updateInstance {
-  BOOL pathChanged = ! [_databaseField.stringValue isEqualToString:_status.path];
-  
-  // if the database path has been changed, we need to stop the instance
-  if (pathChanged) {
-    ArangoStatus* status = [self.delegate currentStatus:_status.name];
+  ArangoStatus* status = [self.delegate currentStatus:_status.name];
 
-    if (status == nil) {
-      [self.window close];
-      return YES;
-    }
+  if (status == nil) {
+    [self.window close];
+    return YES;
+  }
 
-    if (status.isRunning) {
-      NSAlert* info = [[[NSAlert alloc] init] autorelease];
+  if (status.isRunning) {
+    NSAlert* info = [[[NSAlert alloc] init] autorelease];
       
-      [info setMessageText:@"ArangoDB instance must be stopped!"];
-      [info setInformativeText:@"The ArangoDB instance must be stopped before moving the database directory."];
-      [info addButtonWithTitle:@"Stop & Update"];
-      [info addButtonWithTitle:@"Change Config"];
-      [info addButtonWithTitle:@"Keep Directory"];
+    [info setMessageText:@"ArangoDB instance must be stopped!"];
+    [info setInformativeText:@"The ArangoDB instance must be stopped before moving the database directory."];
 
-      [info beginSheetModalForWindow:self.window
-                       modalDelegate:self
-                      didEndSelector:@selector(stopAlertDidEnd:returnCode:contextInfo:)
-                         contextInfo:nil];
+    [info beginSheetModalForWindow:self.window
+                     modalDelegate:self
+                    didEndSelector:@selector(stopAlertDidEnd:returnCode:contextInfo:)
+                       contextInfo:nil];
 
-      return YES;
-    }
+    return YES;
   }
 
   // update configuration
