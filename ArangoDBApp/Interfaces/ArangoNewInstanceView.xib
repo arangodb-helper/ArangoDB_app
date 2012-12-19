@@ -34,7 +34,7 @@
 		</object>
 		<array class="NSMutableArray" key="IBDocument.RootObjects" id="1000">
 			<object class="NSCustomObject" id="1001">
-				<string key="NSClassName">ArangoNewInstanceController</string>
+				<string key="NSClassName">ArangoInstanceController</string>
 			</object>
 			<object class="NSCustomObject" id="1003">
 				<string key="NSClassName">FirstResponder</string>
@@ -838,14 +838,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">createInstance:</string>
-						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="1034732593"/>
-					</object>
-					<int key="connectionID">464</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
 						<string key="label">abortCreate:</string>
 						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="825934775"/>
@@ -859,6 +851,14 @@
 						<reference key="destination" ref="490671953"/>
 					</object>
 					<int key="connectionID">466</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">saveInstance:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="1034732593"/>
+					</object>
+					<int key="connectionID">467</int>
 				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -1241,121 +1241,9 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">466</int>
+			<int key="maxID">467</int>
 		</object>
-		<object class="IBClassDescriber" key="IBDocument.Classes">
-			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
-				<object class="IBPartialClassDescription">
-					<string key="className">ArangoBaseController</string>
-					<string key="superclassName">NSWindowController</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/ArangoBaseController.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">ArangoNewInstanceController</string>
-					<string key="superclassName">ArangoBaseController</string>
-					<dictionary class="NSMutableDictionary" key="actions">
-						<string key="abortCreate:">id</string>
-						<string key="browseDatabase:">id</string>
-						<string key="browseLog:">id</string>
-						<string key="createInstance:">id</string>
-						<string key="toggleAdvanced:">id</string>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="actionInfosByName">
-						<object class="IBActionInfo" key="abortCreate:">
-							<string key="name">abortCreate:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="browseDatabase:">
-							<string key="name">browseDatabase:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="browseLog:">
-							<string key="name">browseLog:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="createInstance:">
-							<string key="name">createInstance:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="toggleAdvanced:">
-							<string key="name">toggleAdvanced:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="outlets">
-						<string key="abortButton">NSButton</string>
-						<string key="advancedOptions">NSBox</string>
-						<string key="browseDatabaseButton">NSButton</string>
-						<string key="browseLogButton">NSButton</string>
-						<string key="databaseField">NSTextField</string>
-						<string key="logField">NSTextField</string>
-						<string key="logLevelOptions">NSComboBox</string>
-						<string key="nameField">NSTextField</string>
-						<string key="okButton">NSButton</string>
-						<string key="portField">NSTextField</string>
-						<string key="runOnStartupButton">NSButton</string>
-						<string key="showAdvanced">NSButton</string>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<object class="IBToOneOutletInfo" key="abortButton">
-							<string key="name">abortButton</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="advancedOptions">
-							<string key="name">advancedOptions</string>
-							<string key="candidateClassName">NSBox</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="browseDatabaseButton">
-							<string key="name">browseDatabaseButton</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="browseLogButton">
-							<string key="name">browseLogButton</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="databaseField">
-							<string key="name">databaseField</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="logField">
-							<string key="name">logField</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="logLevelOptions">
-							<string key="name">logLevelOptions</string>
-							<string key="candidateClassName">NSComboBox</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="nameField">
-							<string key="name">nameField</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="okButton">
-							<string key="name">okButton</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="portField">
-							<string key="name">portField</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="runOnStartupButton">
-							<string key="name">runOnStartupButton</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="showAdvanced">
-							<string key="name">showAdvanced</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-					</dictionary>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/ArangoNewInstanceController.h</string>
-					</object>
-				</object>
-			</array>
-		</object>
+		<object class="IBClassDescriber" key="IBDocument.Classes"/>
 		<int key="IBDocument.localizationMode">0</int>
 		<string key="IBDocument.TargetRuntimeIdentifier">IBCocoaFramework</string>
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>

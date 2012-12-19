@@ -55,7 +55,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 - (id) initWithArangoManager: (ArangoManager*) delegate
-                    nibNamed: (NSString*) name;
+                 andNibNamed: (NSString*) name
+        andReleasedWhenClose: (BOOL) releasedWhenClosed;
 
 @end
 

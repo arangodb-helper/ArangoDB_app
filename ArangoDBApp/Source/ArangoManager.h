@@ -28,7 +28,6 @@
 
 #import <Foundation/Foundation.h>
 
-@class ArangoConfiguration;
 @class ArangoStatus;
 @class User;
 
@@ -146,7 +145,7 @@ extern NSString* ArangoConfigurationDidChange;
 
 - (BOOL) createConfiguration: (NSString*) alias
                     withPath: (NSString*) path
-                     andPort: (NSNumber*) port
+                     andPort: (int) port
                       andLog: (NSString*) logPath
                  andLogLevel: (NSString*) logLevel
              andRunOnStartUp: (BOOL) ros;
@@ -157,14 +156,9 @@ extern NSString* ArangoConfigurationDidChange;
 
 - (ArangoStatus*) prepareConfiguration: (NSString*) alias
                               withPath: (NSString*) path
-                               andPort: (NSNumber*) port
-                                andLog: (NSString*) logPath;
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief reads a configurations
-////////////////////////////////////////////////////////////////////////////////
-
-- (ArangoConfiguration*) configuration: (NSString*) alias;
+                               andPort: (int) port
+                                andLog: (NSString*) logPath
+                           andLogLevel: (NSString*) logLevel;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief returns current status for all configurations
@@ -184,7 +178,7 @@ extern NSString* ArangoConfigurationDidChange;
 
 - (BOOL) updateConfiguration: (NSString*) alias
                     withPath: (NSString*) path
-                     andPort: (NSNumber*) port
+                     andPort: (int) port
                       andLog: (NSString*) logPath
                  andLogLevel: (NSString*) logLevel
              andRunOnStartUp: (BOOL) ros;
@@ -205,7 +199,8 @@ extern NSString* ArangoConfigurationDidChange;
 /// @brief stops an ArangoDB instance
 ////////////////////////////////////////////////////////////////////////////////
 
-- (BOOL) stopArangoDB: (NSString*) name;
+- (BOOL) stopArangoDB: (NSString*) name
+              andWait: (BOOL) waitForTermination;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief starts a new ArangoDB instance with the given name

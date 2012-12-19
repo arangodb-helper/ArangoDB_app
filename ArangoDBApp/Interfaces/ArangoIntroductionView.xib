@@ -48,7 +48,7 @@
 				<nil key="NSViewClass"/>
 				<nil key="NSUserInterfaceItemIdentifier"/>
 				<object class="NSView" key="NSWindowView" id="1006">
-					<reference key="NSNextResponder"/>
+					<nil key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<array class="NSMutableArray" key="NSSubviews">
 						<object class="NSImageView" id="469764715">
@@ -64,7 +64,6 @@
 							</set>
 							<string key="NSFrame">{{17, 282}, {446, 86}}</string>
 							<reference key="NSSuperview" ref="1006"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="469345691"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<bool key="NSEnabled">YES</bool>
@@ -89,7 +88,6 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{282, 13}, {112, 32}}</string>
 							<reference key="NSSuperview" ref="1006"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="378956044"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<bool key="NSEnabled">YES</bool>
@@ -118,7 +116,6 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{394, 13}, {75, 32}}</string>
 							<reference key="NSSuperview" ref="1006"/>
-							<reference key="NSWindow"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="730291054">
@@ -142,7 +139,6 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{14, 13}, {122, 32}}</string>
 							<reference key="NSSuperview" ref="1006"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="527626992"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<bool key="NSEnabled">YES</bool>
@@ -168,7 +164,6 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{17, 58}, {446, 204}}</string>
 							<reference key="NSSuperview" ref="1006"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="275509041"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<string key="NSAntiCompressionPriority">{250, 750}</string>
@@ -215,8 +210,6 @@ cXVlc3Rpb25zLCBwbGVhc2UgY29udGFjdCB1cyBhdAoKICAgIGhhY2tlcnNAYXJhbmdvZGIub3JnA</b
 						</object>
 					</array>
 					<string key="NSFrameSize">{480, 368}</string>
-					<reference key="NSSuperview"/>
-					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="469764715"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1920, 1178}}</string>
@@ -260,19 +253,19 @@ cXVlc3Rpb25zLCBwbGVhc2UgY29udGFjdCB1cyBhdAoKICAgIGhhY2tlcnNAYXJhbmdvZGIub3JnA</b
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">close:</string>
-						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="378956044"/>
-					</object>
-					<int key="connectionID">161</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
 						<string key="label">createInstance:</string>
 						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="275509041"/>
 					</object>
 					<int key="connectionID">162</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">closeHelp:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="378956044"/>
+					</object>
+					<int key="connectionID">163</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -419,7 +412,7 @@ cXVlc3Rpb25zLCBwbGVhc2UgY29udGFjdCB1cyBhdAoKICAgIGhhY2tlcnNAYXJhbmdvZGIub3JnA</b
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">162</int>
+			<int key="maxID">163</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">

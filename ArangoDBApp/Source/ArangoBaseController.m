@@ -43,7 +43,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 - (id) initWithArangoManager: (ArangoManager*) delegate
-                    nibNamed: (NSString*) name {
+                 andNibNamed: (NSString*) name
+        andReleasedWhenClose: (BOOL) releasedWhenClosed {
 
   // loadNibNamed:owner:topLevelObjects was introduced in 10.8
   if ([[NSBundle mainBundle] respondsToSelector:@selector(loadNibNamed:owner:topLevelObjects:)]) {
@@ -60,7 +61,7 @@
   if (self) {
     _delegate = [delegate retain];
 
-    [self.window setReleasedWhenClosed:NO];
+    [self.window setReleasedWhenClosed:releasedWhenClosed];
     [self.window center];
 
     [NSApp activateIgnoringOtherApps:YES];

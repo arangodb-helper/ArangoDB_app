@@ -78,6 +78,14 @@
   _manager = [[ArangoManager alloc] init];
   
   if (_manager == nil) {
+    NSAlert* info = [[[NSAlert alloc] init] autorelease];
+      
+    [info setMessageText:@"ArangoDB application failed to start!"];
+    [info setInformativeText:@"Cannot create or load the configuration. Please reinstall the application."];
+    
+    [info runModal];
+    [[NSApplication sharedApplication] terminate:nil];
+    
     return;
   }
   
@@ -102,7 +110,7 @@
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief creates the status menu with icon
+/// @brief creates the status menu item with icon
 ////////////////////////////////////////////////////////////////////////////////
 
 -(void) awakeFromNib {

@@ -44,7 +44,9 @@
 
 - (id) initWithArangoManager: (ArangoManager*) delegate
                  andNibNamed: (NSString*) nib {
-  return [super initWithArangoManager:delegate nibNamed:nib];
+  return [super initWithArangoManager:delegate
+                          andNibNamed:nib
+                andReleasedWhenClose:NO];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -52,14 +54,15 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 - (id) initWithArangoManager: (ArangoManager*) delegate {
-  return [self initWithArangoManager:delegate nibNamed:@"ArangoHelpView"];
+  return [self initWithArangoManager:delegate 
+                         andNibNamed:@"ArangoHelpView"];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief close window
 ////////////////////////////////////////////////////////////////////////////////
 
-- (IBAction) close: (id) sender {
+- (IBAction) closeHelp: (id) sender {
   [self.window orderOut:self.window];
 }
 

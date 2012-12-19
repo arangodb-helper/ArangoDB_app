@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief new instance controller
+/// @brief create or update instance controller
 ///
 /// @file
 ///
@@ -28,14 +28,14 @@
 
 #import "ArangoBaseController.h"
 
-@class ArangoConfiguration;
+@class ArangoStatus;
 @class ArangoManager;
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                       ArangoNewInstanceController
 // -----------------------------------------------------------------------------
 
-@interface ArangoNewInstanceController : ArangoBaseController
+@interface ArangoInstanceController : ArangoBaseController
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                        properties
@@ -117,13 +117,13 @@
 /// @brief number formatter
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, retain, readonly) NSNumberFormatter* portFormatter;
+@property (nonatomic, assign, readonly) NSNumberFormatter* portFormatter;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief configuration to edit
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, retain, readonly) ArangoConfiguration* configuration;
+@property (nonatomic, assign, readonly) ArangoStatus* status;
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                    public methods
@@ -140,7 +140,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 - (id) initWithArangoManager: (ArangoManager*) delegate
-            andConfiguration: (ArangoConfiguration*) config;
+                   andStatus: (ArangoStatus*) status;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief browse database path
@@ -158,7 +158,7 @@
 /// @brief create instance
 ////////////////////////////////////////////////////////////////////////////////
 
-- (IBAction) createInstance: (id) sender;
+- (IBAction) saveInstance: (id) sender;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief abort

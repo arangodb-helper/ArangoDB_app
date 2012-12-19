@@ -48,7 +48,7 @@
 				<nil key="NSViewClass"/>
 				<nil key="NSUserInterfaceItemIdentifier"/>
 				<object class="NSView" key="NSWindowView" id="1006">
-					<reference key="NSNextResponder"/>
+					<nil key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<array class="NSMutableArray" key="NSSubviews">
 						<object class="NSImageView" id="469764715">
@@ -182,7 +182,6 @@ dSBjYW4gbWFuYWdlIG9uZSBvciBtb3JlIGluc3RhbmNlcyB1c2luZyB0aGUgQXJhbmdvREIgbWVudS4<
 						</object>
 					</array>
 					<string key="NSFrameSize">{483, 287}</string>
-					<reference key="NSSuperview"/>
 					<reference key="NSNextKeyView" ref="469764715"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1920, 1178}}</string>
@@ -226,11 +225,11 @@ dSBjYW4gbWFuYWdlIG9uZSBvciBtb3JlIGluc3RhbmNlcyB1c2luZyB0aGUgQXJhbmdvREIgbWVudS4<
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">close:</string>
+						<string key="label">closeHelp:</string>
 						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="378956044"/>
 					</object>
-					<int key="connectionID">161</int>
+					<int key="connectionID">162</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -361,7 +360,7 @@ dSBjYW4gbWFuYWdlIG9uZSBvciBtb3JlIGluc3RhbmNlcyB1c2luZyB0aGUgQXJhbmdvREIgbWVudS4<
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">161</int>
+			<int key="maxID">162</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes"/>
 		<int key="IBDocument.localizationMode">0</int>

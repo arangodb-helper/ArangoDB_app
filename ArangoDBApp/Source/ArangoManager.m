@@ -63,6 +63,8 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
 - (BOOL) moveDatabaseFiles: (NSString*) src 
              toDestination: (NSString*) dst {
+
+  // TODO use the Mac OS X functions
   DIR * d;
   struct dirent * de;
 
@@ -172,10 +174,15 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   NSURL* pathURL = [NSURL fileURLWithPath:config.path];
   NSData* path = [self bookmarkForURL:pathURL];
 
-  NSURL* logURL = [NSURL fileURLWithPath:config.log];
-  NSData* log = [self bookmarkForURL:logURL];
+  NSData* log = nil;
 
-  Bookmarks* bookmarks = (Bookmarks*) [NSEntityDescription insertNewObjectForEntityForName:@"Bookmarks" inManagedObjectContext:_managedObjectContext];
+  if (! [config.log isEqualToString:@""]) {
+    NSURL* logURL = [NSURL fileURLWithPath:config.log];
+    log = [self bookmarkForURL:logURL];
+  }
+
+  Bookmarks* bookmarks = (Bookmarks*) [NSEntityDescription insertNewObjectForEntityForName:@"Bookmarks"
+                                                                    inManagedObjectContext:_managedObjectContext];
 
   bookmarks.path = path;
   bookmarks.log = log;
@@ -266,7 +273,8 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   
   // load the global user configuration
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
-  NSEntityDescription *entity = [NSEntityDescription entityForName:@"User" inManagedObjectContext: _managedObjectContext];
+  NSEntityDescription *entity = [NSEntityDescription entityForName:@"User"
+                                            inManagedObjectContext: _managedObjectContext];
   [request setEntity:entity];
   
   NSError *err = nil;
@@ -283,33 +291,15 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
       }
     }
     else {
-      _user = (User*) [NSEntityDescription insertNewObjectForEntityForName:@"User" inManagedObjectContext:_managedObjectContext];
+      _user = (User*) [NSEntityDescription insertNewObjectForEntityForName:@"User"
+                                                    inManagedObjectContext:_managedObjectContext];
     }
   }
-
-  /*
-  // check the start on login
-  LSSharedFileListRef autostart = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems, nil);
-  if (autostart) {
-    UInt32 seedValue;
-    NSArray  *loginItemsArray = (NSArray *) LSSharedFileListCopySnapshot(autostart, &seedValue);
-    for(int i = 0; i< [loginItemsArray count]; i++){
-      LSSharedFileListItemRef itemRef = (LSSharedFileListItemRef) [loginItemsArray objectAtIndex:i];
-      CFURLRef url = (CFURLRef) [NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]];
-      if (LSSharedFileListItemResolve(itemRef, 0, &url, nil) == noErr) {
-        NSString * urlPath = [(NSURL*)url path];
-        if ([urlPath compare:[[NSBundle mainBundle] bundlePath]] == NSOrderedSame){
-          self.runOnStartupButton.state = NSOnState;
-        }
-      }
-    }
-    [loginItemsArray release];
-  }
-   */
 
   // load the configurations
   request = [[[NSFetchRequest alloc] init] autorelease];
-  entity = [NSEntityDescription entityForName:@"ArangoConfiguration" inManagedObjectContext: _managedObjectContext];
+  entity = [NSEntityDescription entityForName:@"ArangoConfiguration"
+                       inManagedObjectContext: _managedObjectContext];
   [request setEntity:entity];
 
   err = nil;
@@ -360,58 +350,6 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   return YES;
 }
 
-/*
-- (IBAction) storeConfiguration: (id) sender {
-  NSFetchRequest *userRequest = [[NSFetchRequest alloc] init];
-  NSEntityDescription *userEntity = [NSEntityDescription entityForName:@"User" inManagedObjectContext: [self.delegate getArangoManagedObjectContext]];
-  [userRequest setEntity:userEntity];
-  NSError *error = nil;
-  NSArray *fetchedResults = [[self.delegate getArangoManagedObjectContext] executeFetchRequest:userRequest error:&error];
-  [userRequest release];
-
-  if (fetchedResults == nil) {
-    NSLog(@"%@", error.localizedDescription);
-  } else {
-    if (fetchedResults.count > 0) {
-      for (User* u in fetchedResults) {
-        u.runOnStartUp = ros;
-      }
-      [self.delegate save];
-    } else {
-      User* u = (User*) [NSEntityDescription insertNewObjectForEntityForName:@"User" inManagedObjectContext:[self.delegate getArangoManagedObjectContext]];
-      u.runOnStartUp = ros;
-      [self.delegate save];
-    }
-  }
-  LSSharedFileListRef autostart = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems, nil);
-  if (autostart) {
-    if (self.runOnStartupButton.state == NSOnState) {
-      LSSharedFileListItemRef arangoStarter = LSSharedFileListInsertItemURL(autostart, kLSSharedFileListItemLast, nil, nil, (CFURLRef)[NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]], nil, nil);
-      if (arangoStarter) {
-        CFRelease(arangoStarter);
-      }
-      CFRelease(autostart);
-    } else {
-      UInt32 seedValue;
-      NSArray  *loginItemsArray = (NSArray *) LSSharedFileListCopySnapshot(autostart, &seedValue);
-      for(int i = 0; i< [loginItemsArray count]; i++){
-        LSSharedFileListItemRef itemRef = (LSSharedFileListItemRef) [loginItemsArray objectAtIndex:i];
-        CFURLRef url = (CFURLRef) [NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]];
-        if (LSSharedFileListItemResolve(itemRef, 0, &url, nil) == noErr) {
-          NSString * urlPath = [(NSURL*)url path];
-          if ([urlPath compare:[[NSBundle mainBundle] bundlePath]] == NSOrderedSame){
-            LSSharedFileListItemRemove(autostart,itemRef);
-          }
-        }
-      }
-      [loginItemsArray release];
-    }
-  }
-  
-  [self.window orderOut:self.window];
-}
-*/
-
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief deletes database files
 ////////////////////////////////////////////////////////////////////////////////
@@ -441,11 +379,11 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
   // delete log file and database path
   NSError* err = nil;
-
   [[NSFileManager defaultManager] removeItemAtPath:status.logPath error:&err];
 
   if (err != nil) {
     NSLog(@"%@", err.localizedDescription);
+    // TODO send a notification
   }
 
   err = nil;
@@ -453,7 +391,72 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
   if (err != nil) {
     NSLog(@"%@", err.localizedDescription);
+    // TODO send a notification
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief normalizes and checks the log path
+////////////////////////////////////////////////////////////////////////////////
+
+- (NSString*) checkLogPath: (NSString*) logPath
+                   andName: (NSString*) alias {
+  if ([logPath isEqualToString:@""]) {
+    return logPath;
+  }
+
+  BOOL isDir;
+    
+  if ([[NSFileManager defaultManager] fileExistsAtPath:logPath isDirectory:&isDir]) {
+    if (isDir) {
+      NSMutableString* tmp = [[[NSMutableString alloc] initWithString:logPath] autorelease];
+      [tmp appendString:@"/"];
+      [tmp appendString:alias];
+      [tmp appendString:@".log"];
+      logPath = tmp;
+
+      if (![[NSFileManager defaultManager] fileExistsAtPath:logPath]) {
+        BOOL ok = [[NSFileManager defaultManager] createFileAtPath:logPath
+                                                          contents:nil
+                                                        attributes:nil];
+
+        if (! ok) {
+          self.lastError = [[@"cannot create log file '" stringByAppendingString:logPath] stringByAppendingString:@"'"];
+          return nil;
+        }
+      }
+    }
+  }
+  else {
+    BOOL ok = [[NSFileManager defaultManager] createFileAtPath:logPath contents:nil attributes:nil];
+    
+    if (! ok) {
+      self.lastError = [[@"cannot create log file '" stringByAppendingString:logPath] stringByAppendingString:@"'"];
+      return nil;
+    }
+  }
+
+  return logPath;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief normalizes and checks the database path
+////////////////////////////////////////////////////////////////////////////////
+
+- (NSString*) checkDatabasePath: (NSString*) path
+                        andName: (NSString*) name {
+  if ([path isEqualToString:@""]) {
+    path = [NSHomeDirectory() stringByAppendingString:[@"/" stringByAppendingString:name]];
+  }
+  else if ([path hasPrefix:@"~"]){
+    return [NSHomeDirectory() stringByAppendingString:[path substringFromIndex:1]];
+  }
+  else if ([path isEqualToString:@""]) {
+    self.lastError = @"database path must not be empty";
+    return nil;
+  }
+  
+  return path;
 }
 
 // -----------------------------------------------------------------------------
@@ -560,7 +563,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
 - (BOOL) createConfiguration: (NSString*) alias
                     withPath: (NSString*) path
-                     andPort: (NSNumber*) port
+                     andPort: (int) port
                       andLog: (NSString*) logPath
                  andLogLevel: (NSString*) logLevel
              andRunOnStartUp: (BOOL) ros {
@@ -575,7 +578,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
   config.alias = alias;
   config.path = path;
-  config.port = port;
+  config.port = [NSNumber numberWithInt:port];
   config.log = logPath;
   config.loglevel = logLevel;
   config.runOnStartUp = [NSNumber numberWithBool:ros];
@@ -605,36 +608,35 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
 - (ArangoStatus*) prepareConfiguration: (NSString*) alias
                               withPath: (NSString*) path
-                               andPort: (NSNumber*) port
-                                andLog: (NSString*) logPath {
-  self.lastError = nil;
+                               andPort: (int) port
+                                andLog: (NSString*) logPath
+                           andLogLevel: (NSString*) logLevel {
 
   // check the port
-  if ([port intValue] < 1024) {
+  if (port < 1024) {
     self.lastError = @"illegal or privileged port";
     return nil;
   }
   
   // check the instance name, remove spaces
   alias = [alias stringByReplacingOccurrencesOfString:@" " withString: @"_"];
+  alias = [alias stringByReplacingOccurrencesOfString:@"/" withString: @"_"];
+  alias = [alias stringByReplacingOccurrencesOfString:@"." withString: @"_"];
 
   if ([alias isEqualToString:@""]) {
     alias = @"ArangoDB";
   }
 
   // normalise database path
-  if ([path hasPrefix:@"~"]){
-    path = [NSHomeDirectory() stringByAppendingString:[path substringFromIndex:1]];
-  }
-  else if ([path isEqualToString:@""]) {
-    self.lastError = @"database path must not be empty";
+  path = [self checkDatabasePath:path andName:alias];
+
+  if (path == nil) {
     return nil;
   }
 
   // try to create database directory
   if (! [[NSFileManager defaultManager] fileExistsAtPath:path]) {
     NSError* err = nil;
-
     [[NSFileManager defaultManager] createDirectoryAtPath:path
                               withIntermediateDirectories:YES
                                                attributes:nil
@@ -662,61 +664,16 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   }
 
   // check the log path
-  if ([logPath isEqualToString:@""]) {
-    NSMutableString* tmp = [[[NSMutableString alloc] init] autorelease];
-    [tmp setString:path];
-    [tmp appendString:@"/"];
-    [tmp appendString:alias];
-    [tmp appendString:@".log"];
-    logPath = tmp;
-
-    if (! [[NSFileManager defaultManager] fileExistsAtPath:logPath]) {
-      BOOL ok = [[NSFileManager defaultManager] createFileAtPath:logPath
-                                                        contents:nil
-                                                      attributes:nil];
-
-      if (! ok) {
-        self.lastError = [[@"cannot create log file '" stringByAppendingString:logPath] stringByAppendingString:@"'"];
-        return nil;
-      }
-    }
-  }
-  else {
-    if ([[NSFileManager defaultManager] fileExistsAtPath:logPath isDirectory:&isDir]) {
-      if (isDir) {
-        NSMutableString* tmp = [[[NSMutableString alloc] initWithString:logPath] autorelease];
-        [tmp appendString:@"/"];
-        [tmp appendString:alias];
-        [tmp appendString:@".log"];
-        logPath = tmp;
-
-        if (![[NSFileManager defaultManager] fileExistsAtPath:logPath]) {
-          BOOL ok = [[NSFileManager defaultManager] createFileAtPath:logPath
-                                                            contents:nil
-                                                          attributes:nil];
-
-          if (! ok) {
-            self.lastError = [[@"cannot create log file '" stringByAppendingString:logPath] stringByAppendingString:@"'"];
-            return nil;
-          }
-        }
-      }
-    }
-    else {
-      BOOL ok = [[NSFileManager defaultManager] createFileAtPath:logPath contents:nil attributes:nil];
-
-      if (! ok) {
-        self.lastError = [[@"cannot create log file '" stringByAppendingString:logPath] stringByAppendingString:@"'"];
-        return nil;
-      }
-    }
-  }
+  logPath = [self checkLogPath:logPath
+                       andName:alias];
 
   // everything ready to start
   return [[ArangoStatus alloc] initWithName:alias
                                     andPath:path
                                     andPort:port
                                  andLogPath:logPath
+                                andLogLevel:logLevel
+                            andRunOnStartup:NO
                                  andRunning:NO];
 }
 
@@ -766,8 +723,10 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
   return [[[ArangoStatus alloc] initWithName:config.alias
                                      andPath:config.path
-                                     andPort:config.port
+                                     andPort:[config.port intValue]
                                   andLogPath:config.log
+                                 andLogLevel:config.loglevel
+                             andRunOnStartup:([config.runOnStartUp intValue] != 0)
                                   andRunning:isRunning] autorelease];
 }
 
@@ -777,12 +736,12 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
 - (BOOL) updateConfiguration: (NSString*) alias
                     withPath: (NSString*) path
-                     andPort: (NSNumber*) port
+                     andPort: (int) port
                       andLog: (NSString*) logPath
                  andLogLevel: (NSString*) logLevel
              andRunOnStartUp: (BOOL) ros {
-  self.lastError = nil;
 
+  // extract configuration
   ArangoConfiguration* config = [_configurations objectForKey:alias];
 
   if (config == nil) {
@@ -790,8 +749,62 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     return NO;
   }
 
+  // check the port
+  if (port < 1024) {
+    self.lastError = @"illegal or privileged port";
+    return NO;
+  }
+
+  // check the log-path
+  logPath = [self checkLogPath:logPath
+                       andName:alias];
+
+  if (logPath == nil) {
+    return NO;
+  }
+
+  // check if we have to change the path, instance should be shut-down in this case
+  if (! [config.path isEqualToString:path]) {
+
+    // normalise database path
+    path = [self checkDatabasePath:path andName:alias];
+
+    if (path == nil) {
+      return NO;
+    }
+
+    // path must not already exists
+    if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
+      self.lastError = @"cannot move database files: destination path already exists";
+      return NO;
+    }
+
+    // instance must be shut-down
+    BOOL isRunning = NO;
+    NSTask* task = [_instances objectForKey:alias];
+
+    if (task != nil) {
+      isRunning = [task isRunning];
+    }
+    
+    if (isRunning) {
+      self.lastError = @"cannot change database path while instance is running";
+      return NO;
+    }
+
+    // move files
+    NSError* err;
+    BOOL ok = [[NSFileManager defaultManager] moveItemAtPath:config.path toPath:path error:&err];
+
+    if (! ok) {
+      self.lastError = [@"cannot move database files: " stringByAppendingString:err.localizedDescription];
+      return NO;
+    }
+  }
+
+  // update config
   config.path = path;
-  config.port = port;
+  config.port = [NSNumber numberWithInt:port];
   config.log = logPath;
   config.loglevel = logLevel;
   config.runOnStartUp = [NSNumber numberWithBool:ros];
@@ -808,6 +821,11 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   }
   else {
     [self loadConfigurations];
+
+    if (! [config.path isEqualToString:path]) {
+      NSError* err;
+      [[NSFileManager defaultManager] moveItemAtPath:path toPath:config.path error:&err];
+    }
   }
 
   return ok;
@@ -818,8 +836,6 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 ////////////////////////////////////////////////////////////////////////////////
 
 - (BOOL) deleteConfiguration: (NSString*) alias {
-  self.lastError = nil;
-
   ArangoConfiguration* config = [_configurations objectForKey:alias];
 
   if (config == nil) {
@@ -880,11 +896,13 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
       return NO;
     }
 
-    NSURL* bmLog = [self urlForBookmark:config.bookmarks.log];
+    if (! [config.log isEqualToString:@""]) {
+      NSURL* bmLog = [self urlForBookmark:config.bookmarks.log];
 
-    if (! [bmLog startAccessingSecurityScopedResource]) {
-      self.lastError = [@"not allowed to open log path " stringByAppendingString:config.log];
-      return NO;
+      if (! [bmLog startAccessingSecurityScopedResource]) {
+        self.lastError = [@"not allowed to open log path " stringByAppendingString:config.log];
+        return NO;
+      }
     }
   }
 
@@ -907,6 +925,29 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     }
   }
 
+  // create log path
+  NSString* logPath = config.log;
+
+  if ([logPath isEqualToString:@""]) {
+    NSMutableString* tmp = [[[NSMutableString alloc] init] autorelease];
+    [tmp setString:config.path];
+    [tmp appendString:@"/"];
+    [tmp appendString:config.alias];
+    [tmp appendString:@".log"];
+    logPath = tmp;
+    
+    if (! [[NSFileManager defaultManager] fileExistsAtPath:logPath]) {
+      BOOL ok = [[NSFileManager defaultManager] createFileAtPath:logPath
+                                                        contents:nil
+                                                      attributes:nil];
+
+      if (! ok) {
+        self.lastError = [[@"cannot create log file '" stringByAppendingString:logPath] stringByAppendingString:@"'"];
+        return NO;
+      }
+    }
+  }
+
   // prepare task
   task = [[NSTask alloc] init];
   [task setLaunchPath:_arangoDBBinary];
@@ -915,7 +956,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
                         @"--config", _arangoDBConfig,
                         @"--exit-on-parent-death", @"true",
                         @"--server.endpoint", [NSString stringWithFormat:@"tcp://0.0.0.0:%@", config.port.stringValue],
-                        @"--log.file", config.log,
+                        @"--log.file", logPath,
                         @"--log.level", config.loglevel,
                         @"--server.admin-directory", _arangoDBAdminDir,
                         @"--javascript.action-directory", _arangoDBJsActionDir,
@@ -950,7 +991,8 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 /// @brief stops an ArangoDB instance
 ////////////////////////////////////////////////////////////////////////////////
 
-- (BOOL) stopArangoDB: (NSString*) name {
+- (BOOL) stopArangoDB: (NSString*) name
+              andWait: (BOOL) waitForTerminate {
   NSLog(@"Stopping ArangoDB instance '%@'", name);
 
   // load configuration for name (might already be deleted)
@@ -971,6 +1013,11 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   // terminate
   if ([task isRunning]) {
     [task terminate];
+  }
+
+  // wait for termination
+  if (waitForTerminate) {
+    [task waitUntilExit];
   }
   
   return YES;

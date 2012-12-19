@@ -33,7 +33,7 @@
 #import "ArangoStatus.h"
 #import "ArangoUserConfigController.h"
 #import "arangoAppDelegate.h"
-#import "ArangoNewInstanceController.h"
+#import "ArangoInstanceController.h"
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                 ArangoToolbarMenu
@@ -50,7 +50,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 - (void) createNewInstance: (id) sender {
-  [[ArangoNewInstanceController alloc] initWithArangoManager:self.delegate];
+  [[ArangoInstanceController alloc] initWithArangoManager:self.delegate];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -58,14 +58,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 - (void) editInstance: (id) sender {
-  ArangoConfiguration* config = [self.delegate configuration:[sender representedObject]];
+  ArangoStatus* config = [self.delegate currentStatus:[sender representedObject]];
 
   if (config == nil) {
     return;
   }
 
-  [[ArangoNewInstanceController alloc] initWithArangoManager:self.delegate
-                                            andConfiguration:config];
+  [[ArangoInstanceController alloc] initWithArangoManager:self.delegate
+                                            andStatus:config];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -169,7 +169,16 @@
   }
 
   // start the instance
-  [self.delegate startArangoDB:config];
+  BOOL ok = [self.delegate startArangoDB:config];
+
+  if (! ok) {
+    NSAlert* info = [[[NSAlert alloc] init] autorelease];
+      
+    [info setMessageText:@"Cannot start ArangoDB instance!"];
+    [info setInformativeText:[NSString stringWithFormat:@"Encountered error: %@, please correct and try again.",self.delegate.lastError]];
+
+    [info runModal];
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -186,7 +195,7 @@
   }
 
   // start the instance
-  [self.delegate stopArangoDB:config];
+  [self.delegate stopArangoDB:config andWait:NO];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -204,7 +213,7 @@
 
   NSNumberFormatter* f = [[NSNumberFormatter alloc] init];
   [f setThousandSeparator:@""];
-  [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[@"http://localhost:" stringByAppendingString:[f stringFromNumber:status.port]]]];
+  [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://localhost:%d/",status.port]]];
   [f release];
 }
 
@@ -266,13 +275,13 @@
       NSMenuItem* item = [[NSMenuItem alloc] init];
       [item setEnabled:YES];
       
-      NSString* title = status.name;
+      NSString* title;
       
       if (status.isRunning) {
-        title = [[[title stringByAppendingString:@" ("] stringByAppendingString:[status.port stringValue]] stringByAppendingString:@")"];
+        title = [NSString stringWithFormat:@"%@ (%d)",status.name,status.port];
       }
       else {
-        title = [title stringByAppendingString:@" (Stopped)"];
+        title = [NSString stringWithFormat:@"%@ (stopped)",status.name];
       }
       
       [item setTitle: title];

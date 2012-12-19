@@ -28,7 +28,7 @@
 
 #import "ArangoIntroductionController.h"
 
-#import "ArangoNewInstanceController.h"
+#import "ArangoInstanceController.h"
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                      ArangoIntroductionController
@@ -45,7 +45,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 - (id) initWithArangoManager: (ArangoManager*) delegate {
-  return [self initWithArangoManager:delegate nibNamed:@"ArangoIntroductionView"];
+  return [self initWithArangoManager:delegate
+                         andNibNamed:@"ArangoIntroductionView"];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -53,7 +54,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 - (IBAction) createInstance: (id) sender {
-  [[ArangoNewInstanceController alloc] initWithArangoManager:self.delegate];
+  [[ArangoInstanceController alloc] initWithArangoManager:self.delegate];
   [self.window orderOut:self.window];
 }
 

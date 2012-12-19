@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief new instance controller
+/// @brief create or update instance controller
 ///
 /// @file
 ///
@@ -26,7 +26,7 @@
 /// @author Copyright 2012, triAGENS GmbH, Cologne, Germany
 ////////////////////////////////////////////////////////////////////////////////
 
-#import "ArangoNewInstanceController.h"
+#import "ArangoInstanceController.h"
 
 #import "ArangoConfiguration.h"
 #import "ArangoManager.h"
@@ -44,7 +44,7 @@ static const double HeightCorrection = 10;
 // --SECTION--                                       ArangoNewInstanceController
 // -----------------------------------------------------------------------------
 
-@implementation ArangoNewInstanceController
+@implementation ArangoInstanceController
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                   private methods
@@ -72,33 +72,24 @@ static const double HeightCorrection = 10;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief ignores confirmed errors
-////////////////////////////////////////////////////////////////////////////////
-
-- (void) confirmedError: (NSAlert*) alert
-             returnCode: (int) returnCode
-            contextInfo: (void*) contextInfo {
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// @brief display advanced box
 ////////////////////////////////////////////////////////////////////////////////
 
 - (void) displayAdvanced: (id) sender {
-  double height = self.advancedOptions.frame.size.height - HeightCorrection;
+  double height = _advancedOptions.frame.size.height - HeightCorrection;
 
-  NSRect okRect = self.okButton.frame;
+  NSRect okRect = _okButton.frame;
   okRect.origin.y -= height;
-  self.okButton.frame = okRect;
+  _okButton.frame = okRect;
 
-  NSRect abortRect = self.abortButton.frame;
+  NSRect abortRect = _abortButton.frame;
   abortRect.origin.y -= height;
-  self.abortButton.frame = abortRect;
+  _abortButton.frame = abortRect;
   
-  [self.okButton setHidden:NO];
-  [self.abortButton setHidden:NO];
+  [_okButton setHidden:NO];
+  [_abortButton setHidden:NO];
 
-  [self.advancedOptions setHidden:NO];
+  [_advancedOptions setHidden:NO];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -106,18 +97,18 @@ static const double HeightCorrection = 10;
 ////////////////////////////////////////////////////////////////////////////////
 
 - (void) hideAdvanced: (id) sender {
-  double height = self.advancedOptions.frame.size.height - HeightCorrection;
+  double height = _advancedOptions.frame.size.height - HeightCorrection;
 
-  NSRect okRect = self.okButton.frame;
+  NSRect okRect = _okButton.frame;
   okRect.origin.y += height;
-  self.okButton.frame = okRect;
+  _okButton.frame = okRect;
   
-  NSRect abortRect = self.abortButton.frame;
+  NSRect abortRect = _abortButton.frame;
   abortRect.origin.y += height;
-  self.abortButton.frame = abortRect;
+  _abortButton.frame = abortRect;
 
-  [self.okButton setHidden:NO];
-  [self.abortButton setHidden:NO];
+  [_okButton setHidden:NO];
+  [_abortButton setHidden:NO];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -125,14 +116,14 @@ static const double HeightCorrection = 10;
 ////////////////////////////////////////////////////////////////////////////////
 
 - (void) toggleAdvancedBox: (BOOL) animate {
-  double height = self.advancedOptions.frame.size.height - HeightCorrection;
+  double height = _advancedOptions.frame.size.height - HeightCorrection;
   NSRect changeTo = self.window.frame;
 
-  [self.okButton setHidden:YES];
-  [self.abortButton setHidden:YES];
+  [_okButton setHidden:YES];
+  [_abortButton setHidden:YES];
 
   // show advance
-  if ([self.advancedOptions isHidden]) {
+  if ([_advancedOptions isHidden]) {
     changeTo.size.height += height;
     changeTo.origin.y -= height;
 
@@ -154,7 +145,7 @@ static const double HeightCorrection = 10;
 
     double toSleep = [self.window animationResizeTime:changeTo];
 
-    [self.advancedOptions setHidden:YES];
+    [_advancedOptions setHidden:YES];
 
     [self.window setFrame:changeTo display:NO animate:animate];
 
@@ -166,6 +157,123 @@ static const double HeightCorrection = 10;
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// @brief ignores confirmed errors
+////////////////////////////////////////////////////////////////////////////////
+
+- (void) confirmedError: (NSAlert*) alert
+             returnCode: (int) returnCode
+            contextInfo: (void*) contextInfo {
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief creates a new instance
+////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL) createNewInstance {
+
+  // prepare configuration
+  ArangoStatus* status = [self.delegate prepareConfiguration:_nameField.stringValue
+                                                    withPath:_databaseField.stringValue
+                                                     andPort:[[_portFormatter numberFromString:_portField.stringValue] intValue]
+                                                      andLog:_logField.stringValue
+                                                 andLogLevel:_logLevelOptions.stringValue];
+
+  if (status == nil) {
+    return NO;
+  }
+
+  // create configuration
+  BOOL ok = [self.delegate createConfiguration:status.name
+                                      withPath:status.path
+                                       andPort:status.port
+                                        andLog:status.logPath
+                                   andLogLevel:status.logLevel
+                               andRunOnStartUp:_runOnStartupButton.state == NSOnState];
+
+  if (ok) {
+    [self.window close];
+  }
+  
+  return ok;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief ignores confirmed errors
+////////////////////////////////////////////////////////////////////////////////
+
+- (void) stopAlertDidEnd: (NSAlert*) alert
+              returnCode: (NSInteger) returnCode
+             contextInfo: (void*) contextInfo {
+
+  // stop and update
+  if (returnCode == NSAlertFirstButtonReturn) {
+    [self.delegate stopArangoDB:_status.name andWait:YES];
+    [self updateInstance];
+  }
+
+  // change config
+  else if (returnCode == NSAlertSecondButtonReturn) {
+    return;
+  }
+
+  // keep directory
+  else {
+    _databaseField.stringValue = _status.path;
+    [self updateInstance];
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief updates a new instance
+////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL) updateInstance {
+  BOOL pathChanged = ! [_databaseField.stringValue isEqualToString:_status.path];
+  
+  // if the database path has been changed, we need to stop the instance
+  if (pathChanged) {
+    ArangoStatus* status = [self.delegate currentStatus:_status.name];
+
+    if (status == nil) {
+      [self.window close];
+      return YES;
+    }
+
+    if (status.isRunning) {
+      NSAlert* info = [[[NSAlert alloc] init] autorelease];
+      
+      [info setMessageText:@"ArangoDB instance must be stopped!"];
+      [info setInformativeText:@"The ArangoDB instance must be stopped before moving the database directory."];
+      [info addButtonWithTitle:@"Stop & Update"];
+      [info addButtonWithTitle:@"Change Config"];
+      [info addButtonWithTitle:@"Keep Directory"];
+
+      [info beginSheetModalForWindow:self.window
+                       modalDelegate:self
+                      didEndSelector:@selector(stopAlertDidEnd:returnCode:contextInfo:)
+                         contextInfo:nil];
+
+      return YES;
+    }
+  }
+
+  // update configuration
+  BOOL ok = [self.delegate updateConfiguration:_status.name
+                                      withPath:_databaseField.stringValue
+                                       andPort:[[_portFormatter numberFromString:_portField.stringValue] intValue]
+                                        andLog:_logField.stringValue
+                                   andLogLevel:_logLevelOptions.stringValue
+                               andRunOnStartUp:_runOnStartupButton.state == NSOnState];
+
+  if (! ok) {
+    return NO;
+  }
+  
+  [self.window close];
+  return YES;
+}
+
 // -----------------------------------------------------------------------------
 // --SECTION--                                                    public methods
 // -----------------------------------------------------------------------------
@@ -175,22 +283,22 @@ static const double HeightCorrection = 10;
 ////////////////////////////////////////////////////////////////////////////////
 
 - (id) initWithArangoManager: (ArangoManager*) delegate {
-  self = [super initWithArangoManager:delegate nibNamed:@"ArangoNewInstanceView"];
+  self = [super initWithArangoManager:delegate
+                          andNibNamed:@"ArangoNewInstanceView"
+                 andReleasedWhenClose:YES];
 
   if (self) {
-    [self.window setReleasedWhenClosed:YES];
-
     _portFormatter = [[NSNumberFormatter alloc] init];
     [_portFormatter setNumberStyle:NSNumberFormatterNoStyle];
     [_portFormatter setGeneratesDecimalNumbers:NO];
     [_portFormatter setMinimumFractionDigits:0];
     [_portFormatter setMaximumFractionDigits:0];
     [_portFormatter setThousandSeparator:@""];
-    [_portField setFormatter:self.portFormatter];
+    [_portField setFormatter:_portFormatter];
 
-    self.portField.stringValue = [self.portFormatter stringFromNumber:[self.delegate findFreePort]];
+    _portField.stringValue = [_portFormatter stringFromNumber:[self.delegate findFreePort]];
 
-    _configuration = nil;
+    _status = nil;
   }
 
   return self;
@@ -201,25 +309,25 @@ static const double HeightCorrection = 10;
 ////////////////////////////////////////////////////////////////////////////////
 
 - (id) initWithArangoManager: (ArangoManager*) delegate
-            andConfiguration: (ArangoConfiguration*) config {
+                   andStatus: (ArangoStatus*) status {
   self = [self initWithArangoManager: delegate];
 
   if (self) {
-    _configuration = config;
+    _status = [status retain];
 
     self.window.title = @"Edit ArangoDB";
-    self.okButton.title = @"Edit";
-    self.databaseField.stringValue = config.path;
-    self.portField.stringValue = [self.portFormatter stringFromNumber:config.port];
-    self.logField.stringValue = config.log;
-    self.nameField.stringValue = config.alias;
-    self.logLevelOptions.stringValue = config.loglevel;
+    _okButton.title = @"Save";
+    _databaseField.stringValue = status.path;
+    _portField.stringValue = [_portFormatter stringFromNumber:[NSNumber numberWithInt:status.port]];
+    _logField.stringValue = status.logPath;
+    _nameField.stringValue = status.name;
+    _logLevelOptions.stringValue = status.logLevel;
 
-    if ([config.runOnStartUp isEqualToNumber: [NSNumber numberWithBool:YES]]) {
-      self.runOnStartupButton.state = NSOnState;
+    if (status.runOnStartup) {
+      _runOnStartupButton.state = NSOnState;
     }
     else {
-      self.runOnStartupButton.state = NSOffState;
+      _runOnStartupButton.state = NSOffState;
     }
   }
 
@@ -232,6 +340,7 @@ static const double HeightCorrection = 10;
 
 - (void) dealloc {
   [_portFormatter release];
+  [_status release];
   
   [super dealloc];
 }
@@ -257,7 +366,7 @@ static const double HeightCorrection = 10;
     [[NSFileManager defaultManager] fileExistsAtPath:[dburl path] isDirectory:&isDir];
 
     if (isDir) {
-      [self.databaseField setStringValue:[dburl path]];
+      [_databaseField setStringValue:[dburl path]];
     }
   }
 }
@@ -270,7 +379,7 @@ static const double HeightCorrection = 10;
   NSURL* logurl = [self showFileBrowser:NO];
 
   if (logurl) {
-    [self.logField setStringValue:[logurl path]];
+    [_logField setStringValue:[logurl path]];
   }
 }
 
@@ -278,50 +387,27 @@ static const double HeightCorrection = 10;
 /// @brief create instance
 ////////////////////////////////////////////////////////////////////////////////
 
-- (IBAction) createInstance: (id) sender {
-
-  // prepare configuration
-  ArangoStatus* status = [self.delegate prepareConfiguration:self.nameField.stringValue
-                                                    withPath:self.databaseField.stringValue
-                                                     andPort:[self.portFormatter numberFromString:_portField.stringValue]
-                                                      andLog:self.logField.stringValue];
-
-  if (status == nil) {
-    NSAlert* info = [[NSAlert alloc] init];
-
-    [info setMessageText:@"Cannot create new ArangoDB instance!"];
-    [info setInformativeText:[[@"Encountered error: " stringByAppendingString:self.delegate.lastError] stringByAppendingString:@", please correct and try again."]];
-
-    [info beginSheetModalForWindow:self.window
-                     modalDelegate:self
-                    didEndSelector:@selector(confirmedError:returnCode:contextInfo:)
-                       contextInfo:nil];
-    return;
+- (IBAction) saveInstance: (id) sender {
+  BOOL ok;
+  
+  if (_status == nil) {
+    ok = [self createNewInstance];
   }
-
-  // create configuration
-  BOOL ok = [self.delegate createConfiguration:status.name
-                                      withPath:status.path
-                                       andPort:status.port
-                                        andLog:status.logPath
-                                   andLogLevel:self.logLevelOptions.stringValue
-                               andRunOnStartUp:self.runOnStartupButton.state == NSOnState];
+  else {
+    ok = [self updateInstance];
+  }
 
   if (! ok) {
-    NSAlert* info = [[NSAlert alloc] init];
+      NSAlert* info = [[[NSAlert alloc] init] autorelease];
+      
+      [info setMessageText:@"Cannot create new ArangoDB instance!"];
+      [info setInformativeText:[NSString stringWithFormat:@"Encountered error: \"%@\", please correct and try again.",self.delegate.lastError]];
 
-    [info setMessageText:@"Cannot create new ArangoDB instance!"];
-    [info setInformativeText:[[@"Encountered error: " stringByAppendingString:self.delegate.lastError] stringByAppendingString:@", please correct and try again."]];
-
-    [info beginSheetModalForWindow:self.window
-                     modalDelegate:self
-                    didEndSelector:@selector(confirmedError:returnCode:contextInfo:)
-                       contextInfo:nil];
-    return;
+      [info beginSheetModalForWindow:self.window
+                       modalDelegate:self
+                      didEndSelector:@selector(confirmedError:returnCode:contextInfo:)
+                         contextInfo:nil];
   }
-
-  // that's it
-  [self.window close];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
