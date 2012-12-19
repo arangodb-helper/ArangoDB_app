@@ -107,6 +107,9 @@
   if (0 == _manager.configurations.count) {
     [[ArangoIntroductionController alloc] initWithArangoManager:_manager];
   }
+  else {
+    [_manager startupInstances];
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -98,7 +98,7 @@
 
   BOOL ok = [self.delegate deleteConfiguration:config];
 
-  if (ok) {
+  if (! ok) {
     NSAlert* info = [[[NSAlert alloc] init] autorelease];
       
     [info setMessageText:@"Cannot delete ArangoDB instance!"];
@@ -159,15 +159,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 - (void) showConfiguration: (id) sender {
-  if (self.userConfigController) {
-    [NSApp activateIgnoringOtherApps:YES];
-
-    [self.userConfigController.window makeKeyAndOrderFront:self];
-    [self.userConfigController showWindow:self.userConfigController.window];
-  }
-  else {
-    self.userConfigController = [[[ArangoUserConfigController alloc] initWithArangoManager:self.delegate] autorelease];
-  }
+  [[ArangoUserConfigController alloc] initWithArangoManager:self.delegate];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -230,7 +222,7 @@
 
   // start the instance
   [self.delegate stopArangoDB:config andWait:NO];
-  [self.delegate updateConfiguration:config withIsRunning:YES];
+  [self.delegate updateConfiguration:config withIsRunning:NO];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -274,7 +266,6 @@
   if (self) {
     _delegate = delegate;
     _helpController = nil;
-    _userConfigController = nil;
 
     [self updateMenu];
   }
@@ -288,7 +279,6 @@
 
 - (void) dealloc {
   self.helpController = nil;
-  self.userConfigController = nil;
 
   [super dealloc];
 }

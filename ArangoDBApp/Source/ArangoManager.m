@@ -286,9 +286,13 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   }
   else {
     if (0 < fetchedResults.count) {
+      User* user;
+      
       for (User* u in fetchedResults) {
-        _user = u;
+        user = u;
       }
+      
+      _user = [user retain];
     }
     else {
       _user = (User*) [NSEntityDescription insertNewObjectForEntityForName:@"User"
@@ -547,6 +551,42 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   }
 
   return port;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief starts up all instances
+////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL) startupInstances {
+  BOOL ok = YES;
+  int ros = [self runOnStartup];
+
+  // arangos that were running at last shutdown
+  if (ros == 1) {
+    for (ArangoConfiguration* config in [_configurations allValues]) {
+      if ([config.isRunning intValue] != 0) {
+        ok = [self startArangoDB:config.alias] && ok;
+      }
+    }
+  }
+
+  // arangos that are labeled by the user
+  else if (ros == 2) {
+    for (ArangoConfiguration* config in [_configurations allValues]) {
+      if ([config.runOnStartUp intValue] != 0) {
+        ok = [self startArangoDB:config.alias] && ok;
+      }
+    }
+  }
+
+  // all arangos
+  else if (ros == 3) {
+    for (ArangoConfiguration* config in [_configurations allValues]) {
+      ok = [self startArangoDB:config.alias] && ok;
+    }
+  }
+
+  return ok;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -865,18 +905,22 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
   // delete log file and database path
   NSError* err = nil;
-  BOOL ok = [[NSFileManager defaultManager] removeItemAtPath:logPath error:&err];
+  BOOL ok;
 
-  if (! ok) {
-    NSLog(@"cannot log file %@", err.localizedDescription);
-    self.lastError = [NSString stringWithFormat:"cannot remove database files: %@",err.localizedDescription];
+  if (! [logPath isEqualToString:@""]) {
+    ok = [[NSFileManager defaultManager] removeItemAtPath:logPath error:&err];
+
+    if (! ok) {
+      NSLog(@"cannot log file %@", err.localizedDescription);
+      self.lastError = [NSString stringWithFormat:@"cannot remove database files: %@",err.localizedDescription];
+    }
   }
 
   ok = [[NSFileManager defaultManager] removeItemAtPath:path error:&err];
 
   if (! ok) {
     NSLog(@"cannot remove database files %@", err.localizedDescription);
-    self.lastError = [NSString stringWithFormat:"cannot remove database files: %@",err.localizedDescription];
+    self.lastError = [NSString stringWithFormat:@"cannot remove database files: %@",err.localizedDescription];
   }
 
   return ok;
@@ -1072,6 +1116,90 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   }
   
   return YES;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief runOnStartup options
+////////////////////////////////////////////////////////////////////////////////
+
+- (int) runOnStartup {
+  return [_user.runOnStartUp intValue];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief startupOnLogin options
+////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL) startupOnLogin {
+  LSSharedFileListRef autostart = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems, nil);
+
+  if (autostart) {
+    UInt32 seedValue;
+    NSArray  *loginItemsArray = (NSArray *) LSSharedFileListCopySnapshot(autostart, &seedValue);
+
+    for (int i = 0; i<  [loginItemsArray count];  ++i) {
+      LSSharedFileListItemRef itemRef = (LSSharedFileListItemRef) [loginItemsArray objectAtIndex:i];
+      CFURLRef url = (CFURLRef) [NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]];
+
+      if (LSSharedFileListItemResolve(itemRef, 0, &url, nil) == noErr) {
+        NSString * urlPath = [(NSURL*)url path];
+
+        if ([urlPath compare:[[NSBundle mainBundle] bundlePath]] == NSOrderedSame){
+          return YES;
+        }
+      }
+    }
+
+    [loginItemsArray release];
+  }
+
+  return NO;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief sets startupOnLogin and runOnStartup
+////////////////////////////////////////////////////////////////////////////////
+
+- (void) setRunOnStartup: (int) runOnStartup
+       setStartupOnLogin: (BOOL) startupOnLogin {
+
+  // update run on startup
+  _user.runOnStartUp = [NSNumber numberWithInt:runOnStartup];
+  [self saveConfigurations];
+
+  // check startupOnLogin
+  LSSharedFileListRef autostart = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems, nil);
+
+  if (autostart) {
+    if (startupOnLogin) {
+      LSSharedFileListItemRef arangoStarter = LSSharedFileListInsertItemURL(autostart, kLSSharedFileListItemLast, nil, nil, (CFURLRef)[NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]], nil, nil);
+
+      if (arangoStarter) {
+        CFRelease(arangoStarter);
+      }
+
+      CFRelease(autostart);
+    }
+    else {
+      UInt32 seedValue;
+      NSArray  *loginItemsArray = (NSArray *) LSSharedFileListCopySnapshot(autostart, &seedValue);
+
+      for (int i = 0; i< [loginItemsArray count]; i++){
+        LSSharedFileListItemRef itemRef = (LSSharedFileListItemRef) [loginItemsArray objectAtIndex:i];
+        CFURLRef url = (CFURLRef) [NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]];
+
+        if (LSSharedFileListItemResolve(itemRef, 0, &url, nil) == noErr) {
+          NSString * urlPath = [(NSURL*)url path];
+
+          if ([urlPath compare:[[NSBundle mainBundle] bundlePath]] == NSOrderedSame){
+            LSSharedFileListItemRemove(autostart,itemRef);
+          }
+        }
+      }
+
+      [loginItemsArray release];
+    }
+  }
 }
 
 @end

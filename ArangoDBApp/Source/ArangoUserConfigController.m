@@ -40,7 +40,7 @@
 static const NSString* RES = @"Restart all instances running at last shutdown";
 static const NSString* DEF = @"Define for each instance";
 static const NSString* ALL = @"Start all instances";
-static const NSString* NON = @"Do not start instaces";
+static const NSString* NON = @"Do not start instances";
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                   private methods
@@ -59,23 +59,23 @@ static const NSString* NON = @"Do not start instaces";
 ////////////////////////////////////////////////////////////////////////////////
 
 - (IBAction) storeConfiguration: (id) sender {
-  NSNumber* ros = [NSNumber numberWithInt:0];
+  int ros = 0;
 
   if ([self.runOnStartupOptions.stringValue isEqual:RES]) {
-    ros = [NSNumber numberWithInt:1];
+    ros = 1;
   }
   else if ([self.runOnStartupOptions.stringValue isEqual:DEF]) {
-    ros = [NSNumber numberWithInt:2];
+    ros = 2;
   }
   else if ([self.runOnStartupOptions.stringValue isEqual:ALL]) {
-    ros = [NSNumber numberWithInt:3];
+    ros = 3;
   }
   else if([self.runOnStartupOptions.stringValue isEqual:NON]) {
-    ros = [NSNumber numberWithInt:0];
+    ros = 0;
   }
 
-  [self.delegate setRunOnStartupOptions:ros
-                          setRunOnLogin:(self.runOnStartupButton.state == NSOnState)];
+  [self.delegate setRunOnStartup:ros
+               setStartupOnLogin:(self.startOnLoginButton.state == NSOnState)];
 
   [self.window close];
 }
@@ -89,12 +89,30 @@ static const NSString* NON = @"Do not start instaces";
 ////////////////////////////////////////////////////////////////////////////////
 
 - (id) initWithArangoManager: (ArangoManager*) delegate {
-  self = [super initWithArangoManager:delegate nibNamed:@"ArangoUserConfigView"];
-
+  self = [super initWithArangoManager:delegate andNibNamed:@"ArangoUserConfigView" andReleasedWhenClose:YES];
+  
   if (self) {
-    [self.window setReleasedWhenClosed:YES];
+    switch ([self.delegate runOnStartup]) {
+      case 0:
+        [self.runOnStartupOptions selectItemWithObjectValue:NON];
+        break;
+        
+      case 1:
+        [self.runOnStartupOptions selectItemWithObjectValue:RES];
+        break;
+        
+      case 2:
+        [self.runOnStartupOptions selectItemWithObjectValue:DEF];
+        break;
+        
+      case 3:
+        [self.runOnStartupOptions selectItemWithObjectValue:ALL];
+        break;
+    }
+    
+    self.startOnLoginButton.state = [self.delegate startupOnLogin] ? NSOnState : NSOffState;
   }
-
+  
   return self;
 }
 
@@ -107,26 +125,6 @@ static const NSString* NON = @"Do not start instaces";
   [self.runOnStartupOptions addItemWithObjectValue:DEF];
   [self.runOnStartupOptions addItemWithObjectValue:ALL];
   [self.runOnStartupOptions addItemWithObjectValue:NON];
-
-  switch ([[self.delegate runOnStartUp] intValue]) {
-    case 0:
-      [self.runOnStartupOptions selectItemWithObjectValue:NON];
-      break;
-
-    case 1:
-      [self.runOnStartupOptions selectItemWithObjectValue:RES];
-      break;
-
-    case 2:
-      [self.runOnStartupOptions selectItemWithObjectValue:DEF];
-      break;
-
-    case 3:
-      [self.runOnStartupOptions selectItemWithObjectValue:ALL];
-      break;
-  }
-
-  self.runOnStartupButton.state = [self.delegate runOnLogin] ? NSOnState : NSOffState;
 }
 
 @end

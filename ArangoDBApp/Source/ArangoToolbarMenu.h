@@ -31,7 +31,6 @@
 @class ArangoConfiguration;
 @class ArangoHelpController;
 @class ArangoManager;
-@class ArangoUserConfigController;
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                 ArangoToolbarMenu
@@ -54,12 +53,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 @property (nonatomic, retain) ArangoHelpController* helpController;
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief add server controller
-////////////////////////////////////////////////////////////////////////////////
-
-@property (nonatomic, retain) ArangoUserConfigController* userConfigController;
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                    public methods
