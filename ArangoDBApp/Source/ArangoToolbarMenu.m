@@ -243,7 +243,7 @@
 
   NSNumberFormatter* f = [[NSNumberFormatter alloc] init];
   [f setThousandSeparator:@""];
-  [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://localhost:%d/",status.port]]];
+  [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://localhost:%d/_admin/html/index.html",status.port]]];
   [f release];
 }
 
