@@ -517,8 +517,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = ArangoDBApp/ArangoDB.entitlements;
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				INFOPLIST_FILE = "$(SRCROOT)/ArangoDBApp/PropertyLists/Arango-Info.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/ArangoDBApp/PropertyLists/ArangoDev-Info.plist";
 				PRODUCT_NAME = Arango;
 			};
 			name = Debug;
@@ -527,8 +526,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = ArangoDBApp/ArangoDB.entitlements;
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				INFOPLIST_FILE = "$(SRCROOT)/ArangoDBApp/PropertyLists/Arango-Info.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/ArangoDBApp/PropertyLists/ArangoDev-Info.plist";
 				PRODUCT_NAME = Arango;
 			};
 			name = Release;
@@ -599,9 +597,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = ArangoDBApp/ArangoDB.entitlements;
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "Mac Developer: Frank Celler (254X3E529E)";
 				INFOPLIST_FILE = "$(SRCROOT)/ArangoDBApp/PropertyLists/Arango-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "9997A850-56ED-47E4-8483-8837DB2147CA";
 			};
 			name = Debug;
 		};
@@ -609,9 +608,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = ArangoDBApp/ArangoDB.entitlements;
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "Mac Developer: Frank Celler (254X3E529E)";
 				INFOPLIST_FILE = "$(SRCROOT)/ArangoDBApp/PropertyLists/Arango-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "9997A850-56ED-47E4-8483-8837DB2147CA";
 			};
 			name = Release;
 		};
