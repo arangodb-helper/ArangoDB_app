@@ -11,7 +11,9 @@
 		2C21DBE11680C65800728A04 /* ArangoAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C21DBE01680C65800728A04 /* ArangoAppDelegate.m */; };
 		2C21DBF2168272F600728A04 /* ArangoAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C21DBE01680C65800728A04 /* ArangoAppDelegate.m */; };
 		2C21DBF3168272FA00728A04 /* ArangoIntroductionController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C14F371167D1C6E00D474D0 /* ArangoIntroductionController.m */; };
-		2C29AF0C1668EE8900036073 /* Arango-10.8-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8A539DBB15ECEE6500A267B6 /* Arango-10.8-Info.plist */; };
+		2C21DC0916834D2D00728A04 /* Arango-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8A4E6377160C5EB70001D66F /* Arango-Info.plist */; };
+		2C21DC0A16834D3700728A04 /* arangod_10_6 in Resources */ = {isa = PBXBuildFile; fileRef = 8A4E632F160A12E60001D66F /* arangod_10_6 */; };
+		2C21DC0B16834D3E00728A04 /* arangod_10_7 in Resources */ = {isa = PBXBuildFile; fileRef = 8A9499761609DAD500A0ABA7 /* arangod_10_7 */; };
 		2C29AF111668F97800036073 /* ArangoIntroductionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2C29AF101668F97800036073 /* ArangoIntroductionView.xib */; };
 		2C29AF141668F97800036073 /* ArangoIntroductionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2C29AF101668F97800036073 /* ArangoIntroductionView.xib */; };
 		2C29AF171668FA2100036073 /* ArangoHelpController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C29AF161668FA2100036073 /* ArangoHelpController.m */; };
@@ -81,7 +83,6 @@
 		2C14F372167D1C6E00D474D0 /* ArangoIntroductionController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArangoIntroductionController.h; sourceTree = "<group>"; };
 		2C21DBDF1680C65800728A04 /* ArangoAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArangoAppDelegate.h; sourceTree = "<group>"; };
 		2C21DBE01680C65800728A04 /* ArangoAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ArangoAppDelegate.m; sourceTree = "<group>"; };
-		2C21DBF41683240700728A04 /* Arango.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Arango.entitlements; sourceTree = "<group>"; };
 		2C29AF101668F97800036073 /* ArangoIntroductionView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ArangoIntroductionView.xib; sourceTree = "<group>"; };
 		2C29AF151668FA1700036073 /* ArangoHelpController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArangoHelpController.h; sourceTree = "<group>"; };
 		2C29AF161668FA2100036073 /* ArangoHelpController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ArangoHelpController.m; sourceTree = "<group>"; };
@@ -113,7 +114,6 @@
 		8A539DB615ECEE6500A267B6 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		8A539DB715ECEE6500A267B6 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		8A539DB815ECEE6500A267B6 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		8A539DBB15ECEE6500A267B6 /* Arango-10.8-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Arango-10.8-Info.plist"; sourceTree = "<group>"; };
 		8A539DBD15ECEE6500A267B6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8A539DBF15ECEE6500A267B6 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		8A539DC115ECEE6500A267B6 /* Arango-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Arango-Prefix.pch"; sourceTree = "<group>"; };
@@ -131,8 +131,6 @@
 		8A9499701607214A00A0ABA7 /* Logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Logo.png; sourceTree = "<group>"; };
 		8A9499761609DAD500A0ABA7 /* arangod_10_7 */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = arangod_10_7; sourceTree = "<group>"; };
 		8A9499771609DAD500A0ABA7 /* arangod_10_8 */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = arangod_10_8; sourceTree = "<group>"; };
-		8A9499BB1609E40200A0ABA7 /* Arango-10.7-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Arango-10.7-Info.plist"; sourceTree = "<group>"; };
-		8A9499DD1609E44400A0ABA7 /* Arango-10.6-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Arango-10.6-Info.plist"; sourceTree = "<group>"; };
 		8AE205FF16109E53003CF0AA /* arangod.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = arangod.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -161,9 +159,6 @@
 		2C29AF091668E86C00036073 /* PropertyLists */ = {
 			isa = PBXGroup;
 			children = (
-				8A9499DD1609E44400A0ABA7 /* Arango-10.6-Info.plist */,
-				8A9499BB1609E40200A0ABA7 /* Arango-10.7-Info.plist */,
-				8A539DBB15ECEE6500A267B6 /* Arango-10.8-Info.plist */,
 				8A4E6377160C5EB70001D66F /* Arango-Info.plist */,
 			);
 			path = PropertyLists;
@@ -237,7 +232,6 @@
 		8A539DA415ECEE6500A267B6 = {
 			isa = PBXGroup;
 			children = (
-				2C21DBF41683240700728A04 /* Arango.entitlements */,
 				8A539DB915ECEE6500A267B6 /* ArangoDBApp */,
 				8A293B3F15F5E23D008959B1 /* ArangoDBCore */,
 				8A293B4B15F5F82A008959B1 /* Images */,
@@ -405,23 +399,25 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2C21DC0916834D2D00728A04 /* Arango-Info.plist in Resources */,
+				8A293B4415F5EC58008959B1 /* arangod.conf in Resources */,
+				8AE2060016109E53003CF0AA /* arangod.entitlements in Resources */,
+				8A9499791609DAD500A0ABA7 /* arangod_10_8 in Resources */,
+				2C21DC0B16834D3E00728A04 /* arangod_10_7 in Resources */,
+				2C21DC0A16834D3700728A04 /* arangod_10_6 in Resources */,
 				8A539DBE15ECEE6500A267B6 /* InfoPlist.strings in Resources */,
 				8A539DC415ECEE6500A267B6 /* Credits.rtf in Resources */,
+				2C76DAB9167A26D200505954 /* ArangoHelpView.xib in Resources */,
+				2C29AF111668F97800036073 /* ArangoIntroductionView.xib in Resources */,
+				8A94996F16071D3700A0ABA7 /* ArangoUserConfigView.xib in Resources */,
+				8A293B5D15F64C28008959B1 /* ArangoNewInstanceView.xib in Resources */,
 				8A539DCA15ECEE6500A267B6 /* MainMenu.xib in Resources */,
-				8A293B4415F5EC58008959B1 /* arangod.conf in Resources */,
+				8A949953160072B500A0ABA7 /* icon.icns in Resources */,
 				8A293B4F15F5FD1A008959B1 /* IconColor.png in Resources */,
+				8A9499551600752100A0ABA7 /* IconGrey.png in Resources */,
+				8A9499711607214A00A0ABA7 /* Logo.png in Resources */,
 				8A293B5215F619B4008959B1 /* html in Resources */,
 				8A293B5315F619B4008959B1 /* js in Resources */,
-				8A293B5D15F64C28008959B1 /* ArangoNewInstanceView.xib in Resources */,
-				8A949953160072B500A0ABA7 /* icon.icns in Resources */,
-				8A9499551600752100A0ABA7 /* IconGrey.png in Resources */,
-				8A94996F16071D3700A0ABA7 /* ArangoUserConfigView.xib in Resources */,
-				8A9499711607214A00A0ABA7 /* Logo.png in Resources */,
-				8A9499791609DAD500A0ABA7 /* arangod_10_8 in Resources */,
-				8AE2060016109E53003CF0AA /* arangod.entitlements in Resources */,
-				2C29AF0C1668EE8900036073 /* Arango-10.8-Info.plist in Resources */,
-				2C29AF111668F97800036073 /* ArangoIntroductionView.xib in Resources */,
-				2C76DAB9167A26D200505954 /* ArangoHelpView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -439,7 +435,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "codesign --entitlements ${SOURCE_ROOT}/Arango/arangod.entitlements -f -v -s \"3rd Party Mac Developer Application: triAGENS GmbH\" $TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/arangod_10_6\ncodesign --entitlements ${SOURCE_ROOT}/Arango/arangod.entitlements -f -v -s \"3rd Party Mac Developer Application: triAGENS GmbH\" $TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/arangod_10_7\ncodesign --entitlements ${SOURCE_ROOT}/Arango/arangod.entitlements -f -v -s \"3rd Party Mac Developer Application: triAGENS GmbH\" $TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/arangod_10_8";
+			shellScript = "codesign --entitlements ${SOURCE_ROOT}/ArangoDBCore/arangod.entitlements -f -v -s \"3rd Party Mac Developer Application: triAGENS GmbH\" $TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/arangod_10_6\ncodesign --entitlements ${SOURCE_ROOT}/ArangoDBCore/arangod.entitlements -f -v -s \"3rd Party Mac Developer Application: triAGENS GmbH\" $TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/arangod_10_7\ncodesign --entitlements ${SOURCE_ROOT}/ArangoDBCore/arangod.entitlements -f -v -s \"3rd Party Mac Developer Application: triAGENS GmbH\" $TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/arangod_10_8";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -604,7 +600,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = ArangoDBApp/ArangoDB.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
-				INFOPLIST_FILE = "$(SRCROOT)/ArangoDBApp/PropertyLists/Arango-10.8-Info.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/ArangoDBApp/PropertyLists/Arango-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -614,7 +610,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = ArangoDBApp/ArangoDB.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
-				INFOPLIST_FILE = "$(SRCROOT)/ArangoDBApp/PropertyLists/Arango-10.8-Info.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/ArangoDBApp/PropertyLists/Arango-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
