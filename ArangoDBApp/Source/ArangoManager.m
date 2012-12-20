@@ -286,13 +286,10 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   }
   else {
     if (0 < fetchedResults.count) {
-      User* user;
-      
       for (User* u in fetchedResults) {
-        user = u;
+        _user = [u retain];
+        break;
       }
-      
-      _user = [user retain];
     }
     else {
       _user = (User*) [NSEntityDescription insertNewObjectForEntityForName:@"User"
@@ -346,6 +343,17 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   _configurations = [[NSMutableDictionary alloc] init];
   
   for (ArangoConfiguration* c in configurations) {
+    if (c.alias == nil || c.path == nil) {
+      continue;
+    }
+    
+    if (c.log == nil) {
+      c.log = @"";
+    }
+    
+    if (c.loglevel == nil) {
+      c.loglevel = @"info";
+    }
     [_configurations setValue:c forKey:c.alias];
   }
   
@@ -700,13 +708,13 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
                        andName:alias];
 
   // everything ready to start
-  return [[ArangoStatus alloc] initWithName:alias
-                                    andPath:path
-                                    andPort:port
-                                 andLogPath:logPath
-                                andLogLevel:logLevel
-                            andRunOnStartup:NO
-                                 andRunning:NO];
+  return [[[ArangoStatus alloc] initWithName:alias
+                                     andPath:path
+                                     andPort:port
+                                  andLogPath:logPath
+                                 andLogLevel:logLevel
+                             andRunOnStartup:NO
+                                  andRunning:NO] autorelease];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1044,7 +1052,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   }
 
   // prepare task
-  task = [[NSTask alloc] init];
+  task = [[[NSTask alloc] init] autorelease];
   [task setLaunchPath:_arangoDBBinary];
 
   NSArray* arguments = [NSArray arrayWithObjects:
@@ -1144,7 +1152,8 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
       if (LSSharedFileListItemResolve(itemRef, 0, &url, nil) == noErr) {
         NSString * urlPath = [(NSURL*)url path];
 
-        if ([urlPath compare:[[NSBundle mainBundle] bundlePath]] == NSOrderedSame){
+        if ([urlPath compare:[[NSBundle mainBundle] bundlePath]] == NSOrderedSame) {
+          [loginItemsArray release];
           return YES;
         }
       }

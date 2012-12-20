@@ -34,7 +34,7 @@
 // --SECTION--                                              ArangoBaseController
 // -----------------------------------------------------------------------------
 
-@interface ArangoBaseController : NSWindowController
+@interface ArangoBaseController : NSWindowController<NSWindowDelegate>
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                        properties
@@ -45,6 +45,19 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 @property (nonatomic, assign, readonly) ArangoManager* delegate;
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief application delegate
+////////////////////////////////////////////////////////////////////////////////
+
+@property (nonatomic, assign, readonly) NSArray* tlo;
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief release window and controller when closed
+////////////////////////////////////////////////////////////////////////////////
+
+@property (nonatomic, assign, readonly) BOOL releaseWhenClosed;
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                    public methods

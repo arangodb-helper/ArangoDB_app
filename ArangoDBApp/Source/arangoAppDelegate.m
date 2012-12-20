@@ -105,6 +105,7 @@
 
   // without any configuration, display some help
   if (0 == _manager.configurations.count) {
+    // will autorelease on close
     [[ArangoIntroductionController alloc] initWithArangoManager:_manager];
   }
   else {

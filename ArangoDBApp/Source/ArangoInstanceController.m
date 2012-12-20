@@ -291,11 +291,11 @@ static const double HeightCorrection = 10;
 
     self.window.title = @"Edit ArangoDB";
     _okButton.title = @"Save";
-    _databaseField.stringValue = status.path;
+    _databaseField.stringValue = status.path == nil ? @"" : status.path;
     _portField.stringValue = [_portFormatter stringFromNumber:[NSNumber numberWithInt:status.port]];
-    _logField.stringValue = status.logPath;
+    _logField.stringValue = status.logPath == nil ? @"" : status.logPath;
     _nameField.stringValue = status.name;
-    _logLevelOptions.stringValue = status.logLevel;
+    _logLevelOptions.stringValue = status.logLevel == nil ? @"info" : status.logLevel;
 
     if (status.runOnStartup) {
       _runOnStartupButton.state = NSOnState;

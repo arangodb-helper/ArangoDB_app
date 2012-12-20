@@ -45,13 +45,15 @@
 - (id) initWithArangoManager: (ArangoManager*) delegate
                  andNibNamed: (NSString*) name
         andReleasedWhenClose: (BOOL) releasedWhenClosed {
-
+  _tlo = nil;
+  
   // loadNibNamed:owner:topLevelObjects was introduced in 10.8
   if ([[NSBundle mainBundle] respondsToSelector:@selector(loadNibNamed:owner:topLevelObjects:)]) {
     self = [super init];
       
     if (self) {
-      [[NSBundle mainBundle] loadNibNamed:name owner:self topLevelObjects:nil];
+      [[NSBundle mainBundle] loadNibNamed:name owner:self topLevelObjects:&_tlo];
+      [_tlo retain];
     }
   }
   else {
@@ -60,6 +62,9 @@
 
   if (self) {
     _delegate = [delegate retain];
+    _releaseWhenClosed = releasedWhenClosed;
+    
+    [self.window setDelegate:self];
 
     [self.window setReleasedWhenClosed:releasedWhenClosed];
     [self.window center];
@@ -78,9 +83,20 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 - (void) dealloc {
+  [_tlo release];
   [_delegate release];
 
   [super dealloc];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief window should close
+////////////////////////////////////////////////////////////////////////////////
+
+- (void) windowWillClose: (id) sender {
+  // if (_releaseWhenClosed) {
+  //   [self autorelease];
+  // }
 }
 
 @end

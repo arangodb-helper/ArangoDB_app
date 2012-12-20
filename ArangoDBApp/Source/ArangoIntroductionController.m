@@ -54,6 +54,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 - (IBAction) createInstance: (id) sender {
+  // will autorelease on close
   [[ArangoInstanceController alloc] initWithArangoManager:self.delegate];
   [self.window orderOut:self.window];
 }

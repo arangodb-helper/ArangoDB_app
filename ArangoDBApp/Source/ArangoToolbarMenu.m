@@ -50,6 +50,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 - (void) createNewInstance: (id) sender {
+  // will autorelease on close
   [[ArangoInstanceController alloc] initWithArangoManager:self.delegate];
 }
 
@@ -64,6 +65,7 @@
     return;
   }
 
+  // will autorelease on close
   [[ArangoInstanceController alloc] initWithArangoManager:self.delegate
                                                 andStatus:status];
 }
@@ -159,6 +161,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 - (void) showConfiguration: (id) sender {
+  // will autorelease on close
   [[ArangoUserConfigController alloc] initWithArangoManager:self.delegate];
 }
 
