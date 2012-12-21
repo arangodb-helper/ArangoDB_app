@@ -8,5 +8,5 @@ See https://github.com/triAGENS/ArangoDB or http://www.arangodb.org
 for details.
 
 This app allows you to easily setup and manage instances with a mouse
-click. Explore the amazing features of ArangoDB without complicate compilations
+click. Explore the amazing features of ArangoDB without complicated compilations
 or installations.
