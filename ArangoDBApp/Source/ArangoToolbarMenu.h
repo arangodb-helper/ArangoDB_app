@@ -28,7 +28,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class ArangoConfiguration;
+@class ArangoAppDelegate;
 @class ArangoHelpController;
 @class ArangoManager;
 
@@ -43,16 +43,22 @@
 // -----------------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////////////
+/// @brief underlying manager
+////////////////////////////////////////////////////////////////////////////////
+
+@property (nonatomic, weak, readonly) ArangoManager* manager;
+
+////////////////////////////////////////////////////////////////////////////////
 /// @brief underlying delegate
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) ArangoManager* delegate;
+@property (nonatomic, weak, readonly) ArangoAppDelegate* delegate;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief help controller
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, retain) ArangoHelpController* helpController;
+@property (nonatomic, strong) ArangoHelpController* helpController;
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                    public methods
@@ -62,7 +68,8 @@
 /// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (id) initWithArangoManager: (ArangoManager*) delegate;
+- (id) initWithArangoManager: (ArangoManager*) manager
+              andAppDelegate: (ArangoAppDelegate*) delegate;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief updates the menu entries

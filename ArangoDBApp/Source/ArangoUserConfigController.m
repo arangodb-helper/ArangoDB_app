@@ -74,7 +74,7 @@ static const NSString* NON = @"Do not start instances";
     ros = 0;
   }
 
-  [self.delegate setRunOnStartup:ros
+  [self.manager setRunOnStartup:ros
                setStartupOnLogin:(self.startOnLoginButton.state == NSOnState)];
 
   [self.window close];
@@ -88,11 +88,14 @@ static const NSString* NON = @"Do not start instances";
 /// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (id) initWithArangoManager: (ArangoManager*) delegate {
-  self = [super initWithArangoManager:delegate andNibNamed:@"ArangoUserConfigView" andReleasedWhenClose:YES];
+- (id) initWithArangoManager: (ArangoManager*) manager
+              andAppDelegate: (ArangoAppDelegate*) delegate {
+  self = [super initWithArangoManager:manager
+                       andAppDelegate:delegate
+                          andNibNamed:@"ArangoUserConfigView"];
   
   if (self) {
-    switch ([self.delegate runOnStartup]) {
+    switch ([self.manager runOnStartup]) {
       case 0:
         [self.runOnStartupOptions selectItemWithObjectValue:NON];
         break;
@@ -110,7 +113,7 @@ static const NSString* NON = @"Do not start instances";
         break;
     }
     
-    self.startOnLoginButton.state = [self.delegate startupOnLogin] ? NSOnState : NSOffState;
+    self.startOnLoginButton.state = [self.manager startupOnLogin] ? NSOnState : NSOffState;
   }
   
   return self;

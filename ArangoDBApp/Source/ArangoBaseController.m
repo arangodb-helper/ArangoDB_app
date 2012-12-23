@@ -28,6 +28,9 @@
 
 #import "ArangoBaseController.h"
 
+#import "ArangoAppDelegate.h"
+#import "ArangoManager.h"
+
 // -----------------------------------------------------------------------------
 // --SECTION--                                              ArangoBaseController
 // -----------------------------------------------------------------------------
@@ -42,18 +45,16 @@
 /// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (id) initWithArangoManager: (ArangoManager*) delegate
-                 andNibNamed: (NSString*) name
-        andReleasedWhenClose: (BOOL) releasedWhenClosed {
-  _tlo = nil;
-  
+- (id) initWithArangoManager: (ArangoManager*) manager
+              andAppDelegate: (ArangoAppDelegate*) delegate
+                 andNibNamed: (NSString*) name {
+
   // loadNibNamed:owner:topLevelObjects was introduced in 10.8
   if ([[NSBundle mainBundle] respondsToSelector:@selector(loadNibNamed:owner:topLevelObjects:)]) {
     self = [super init];
       
     if (self) {
-      [[NSBundle mainBundle] loadNibNamed:name owner:self topLevelObjects:&_tlo];
-      [_tlo retain];
+      [[NSBundle mainBundle] loadNibNamed:name owner:self topLevelObjects:nil];
     }
   }
   else {
@@ -61,12 +62,12 @@
   }
 
   if (self) {
-    _delegate = [delegate retain];
-    _releaseWhenClosed = releasedWhenClosed;
+    _manager = manager;
+    _delegate = delegate;
     
     [self.window setDelegate:self];
 
-    [self.window setReleasedWhenClosed:releasedWhenClosed];
+    [self.window setReleasedWhenClosed:NO];
     [self.window center];
 
     [NSApp activateIgnoringOtherApps:YES];
@@ -79,24 +80,11 @@
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief destructor
-////////////////////////////////////////////////////////////////////////////////
-
-- (void) dealloc {
-  [_tlo release];
-  [_delegate release];
-
-  [super dealloc];
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// @brief window should close
 ////////////////////////////////////////////////////////////////////////////////
 
-- (void) windowWillClose: (id) sender {
-  // if (_releaseWhenClosed) {
-  //   [self autorelease];
-  // }
+- (void) windowWillClose: (NSNotification*) notification {
+  [self.delegate removeController:self];
 }
 
 @end

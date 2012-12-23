@@ -48,7 +48,7 @@
 				<nil key="NSViewClass"/>
 				<nil key="NSUserInterfaceItemIdentifier"/>
 				<object class="NSView" key="NSWindowView" id="1006">
-					<reference key="NSNextResponder"/>
+					<nil key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<array class="NSMutableArray" key="NSSubviews">
 						<object class="NSImageView" id="469764715">
@@ -210,7 +210,6 @@ dWVzdGlvbnMsIHBsZWFzZSBjb250YWN0IHVzIGF0CgogICAgaGFja2Vyc0BhcmFuZ29kYi5vcmc</byt
 						</object>
 					</array>
 					<string key="NSFrameSize">{480, 368}</string>
-					<reference key="NSSuperview"/>
 					<reference key="NSNextKeyView" ref="469764715"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1920, 1178}}</string>

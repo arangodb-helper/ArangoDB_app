@@ -51,7 +51,8 @@
 
 - (void) createNewInstance: (id) sender {
   // will autorelease on close
-  [[ArangoInstanceController alloc] initWithArangoManager:self.delegate];
+  [self.delegate addController:[[ArangoInstanceController alloc] initWithArangoManager:self.manager
+                                                                        andAppDelegate:self.delegate]];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -59,15 +60,16 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 - (void) editInstance: (id) sender {
-  ArangoStatus* status = [self.delegate currentStatus:[sender representedObject]];
+  ArangoStatus* status = [self.manager currentStatus:[sender representedObject]];
 
   if (status == nil) {
     return;
   }
 
   // will autorelease on close
-  [[ArangoInstanceController alloc] initWithArangoManager:self.delegate
-                                                andStatus:status];
+  [self.delegate addController:[[ArangoInstanceController alloc] initWithArangoManager:self.manager
+                                                                        andAppDelegate:self.delegate
+                                                                             andStatus:status]];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -87,7 +89,7 @@
                       returnCode: (int) returnCode
                      contextInfo: (NSString*) config
 {
-  ArangoStatus* status = [self.delegate currentStatus:config];
+  ArangoStatus* status = [self.manager currentStatus:config];
 
   // already deleted
   if (status == nil) {
@@ -98,22 +100,22 @@
     return;
   }
 
-  BOOL ok = [self.delegate deleteConfiguration:config];
+  BOOL ok = [self.manager deleteConfiguration:config];
 
   if (! ok) {
-    NSAlert* info = [[[NSAlert alloc] init] autorelease];
+    NSAlert* info = [[NSAlert alloc] init];
       
     [info setMessageText:@"Cannot delete ArangoDB instance!"];
-    [info setInformativeText:[NSString stringWithFormat:@"Encountered error: \"%@\", please correct and try again.",self.delegate.lastError]];
+    [info setInformativeText:[NSString stringWithFormat:@"Encountered error: \"%@\", please correct and try again.",self.manager.lastError]];
 
     [info runModal];
     return;
   }
 
-  [self.delegate stopArangoDB:config andWait:YES];
+  [self.manager stopArangoDB:config andWait:YES];
 
   if (returnCode == NSAlertSecondButtonReturn) {
-    [self.delegate deleteDatabasePath:status.path
+    [self.manager deleteDatabasePath:status.path
                            andLogFile:status.logPath];
   }
 }
@@ -124,7 +126,7 @@
 
 - (void) deleteInstance: (id) sender {
   NSString* config = [sender representedObject];
-  ArangoStatus* status = [self.delegate currentStatus:config];
+  ArangoStatus* status = [self.manager currentStatus:config];
 
   // already deleted
   if (status == nil) {
@@ -132,7 +134,7 @@
   }
 
   if (status.isRunning) {
-    NSAlert* info = [[[NSAlert alloc] init] autorelease];
+    NSAlert* info = [[NSAlert alloc] init];
       
     [info setMessageText:@"ArangoDB instance must be stopped!"];
     [info setInformativeText:@"The ArangoDB instance must be stopped before deleting it."];
@@ -142,7 +144,7 @@
   }
 
   // ask user if s/he wants the database files to be removed
-  NSAlert* info = [[[NSAlert alloc] init] autorelease];
+  NSAlert* info = [[NSAlert alloc] init];
       
   [info setMessageText:@"Delete ArangoDB instance data!"];
   [info setInformativeText:[NSString stringWithFormat:@"Do you want to delete the contents of folder \"%@\" and the log-file as well?",status.path]];
@@ -153,7 +155,7 @@
   [info beginSheetModalForWindow:nil
                    modalDelegate:self
                   didEndSelector:@selector(confirmedDeleteInstance:returnCode:contextInfo:)
-                     contextInfo:config];
+                     contextInfo:(__bridge void *)(config)];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -162,7 +164,8 @@
 
 - (void) showConfiguration: (id) sender {
   // will autorelease on close
-  [[ArangoUserConfigController alloc] initWithArangoManager:self.delegate];
+  [self.delegate addController:[[ArangoUserConfigController alloc] initWithArangoManager:self.manager
+                                                                          andAppDelegate:self.delegate]];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -177,7 +180,9 @@
     [self.helpController showWindow:self.helpController.window];
   }
   else {
-    self.helpController = [[[ArangoHelpController alloc] initWithArangoManager:self.delegate andNibNamed:@"ArangoHelpView"] autorelease];
+    self.helpController = [[ArangoHelpController alloc] initWithArangoManager:self.manager
+                                                               andAppDelegate:self.delegate
+                                                                    andNibNamed:@"ArangoHelpView"];
   }
 }
 
@@ -187,7 +192,7 @@
 
 - (void) startInstance: (id) sender {
   NSString* config = [sender representedObject];
-  ArangoStatus* status = [self.delegate currentStatus:config];
+  ArangoStatus* status = [self.manager currentStatus:config];
 
   // already deleted
   if (status == nil) {
@@ -195,16 +200,16 @@
   }
 
   // start the instance
-  BOOL ok = [self.delegate startArangoDB:config];
+  BOOL ok = [self.manager startArangoDB:config];
 
   if (ok) {
-    [self.delegate updateConfiguration:config withIsRunning:YES];
+    [self.manager updateConfiguration:config withIsRunning:YES];
   }
   else {
-    NSAlert* info = [[[NSAlert alloc] init] autorelease];
+    NSAlert* info = [[NSAlert alloc] init];
       
     [info setMessageText:@"Cannot start ArangoDB instance!"];
-    [info setInformativeText:[NSString stringWithFormat:@"Encountered error: %@, please correct and try again.",self.delegate.lastError]];
+    [info setInformativeText:[NSString stringWithFormat:@"Encountered error: %@, please correct and try again.",self.manager.lastError]];
 
     [info runModal];
   }
@@ -216,7 +221,7 @@
 
 - (void) stopInstance: (id) sender {
   NSString* config = [sender representedObject];
-  ArangoStatus* status = [self.delegate currentStatus:config];
+  ArangoStatus* status = [self.manager currentStatus:config];
 
   // already deleted
   if (status == nil) {
@@ -224,8 +229,8 @@
   }
 
   // start the instance
-  [self.delegate stopArangoDB:config andWait:NO];
-  [self.delegate updateConfiguration:config withIsRunning:NO];
+  [self.manager stopArangoDB:config andWait:NO];
+  [self.manager updateConfiguration:config withIsRunning:NO];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -234,7 +239,7 @@
 
 - (void) openBrowser: (id) sender {
   NSString* config = [sender representedObject];
-  ArangoStatus* status = [self.delegate currentStatus:config];
+  ArangoStatus* status = [self.manager currentStatus:config];
 
   // already deleted
   if (status == nil) {
@@ -244,7 +249,6 @@
   NSNumberFormatter* f = [[NSNumberFormatter alloc] init];
   [f setThousandSeparator:@""];
   [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://localhost:%d/_admin/html/index.html",status.port]]];
-  [f release];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -263,10 +267,12 @@
 /// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (id) initWithArangoManager: (ArangoManager*) delegate {
+- (id) initWithArangoManager: (ArangoManager*) manager
+              andAppDelegate:(ArangoAppDelegate*) delegate {
   self = [super init];
 
   if (self) {
+    _manager = manager;
     _delegate = delegate;
     _helpController = nil;
 
@@ -277,23 +283,13 @@
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief destructor
-////////////////////////////////////////////////////////////////////////////////
-
-- (void) dealloc {
-  self.helpController = nil;
-
-  [super dealloc];
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// @brief updates the menu entries
 ////////////////////////////////////////////////////////////////////////////////
 
 - (void) updateMenu {
   
   // create the menu entries for the instances
-  NSArray* entries = [self.delegate currentStatus];
+  NSArray* entries = [self.manager currentStatus];
   
   [self removeAllItems];
   [self setAutoenablesItems:NO];
@@ -326,7 +322,6 @@
       [browser setRepresentedObject:status.name];
       [browser setAction:@selector(openBrowser:)];
       [subMenu addItem:browser];
-      [browser release];
       
       [subMenu addItem: [NSMenuItem separatorItem]];
       
@@ -338,7 +333,6 @@
       [edit setRepresentedObject:status.name];
       [edit setAction:@selector(editInstance:)];
       [subMenu addItem:edit];
-      [edit release];
       
       // delete instance
       NSMenuItem* delete = [[NSMenuItem alloc] init];
@@ -348,7 +342,6 @@
       [delete setRepresentedObject:status.name];
       [delete setAction:@selector(deleteInstance:)];
       [subMenu addItem:delete];
-      [delete release];
       
       [subMenu addItem: [NSMenuItem separatorItem]];
       
@@ -360,7 +353,6 @@
       [start setRepresentedObject:status.name];
       [start setAction:@selector(startInstance:)];
       [subMenu addItem:start];
-      [start release];
       
       // stop instance
       NSMenuItem* stop = [[NSMenuItem alloc] init];
@@ -370,14 +362,11 @@
       [stop setRepresentedObject:status.name];
       [stop setAction:@selector(stopInstance:)];
       [subMenu addItem:stop];
-      [stop release];
       
       // add item, submenu and release
       [item setSubmenu:subMenu];
-      [subMenu release];
       
       [self addItem:item];
-      [item release];
     }
   }
   
@@ -393,7 +382,6 @@
   [createDB setTarget:self];
   [createDB setAction:@selector(createNewInstance:)];
   [self addItem:createDB];
-  [createDB release];
   
   // configuration
   NSMenuItem* configure = [[NSMenuItem alloc] init];
@@ -402,7 +390,6 @@
   [configure setTarget:self];
   [configure setAction:@selector(showConfiguration:)];
   [self addItem:configure];
-  [configure release];
   
   [self addItem:[NSMenuItem separatorItem]];
   
@@ -413,7 +400,6 @@
   [help setTarget:self];
   [help setAction:@selector(showHelp:)];
   [self addItem:help];
-  [help release];
   
   [self addItem:[NSMenuItem separatorItem]];
   
@@ -424,7 +410,6 @@
   [quit setTarget:self];
   [quit setAction:@selector(quitApplication:)];
   [self addItem:quit];
-  [quit release];
 }
 
 @end

@@ -42,19 +42,22 @@
 /// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (id) initWithArangoManager: (ArangoManager*) delegate
+- (id) initWithArangoManager: (ArangoManager*) manager
+              andAppDelegate: (ArangoAppDelegate*) delegate
                  andNibNamed: (NSString*) nib {
-  return [super initWithArangoManager:delegate
-                          andNibNamed:nib
-                andReleasedWhenClose:NO];
+  return [super initWithArangoManager:manager
+                       andAppDelegate:delegate
+                          andNibNamed:nib];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (id) initWithArangoManager: (ArangoManager*) delegate {
-  return [self initWithArangoManager:delegate 
+- (id) initWithArangoManager: (ArangoManager*) manager
+              andAppDelegate: (ArangoAppDelegate*) delegate {
+  return [self initWithArangoManager:manager
+                      andAppDelegate:delegate
                          andNibNamed:@"ArangoHelpView"];
 }
 
@@ -63,7 +66,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 - (IBAction) closeHelp: (id) sender {
-  [self.window orderOut:self.window];
+  [self.window close];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -72,7 +75,7 @@
 
 - (IBAction) learnMore: (id) sender {
   [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://www.arangodb.org/appstore"]];
-  [self.window orderOut:self.window];
+  [self.window close];
 }
 
 @end

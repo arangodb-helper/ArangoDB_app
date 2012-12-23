@@ -42,13 +42,13 @@
 /// @brief button "start on login"
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign) IBOutlet NSButton *startOnLoginButton;
+@property (nonatomic, weak) IBOutlet NSButton *startOnLoginButton;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief combo "run on startup" options
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign) IBOutlet NSComboBox *runOnStartupOptions;
+@property (nonatomic, weak) IBOutlet NSComboBox *runOnStartupOptions;
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                    public methods
@@ -58,7 +58,8 @@
 /// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (id) initWithArangoManager: (ArangoManager*) delegate;
+- (id) initWithArangoManager: (ArangoManager*) manager
+              andAppDelegate: (ArangoAppDelegate*) delegate;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief stores options

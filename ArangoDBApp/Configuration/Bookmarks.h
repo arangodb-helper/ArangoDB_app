@@ -13,8 +13,8 @@
 
 @interface Bookmarks : NSManagedObject
 
-@property (nonatomic, retain) NSData * path;
-@property (nonatomic, retain) NSData * log;
-@property (nonatomic, retain) ArangoConfiguration *config;
+@property (nonatomic, strong) NSData * path;
+@property (nonatomic, strong) NSData * log;
+@property (nonatomic, strong) ArangoConfiguration *config;
 
 @end

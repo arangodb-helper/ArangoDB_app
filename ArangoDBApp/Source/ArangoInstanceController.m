@@ -172,7 +172,7 @@ static const double HeightCorrection = 10;
 - (BOOL) createNewInstance {
 
   // prepare configuration
-  ArangoStatus* status = [self.delegate prepareConfiguration:_nameField.stringValue
+  ArangoStatus* status = [self.manager prepareConfiguration:_nameField.stringValue
                                                     withPath:_databaseField.stringValue
                                                      andPort:[[_portFormatter numberFromString:_portField.stringValue] intValue]
                                                       andLog:_logField.stringValue
@@ -183,7 +183,7 @@ static const double HeightCorrection = 10;
   }
 
   // create configuration
-  BOOL ok = [self.delegate createConfiguration:status.name
+  BOOL ok = [self.manager createConfiguration:status.name
                                       withPath:status.path
                                        andPort:status.port
                                         andLog:status.logPath
@@ -211,7 +211,7 @@ static const double HeightCorrection = 10;
 ////////////////////////////////////////////////////////////////////////////////
 
 - (BOOL) updateInstance {
-  ArangoStatus* status = [self.delegate currentStatus:_status.name];
+  ArangoStatus* status = [self.manager currentStatus:_status.name];
 
   if (status == nil) {
     [self.window close];
@@ -219,7 +219,7 @@ static const double HeightCorrection = 10;
   }
 
   if (status.isRunning) {
-    NSAlert* info = [[[NSAlert alloc] init] autorelease];
+    NSAlert* info = [[NSAlert alloc] init];
       
     [info setMessageText:@"ArangoDB instance must be stopped!"];
     [info setInformativeText:@"The ArangoDB instance must be stopped before moving the database directory."];
@@ -233,7 +233,7 @@ static const double HeightCorrection = 10;
   }
 
   // update configuration
-  BOOL ok = [self.delegate updateConfiguration:_status.name
+  BOOL ok = [self.manager updateConfiguration:_status.name
                                       withPath:_databaseField.stringValue
                                        andPort:[[_portFormatter numberFromString:_portField.stringValue] intValue]
                                         andLog:_logField.stringValue
@@ -256,10 +256,11 @@ static const double HeightCorrection = 10;
 /// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (id) initWithArangoManager: (ArangoManager*) delegate {
-  self = [super initWithArangoManager:delegate
-                          andNibNamed:@"ArangoNewInstanceView"
-                 andReleasedWhenClose:YES];
+- (id) initWithArangoManager: (ArangoManager*) manager
+              andAppDelegate:(ArangoAppDelegate*) delegate {
+  self = [super initWithArangoManager:manager
+                       andAppDelegate:delegate
+                          andNibNamed:@"ArangoNewInstanceView"];
 
   if (self) {
     _portFormatter = [[NSNumberFormatter alloc] init];
@@ -270,7 +271,7 @@ static const double HeightCorrection = 10;
     [_portFormatter setThousandSeparator:@""];
     [_portField setFormatter:_portFormatter];
 
-    _portField.stringValue = [_portFormatter stringFromNumber:[self.delegate findFreePort]];
+    _portField.stringValue = [_portFormatter stringFromNumber:[self.manager findFreePort]];
 
     _status = nil;
   }
@@ -282,12 +283,14 @@ static const double HeightCorrection = 10;
 /// @brief constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (id) initWithArangoManager: (ArangoManager*) delegate
+- (id) initWithArangoManager: (ArangoManager*) manager
+              andAppDelegate: (ArangoAppDelegate*) delegate
                    andStatus: (ArangoStatus*) status {
-  self = [self initWithArangoManager: delegate];
+  self = [self initWithArangoManager:manager
+            andAppDelegate:delegate];
 
   if (self) {
-    _status = [status retain];
+    _status = status;
 
     self.window.title = @"Edit ArangoDB";
     _okButton.title = @"Save";
@@ -306,17 +309,6 @@ static const double HeightCorrection = 10;
   }
 
   return self;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief destructor
-////////////////////////////////////////////////////////////////////////////////
-
-- (void) dealloc {
-  [_portFormatter release];
-  [_status release];
-  
-  [super dealloc];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -372,10 +364,10 @@ static const double HeightCorrection = 10;
   }
 
   if (! ok) {
-      NSAlert* info = [[[NSAlert alloc] init] autorelease];
+      NSAlert* info = [[NSAlert alloc] init];
       
       [info setMessageText:@"Cannot create new ArangoDB instance!"];
-      [info setInformativeText:[NSString stringWithFormat:@"Encountered error: \"%@\", please correct and try again.",self.delegate.lastError]];
+      [info setInformativeText:[NSString stringWithFormat:@"Encountered error: \"%@\", please correct and try again.",self.manager.lastError]];
 
       [info beginSheetModalForWindow:self.window
                        modalDelegate:self

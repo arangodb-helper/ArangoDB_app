@@ -13,13 +13,13 @@
 
 @interface ArangoConfiguration : NSManagedObject
 
-@property (nonatomic, retain) NSNumber * isRunning;
-@property (nonatomic, retain) NSString * alias;
-@property (nonatomic, retain) NSNumber * port;
-@property (nonatomic, retain) NSNumber * runOnStartUp;
-@property (nonatomic, retain) NSString * log;
-@property (nonatomic, retain) NSString * path;
-@property (nonatomic, retain) NSString * loglevel;
-@property (nonatomic, retain) Bookmarks *bookmarks;
+@property (nonatomic, strong) NSNumber * isRunning;
+@property (nonatomic, strong) NSString * alias;
+@property (nonatomic, strong) NSNumber * port;
+@property (nonatomic, strong) NSNumber * runOnStartUp;
+@property (nonatomic, strong) NSString * log;
+@property (nonatomic, strong) NSString * path;
+@property (nonatomic, strong) NSString * loglevel;
+@property (nonatomic, strong) Bookmarks *bookmarks;
 
 @end

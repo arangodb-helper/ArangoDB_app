@@ -18,6 +18,6 @@
 // * 1 => Arangos that were running at last shutdown.
 // * 2 => Arangos that are labeled by the user.
 // * 3 => All Arangos.
-@property (nonatomic, retain) NSNumber * runOnStartUp;
+@property (nonatomic, strong) NSNumber * runOnStartUp;
 
 @end

@@ -42,14 +42,16 @@
 /// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (id) initWithArangoManager: (ArangoManager*) delegate
+- (id) initWithArangoManager: (ArangoManager*) manager
+              andAppDelegate: (ArangoAppDelegate*) delegate
                  andNibNamed: (NSString*) nib;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (id) initWithArangoManager: (ArangoManager*) delegate;
+- (id) initWithArangoManager: (ArangoManager*) manager
+              andAppDelegate: (ArangoAppDelegate*) delegate;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief "close" button

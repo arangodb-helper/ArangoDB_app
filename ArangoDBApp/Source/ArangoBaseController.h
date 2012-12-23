@@ -29,6 +29,7 @@
 #import <Cocoa/Cocoa.h>
 
 @class ArangoManager;
+@class ArangoAppDelegate;
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                              ArangoBaseController
@@ -41,23 +42,16 @@
 // -----------------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////////////
+/// @brief arango manager
+////////////////////////////////////////////////////////////////////////////////
+
+@property (nonatomic, readonly) ArangoManager* manager;
+
+////////////////////////////////////////////////////////////////////////////////
 /// @brief application delegate
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, assign, readonly) ArangoManager* delegate;
-
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief application delegate
-////////////////////////////////////////////////////////////////////////////////
-
-@property (nonatomic, assign, readonly) NSArray* tlo;
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief release window and controller when closed
-////////////////////////////////////////////////////////////////////////////////
-
-@property (nonatomic, assign, readonly) BOOL releaseWhenClosed;
+@property (nonatomic, readonly) ArangoAppDelegate* delegate;
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                    public methods
@@ -67,9 +61,9 @@
 /// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (id) initWithArangoManager: (ArangoManager*) delegate
-                 andNibNamed: (NSString*) name
-        andReleasedWhenClose: (BOOL) releasedWhenClosed;
+- (id) initWithArangoManager: (ArangoManager*) manager
+              andAppDelegate: (ArangoAppDelegate*) delegate
+                 andNibNamed: (NSString*) name;
 
 @end
 

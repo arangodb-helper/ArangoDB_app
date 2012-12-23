@@ -518,12 +518,12 @@
 		2C138E821684AD8200FB0B9F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_ENTITLEMENTS = ArangoDBApp/ArangoDB.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "Arango copy2-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "Arango copy";
-				PROVISIONING_PROFILE = "1976C438-A402-4E2C-AA1F-73B3CE877DC3";
 				STRIP_INSTALLED_PRODUCT = YES;
 			};
 			name = Debug;
@@ -531,12 +531,12 @@
 		2C138E831684AD8200FB0B9F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_ENTITLEMENTS = ArangoDBApp/ArangoDB.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "Arango copy2-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "Arango copy";
-				PROVISIONING_PROFILE = "1976C438-A402-4E2C-AA1F-73B3CE877DC3";
 				STRIP_INSTALLED_PRODUCT = YES;
 			};
 			name = Release;

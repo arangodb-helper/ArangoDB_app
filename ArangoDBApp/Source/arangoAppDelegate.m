@@ -60,12 +60,6 @@
 
 - (void) dealloc {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
-  
-  [_statusItem release];
-  [_statusMenu release];
-  [_manager release];
-  
-  [super dealloc];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -78,7 +72,7 @@
   _manager = [[ArangoManager alloc] init];
   
   if (_manager == nil) {
-    NSAlert* info = [[[NSAlert alloc] init] autorelease];
+    NSAlert* info = [[NSAlert alloc] init];
       
     [info setMessageText:@"ArangoDB application failed to start!"];
     [info setInformativeText:@"Cannot create or load the configuration. Please reinstall the application."];
@@ -89,6 +83,9 @@
     return;
   }
   
+  // create the controllers
+  _controllers = [[NSMutableArray alloc] init];
+  
   // check for changes in the configuration
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(configurationDidChange:)
@@ -96,7 +93,8 @@
                                              object:_manager];
 
   // create the menu
-  _statusMenu = [[ArangoToolbarMenu alloc] initWithArangoManager:_manager];
+  _statusMenu = [[ArangoToolbarMenu alloc] initWithArangoManager:_manager
+                                                  andAppDelegate:self];
   [_statusItem setMenu: _statusMenu];
   [_statusMenu setAutoenablesItems: NO];
 
@@ -106,7 +104,7 @@
   // without any configuration, display some help
   if (0 == _manager.configurations.count) {
     // will autorelease on close
-    [[ArangoIntroductionController alloc] initWithArangoManager:_manager];
+    [self addController:[[ArangoIntroductionController alloc] initWithArangoManager:_manager andAppDelegate:self]];
   }
   else {
     [_manager startupInstances];
@@ -118,10 +116,26 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 -(void) awakeFromNib {
-  _statusItem = [[[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength] retain];
+  _statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength];
 
   [_statusItem setImage: [NSImage imageNamed:@"IconColor"]];
   [_statusItem setHighlightMode:YES];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief adds a controller
+////////////////////////////////////////////////////////////////////////////////
+
+- (void) addController: (NSWindowController*) controller {
+  [_controllers addObject:controller];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief removes a controller
+////////////////////////////////////////////////////////////////////////////////
+
+- (void) removeController: (NSWindowController*) controller {
+  [_controllers removeObject:controller];
 }
 
 @end

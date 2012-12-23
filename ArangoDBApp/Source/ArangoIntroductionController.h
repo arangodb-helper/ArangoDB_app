@@ -28,6 +28,8 @@
 
 #import "ArangoHelpController.h"
 
+@class ArangoAppDelegate;
+
 // -----------------------------------------------------------------------------
 // --SECTION--                                      ArangoIntroductionController
 // -----------------------------------------------------------------------------
@@ -42,7 +44,8 @@
 /// @brief constructor
 ////////////////////////////////////////////////////////////////////////////////
 
-- (id) initWithArangoManager: (ArangoManager*) delegate;
+- (id) initWithArangoManager: (ArangoManager*) delegate
+              andAppDelegate: (ArangoAppDelegate*) delegate;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief "create instance" button

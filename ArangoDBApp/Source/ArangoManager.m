@@ -130,8 +130,8 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     // create SQLITE
     NSURL* sqliteURL = [storeURL URLByAppendingPathComponent:@"ArangoDB.sqlite"];
     NSURL* modelURL = [[NSBundle mainBundle] URLForResource:@"configurationModel" withExtension:@"momd"];
-    NSManagedObjectModel* model = [[[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL] autorelease];
-    NSPersistentStoreCoordinator* coordinator = [[[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:model] autorelease];
+    NSManagedObjectModel* model = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
+    NSPersistentStoreCoordinator* coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:model];
 
     if (! [coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:sqliteURL options:nil error:&err]) {
       self.lastError = [@"cannot create SQLITE storage: " stringByAppendingString:err.localizedDescription];
@@ -272,7 +272,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   }
   
   // load the global user configuration
-  NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
+  NSFetchRequest *request = [[NSFetchRequest alloc] init];
   NSEntityDescription *entity = [NSEntityDescription entityForName:@"User"
                                             inManagedObjectContext: _managedObjectContext];
   [request setEntity:entity];
@@ -287,7 +287,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   else {
     if (0 < fetchedResults.count) {
       for (User* u in fetchedResults) {
-        _user = [u retain];
+        _user = u;
         break;
       }
     }
@@ -298,7 +298,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   }
 
   // load the configurations
-  request = [[[NSFetchRequest alloc] init] autorelease];
+  request = [[NSFetchRequest alloc] init];
   entity = [NSEntityDescription entityForName:@"ArangoConfiguration"
                        inManagedObjectContext: _managedObjectContext];
   [request setEntity:entity];
@@ -413,7 +413,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     
   if ([[NSFileManager defaultManager] fileExistsAtPath:logPath isDirectory:&isDir]) {
     if (isDir) {
-      NSMutableString* tmp = [[[NSMutableString alloc] initWithString:logPath] autorelease];
+      NSMutableString* tmp = [[NSMutableString alloc] initWithString:logPath];
       [tmp appendString:@"/"];
       [tmp appendString:alias];
       [tmp appendString:@".log"];
@@ -490,17 +490,16 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
     NSString* path = [[NSBundle mainBundle] resourcePath];
 
-    _arangoDBBinary = [[path stringByAppendingString:_arangoDBVersion] retain];
-    _arangoDBConfig = [[path stringByAppendingString:@"/arangod.conf"] retain];
-    _arangoDBAdminDir = [[path stringByAppendingString:@"/html/admin"] retain];
-    _arangoDBJsActionDir = [[path stringByAppendingString:@"/js/actions/system"] retain];
-    _arangoDBJsModuleDir = [[[path stringByAppendingString:@"/js/server/modules:"] stringByAppendingString:[path stringByAppendingString:@"/js/common/modules"]] retain];
+    _arangoDBBinary = [path stringByAppendingString:_arangoDBVersion];
+    _arangoDBConfig = [path stringByAppendingString:@"/arangod.conf"];
+    _arangoDBAdminDir = [path stringByAppendingString:@"/html/admin"];
+    _arangoDBJsActionDir = [path stringByAppendingString:@"/js/actions/system"];
+    _arangoDBJsModuleDir = [[path stringByAppendingString:@"/js/server/modules:"] stringByAppendingString:[path stringByAppendingString:@"/js/common/modules"]];
 
     BOOL ok = [self loadConfigurations];
 
     if (! ok) {
       // TODO-fc broadcast fatal error
-      [self release];
       return nil;
     }
 
@@ -511,33 +510,11 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief destructor
-////////////////////////////////////////////////////////////////////////////////
-
-- (void) dealloc {
-  [_arangoDBVersion release];
-  [_arangoDBBinary release];
-  [_arangoDBConfig release];
-  [_arangoDBAdminDir release];
-  [_arangoDBJsActionDir release];
-  [_arangoDBJsModuleDir release];
-
-  [_managedObjectContext release];
-
-  [_configurations release];
-  [_user release];
-
-  [_instances release];
-
-  [super dealloc];
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// @brief finds a free port
 ////////////////////////////////////////////////////////////////////////////////
 
 - (NSNumber*) findFreePort {
-  NSMutableArray* ports = [[[NSMutableArray alloc] init] autorelease];
+  NSMutableArray* ports = [[NSMutableArray alloc] init];
 
   for (ArangoConfiguration* config in [_configurations allValues]) {
     [ports addObject:config.port];
@@ -708,13 +685,13 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
                        andName:alias];
 
   // everything ready to start
-  return [[[ArangoStatus alloc] initWithName:alias
+  return [[ArangoStatus alloc] initWithName:alias
                                      andPath:path
                                      andPort:port
                                   andLogPath:logPath
                                  andLogLevel:logLevel
                              andRunOnStartup:NO
-                                  andRunning:NO] autorelease];
+                                  andRunning:NO];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -722,7 +699,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 ////////////////////////////////////////////////////////////////////////////////
 
 - (NSArray*) currentStatus {
-  NSMutableArray* result = [[[NSMutableArray alloc] init] autorelease];
+  NSMutableArray* result = [[NSMutableArray alloc] init];
   NSArray* configurations = [[_configurations allKeys] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
 
   for (NSString* name in configurations) {
@@ -752,13 +729,13 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     isRunning = [task isRunning];
   }
 
-  return [[[ArangoStatus alloc] initWithName:config.alias
+  return [[ArangoStatus alloc] initWithName:config.alias
                                      andPath:config.path
                                      andPort:[config.port intValue]
                                   andLogPath:config.log
                                  andLogLevel:config.loglevel
                              andRunOnStartup:([config.runOnStartUp intValue] != 0)
-                                  andRunning:isRunning] autorelease];
+                                  andRunning:isRunning];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1032,7 +1009,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   NSString* logPath = config.log;
 
   if ([logPath isEqualToString:@""]) {
-    NSMutableString* tmp = [[[NSMutableString alloc] init] autorelease];
+    NSMutableString* tmp = [[NSMutableString alloc] init];
     [tmp setString:config.path];
     [tmp appendString:@"/"];
     [tmp appendString:config.alias];
@@ -1052,7 +1029,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   }
 
   // prepare task
-  task = [[[NSTask alloc] init] autorelease];
+  task = [[NSTask alloc] init];
   [task setLaunchPath:_arangoDBBinary];
 
   NSArray* arguments = [NSArray arrayWithObjects:
@@ -1143,23 +1120,21 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
   if (autostart) {
     UInt32 seedValue;
-    NSArray  *loginItemsArray = (NSArray *) LSSharedFileListCopySnapshot(autostart, &seedValue);
+    NSArray  *loginItemsArray = (NSArray *) CFBridgingRelease(LSSharedFileListCopySnapshot(autostart, &seedValue));
 
     for (int i = 0; i<  [loginItemsArray count];  ++i) {
-      LSSharedFileListItemRef itemRef = (LSSharedFileListItemRef) [loginItemsArray objectAtIndex:i];
-      CFURLRef url = (CFURLRef) [NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]];
+      LSSharedFileListItemRef itemRef = (__bridge LSSharedFileListItemRef) [loginItemsArray objectAtIndex:i];
+      CFURLRef url = (__bridge CFURLRef) [NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]];
 
       if (LSSharedFileListItemResolve(itemRef, 0, &url, nil) == noErr) {
-        NSString * urlPath = [(NSURL*)url path];
+        NSString * urlPath = [(__bridge NSURL*)url path];
 
         if ([urlPath compare:[[NSBundle mainBundle] bundlePath]] == NSOrderedSame) {
-          [loginItemsArray release];
           return YES;
         }
       }
     }
 
-    [loginItemsArray release];
   }
 
   return NO;
@@ -1181,7 +1156,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
   if (autostart) {
     if (startupOnLogin) {
-      LSSharedFileListItemRef arangoStarter = LSSharedFileListInsertItemURL(autostart, kLSSharedFileListItemLast, nil, nil, (CFURLRef)[NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]], nil, nil);
+      LSSharedFileListItemRef arangoStarter = LSSharedFileListInsertItemURL(autostart, kLSSharedFileListItemLast, nil, nil, (__bridge CFURLRef)[NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]], nil, nil);
 
       if (arangoStarter) {
         CFRelease(arangoStarter);
@@ -1191,14 +1166,14 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     }
     else {
       UInt32 seedValue;
-      NSArray  *loginItemsArray = (NSArray *) LSSharedFileListCopySnapshot(autostart, &seedValue);
+      NSArray  *loginItemsArray = (NSArray *) CFBridgingRelease(LSSharedFileListCopySnapshot(autostart, &seedValue));
 
       for (int i = 0; i< [loginItemsArray count]; i++){
-        LSSharedFileListItemRef itemRef = (LSSharedFileListItemRef) [loginItemsArray objectAtIndex:i];
-        CFURLRef url = (CFURLRef) [NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]];
+        LSSharedFileListItemRef itemRef = (__bridge LSSharedFileListItemRef) [loginItemsArray objectAtIndex:i];
+        CFURLRef url = (__bridge CFURLRef) [NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]];
 
         if (LSSharedFileListItemResolve(itemRef, 0, &url, nil) == noErr) {
-          NSString * urlPath = [(NSURL*)url path];
+          NSString * urlPath = [(__bridge NSURL*)url path];
 
           if ([urlPath compare:[[NSBundle mainBundle] bundlePath]] == NSOrderedSame){
             LSSharedFileListItemRemove(autostart,itemRef);
@@ -1206,7 +1181,6 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
         }
       }
 
-      [loginItemsArray release];
     }
   }
 }
