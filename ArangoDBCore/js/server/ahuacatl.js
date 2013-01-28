@@ -1370,8 +1370,8 @@ function AHUACATL_STRING_CONCAT_SEPARATOR () {
 /// the input operand must be a string or this function will fail
 ////////////////////////////////////////////////////////////////////////////////
 
-function AHUACATL_STRING_LENGTH (value) {
-  AHUACATL_ARG_CHECK(value, AHUACATL_TYPEWEIGHT_STRING, "STRING_LENGTH");
+function AHUACATL_CHAR_LENGTH (value) {
+  AHUACATL_ARG_CHECK(value, AHUACATL_TYPEWEIGHT_STRING, "CHAR_LENGTH");
 
   return value.length;
 }
@@ -2098,7 +2098,7 @@ function AHUACATL_GRAPH_PATHS () {
     minLength : minLength, 
     maxLength : maxLength, 
     direction : searchDirection,
-    followCycles : followCycles,
+    followCycles : followCycles
   };
 
   // TODO: restrict allEdges to edges with certain _from values etc.
@@ -2131,7 +2131,7 @@ function AHUACATL_GRAPH_SUBNODES (searchAttributes, vertexId, visited, edges, ve
         vertices : vertices, 
         edges : edges,
         source : vertices[0],
-        destination : vertices[vertices.length - 1],
+        destination : vertices[vertices.length - 1]
         });
   }
 
@@ -2155,10 +2155,10 @@ function AHUACATL_GRAPH_SUBNODES (searchAttributes, vertexId, visited, edges, ve
     var subEdge = subEdges[i];
     var targets = [ ];
 
-    if (searchAttributes.direction & 1) {
+    if ((searchAttributes.direction & 1) && (subEdge._to !== vertexId)) {
       targets.push(subEdge._to);
     }
-    if (searchAttributes.direction & 2) {
+    if ((searchAttributes.direction & 2) && (subEdge._from !== vertexId)) {
       targets.push(subEdge._from);
     }
 

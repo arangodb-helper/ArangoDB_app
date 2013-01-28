@@ -482,7 +482,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     else if ([[NSFileManager defaultManager] respondsToSelector:@selector(createDirectoryAtURL:withIntermediateDirectories:attributes:error:)]) {
       _arangoDBVersion = @"/arangod_10_7";
       _version = 107;
-    } 
+    }
     else {
       _arangoDBVersion = @"/arangod_10_6";
       _version = 106;
@@ -494,6 +494,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     _arangoDBConfig = [path stringByAppendingString:@"/arangod.conf"];
     _arangoDBAdminDir = [path stringByAppendingString:@"/html/admin"];
     _arangoDBJsActionDir = [path stringByAppendingString:@"/js/actions/system"];
+    _arangoDBJsStartupDir = [path stringByAppendingString:@"/js"];
     _arangoDBJsModuleDir = [[path stringByAppendingString:@"/js/server/modules:"] stringByAppendingString:[path stringByAppendingString:@"/js/common/modules"]];
 
     BOOL ok = [self loadConfigurations];
@@ -1040,6 +1041,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
                         @"--log.level", config.loglevel,
                         @"--server.admin-directory", _arangoDBAdminDir,
                         @"--javascript.action-directory", _arangoDBJsActionDir,
+                        @"--javascript.startup-directory", _arangoDBJsStartupDir,
                         @"--javascript.modules-path", _arangoDBJsModuleDir,
                         database, nil];
   [task setArguments:arguments];
