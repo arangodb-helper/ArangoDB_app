@@ -1,11 +1,5 @@
-/*jslint indent: 2,
-         nomen: true,
-         maxlen: 80,
-         sloppy: true */
-/*global require,
-    db,
-    assertEqual, assertTrue,
-    ArangoCollection */
+/*jslint indent: 2, nomen: true, maxlen: 80, sloppy: true */
+/*global require, assertEqual, assertTrue */
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief test the graph class
@@ -35,8 +29,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 var jsunity = require("jsunity");
+
+var arangodb = require("org/arangodb");
 var console = require("console");
-var internal = require("internal");
+
+var ArangoCollection = arangodb.ArangoCollection;
+var print = arangodb.print;
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                      graph module
@@ -63,7 +61,7 @@ function GraphCreationSuite() {
 
       graph = new Graph(graph_name, vertex, edge);
 
-      assertEqual(graph_name, graph._properties.name);
+      assertEqual(graph_name, graph._properties._key);
       assertTrue(graph._vertices.type() == ArangoCollection.TYPE_DOCUMENT);
       assertTrue(graph._edges.type() == ArangoCollection.TYPE_EDGE);
 
@@ -86,11 +84,32 @@ function GraphCreationSuite() {
       graph2 = new Graph(graph_name);
 
       assertEqual(graph1._properties.name, graph2._properties.name);
-      assertEqual(graph1._vertices, graph2._vertices);
-      assertEqual(graph1._edges, graph2._edges);
+      assertEqual(graph1._vertices._id, graph2._vertices._id);
+      assertEqual(graph1._edges._id, graph2._edges._id);
 
       graph1.drop();
+    },
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief test: Find Graph
+////////////////////////////////////////////////////////////////////////////////
+
+    testCreateGraph : function () {
+      var Graph = require("org/arangodb/graph").Graph,
+        graph_name = "UnitTestsCollectionGraph",
+        vertex = "UnitTestsCollectionVertex",
+        edge = "UnitTestsCollectionEdge",
+        one = null,
+        two = null,
+        graph = null;
+
+      graph = new Graph(graph_name, vertex, edge);
+      one = graph.addVertex("one");
+      two = graph.addVertex("two");
+      graph.addEdge(one, two);
+      graph.drop();
     }
+
   };
 }
 
@@ -115,8 +134,8 @@ function GraphBasicsSuite() {
       try {
         try {
           graph = new Graph(graph_name);
-          internal.print("FOUND: ");
-          internal.printObject(graph);
+          print("FOUND: ");
+          printObject(graph);
           graph.drop();
         } catch (err1) {
         }
@@ -157,7 +176,6 @@ function GraphBasicsSuite() {
 
     testCreateVertex : function () {
       var v = graph.addVertex("name1", { age : 23 });
-
       assertEqual("name1", v.getId());
       assertEqual(23, v.getProperty("age"));
     },
@@ -206,7 +224,7 @@ function GraphBasicsSuite() {
 
       edge = graph.addEdge(v1, v2);
 
-      assertEqual(null, edge.getId());
+      assertEqual(edge._properties._key, edge.getId());
     },
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -329,8 +347,8 @@ function VertexSuite() {
       try {
         try {
           graph = new Graph(graph_name);
-          internal.print("FOUND: ");
-          internal.printObject(graph);
+          print("FOUND: ");
+          printObject(graph);
           graph.drop();
         } catch (err1) {
         }
@@ -392,13 +410,14 @@ function VertexSuite() {
       v2 = graph.addVertex();
 
       edge = graph.addEdge(v1, v2);
-
+      
       assertEqual(edge.getId(), v1.getOutEdges()[0].getId());
       assertEqual(edge.getId(), v2.getInEdges()[0].getId());
-      assertEqual([], v1.getInEdges());
-      assertEqual([], v2.getOutEdges());
+      assertEqual(0, v1.getInEdges().length);
+      assertEqual(0, v2.getOutEdges().length);
       assertEqual(edge.getId(), v1.edges()[0].getId());
       assertEqual(edge.getId(), v2.edges()[0].getId());
+      assertEqual(1, v1.getEdges().length);
     },
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -428,7 +447,7 @@ function VertexSuite() {
     testProperties : function () {
       var v1;
 
-      v1 = graph.addVertex(graph);
+      v1 = graph.addVertex();
 
       v1.setProperty("myProperty", "myValue");
       assertEqual("myValue", v1.getProperty("myProperty"));
@@ -460,8 +479,8 @@ function EdgeSuite() {
       try {
         try {
           graph = new Graph(graph_name);
-          internal.print("FOUND: ");
-          internal.printObject(graph);
+          print("FOUND: ");
+          printObject(graph);
           graph.drop();
         } catch (err1) {
         }
@@ -499,8 +518,8 @@ function EdgeSuite() {
       v2 = graph.addVertex();
       edge = graph.addEdge(v1, v2);
 
-      assertEqual(v1.getId(), edge.getInVertex().getId());
-      assertEqual(v2.getId(), edge.getOutVertex().getId());
+      assertEqual(v1.getId(), edge.getOutVertex().getId());
+      assertEqual(v2.getId(), edge.getInVertex().getId());
     },
 
 ////////////////////////////////////////////////////////////////////////////////

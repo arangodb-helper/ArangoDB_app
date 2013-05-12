@@ -26,6 +26,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 var jsunity = require("jsunity");
+var internal = require("internal");
+var ArangoError = require("org/arangodb").ArangoError; 
+var QUERY = internal.AQL_QUERY;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief test suite
@@ -40,7 +43,7 @@ function ahuacatlQueryOptimiserRefTestSuite () {
 ////////////////////////////////////////////////////////////////////////////////
 
   function executeQuery (query) {
-    var cursor = AHUACATL_RUN(query, undefined);
+    var cursor = QUERY(query, undefined);
     if (cursor instanceof ArangoError) {
       print(query, cursor.errorMessage);
     }
@@ -68,7 +71,7 @@ function ahuacatlQueryOptimiserRefTestSuite () {
       else {
         var keys = [ ];
         for (var k in row) {
-          if (row.hasOwnProperty(k) && k != '_id' && k != '_rev') {
+          if (row.hasOwnProperty(k) && k != '_id' && k != '_rev' && k != '_key') {
             keys.push(k);
           }
         }
@@ -95,6 +98,7 @@ function ahuacatlQueryOptimiserRefTestSuite () {
 ////////////////////////////////////////////////////////////////////////////////
 
     setUp : function () {
+      internal.db._drop(cn);
       users = internal.db._create(cn);
       users.save({ "id" : 100, "name" : "John", "age" : 37, "active" : true, "gender" : "m" });
       users.save({ "id" : 101, "name" : "Fred", "age" : 36, "active" : true, "gender" : "m" });

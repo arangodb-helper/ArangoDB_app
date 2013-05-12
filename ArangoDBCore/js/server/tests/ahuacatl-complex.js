@@ -27,6 +27,7 @@
 
 var internal = require("internal");
 var jsunity = require("jsunity");
+var QUERY = internal.AQL_QUERY;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief test suite
@@ -41,7 +42,7 @@ function ahuacatlComplexTestSuite () {
 ////////////////////////////////////////////////////////////////////////////////
 
   function executeQuery (query, bindVars) {
-    var cursor = AHUACATL_RUN(query, bindVars, false, 3000);
+    var cursor = QUERY(query, bindVars, false, 3000);
     return cursor;
   }
 
@@ -70,12 +71,11 @@ function ahuacatlComplexTestSuite () {
 ////////////////////////////////////////////////////////////////////////////////
 
     setUp : function () {
-      numbers = internal.db.UnitTestsAhuacatlNumbers;
+      internal.db._drop("UnitTestsAhuacatlNumbers");
+      numbers = internal.db._create("UnitTestsAhuacatlNumbers");
 
-      if (numbers.count() == 0) {
-        for (i = 1; i <= 100; ++i) {
-          numbers.save({ "value" : i });
-        }
+      for (var i = 1; i <= 100; ++i) {
+        numbers.save({ "value" : i });
       }
     },
 
@@ -84,6 +84,7 @@ function ahuacatlComplexTestSuite () {
 ////////////////////////////////////////////////////////////////////////////////
 
     tearDown : function () {
+      internal.db._drop("UnitTestsAhuacatlNumbers");
     },
 
 ////////////////////////////////////////////////////////////////////////////////

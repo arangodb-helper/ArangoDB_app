@@ -171,14 +171,12 @@
 							<object class="NSTextFieldCell" key="NSCell" id="171218430">
 								<int key="NSCellFlags">67108864</int>
 								<int key="NSCellFlags2">272629760</int>
-								<object class="NSMutableString" key="NSContents">
-									<bytes key="NS.bytes">Q29uZ3JhdHVsYXRpb25zISBZb3UgaGF2ZSBzdWNjZXNzZnVsbHkgaW5zdGFsbGVkIEFyYW5nb0RCLiBO
+								<string type="base64-UTF8" key="NSContents">Q29uZ3JhdHVsYXRpb25zISBZb3UgaGF2ZSBzdWNjZXNzZnVsbHkgaW5zdGFsbGVkIEFyYW5nb0RCLiBO
 b3cgeW91IG11c3QgY3JlYXRlIGFuZCBjb25maWd1cmUgYSBuZXcgaW5zdGFuY2UuIEluIG9yZGVyIHRv
 IGxlYXJuIG1vcmUsIGNoZWNrb3V04oCo4oCoICAgIGh0dHA6Ly93d3cuYXJhbmdvZGIub3Jn4oCo4oCo
 QWZ0ZXIgdGhlIGNvbmZpZ3VyYXRpb24sIHlvdSBjYW4gdXNlIHlvdXIgZmF2b3JpdGUgd2ViIGJyb3dz
 ZXIgdG8gYWNjZXNzIHRoZSBhZG1pbmlzdHJhdGlvbiBpbnRlcmZhY2UuIElmIHlvdSBoYXZlIGFueSBx
-dWVzdGlvbnMsIHBsZWFzZSBjb250YWN0IHVzIGF0CgogICAgaGFja2Vyc0BhcmFuZ29kYi5vcmc</bytes>
-								</object>
+dWVzdGlvbnMsIHBsZWFzZSBjb250YWN0IHVzIGF0CgogICAgaGFja2Vyc0BhcmFuZ29kYi5vcmc</string>
 								<object class="NSFont" key="NSSupport">
 									<string key="NSName">LucidaGrande</string>
 									<double key="NSSize">13</double>

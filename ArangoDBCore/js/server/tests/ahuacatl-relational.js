@@ -27,6 +27,8 @@
 
 var internal = require("internal");
 var jsunity = require("jsunity");
+var ArangoError = require("org/arangodb").ArangoError; 
+var QUERY = internal.AQL_QUERY;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief test suite
@@ -40,7 +42,7 @@ function ahuacatlRelationalTestSuite () {
 ////////////////////////////////////////////////////////////////////////////////
 
   function executeQuery (query) {
-    var cursor = AHUACATL_RUN(query, undefined);
+    var cursor = QUERY(query, undefined);
     if (cursor instanceof ArangoError) {
       print(query, cursor.errorMessage);
     }

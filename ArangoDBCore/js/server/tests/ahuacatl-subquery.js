@@ -25,8 +25,8 @@
 /// @author Copyright 2012, triAGENS GmbH, Cologne, Germany
 ////////////////////////////////////////////////////////////////////////////////
 
-var internal = require("internal");
 var jsunity = require("jsunity");
+var QUERY = require("internal").AQL_QUERY;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief test suite
@@ -39,7 +39,7 @@ function ahuacatlSubqueryTestSuite () {
 ////////////////////////////////////////////////////////////////////////////////
 
   function executeQuery (query, bindVars) {
-    var cursor = AHUACATL_RUN(query, bindVars);
+    var cursor = QUERY(query, bindVars);
     return cursor;
   }
 

@@ -27,6 +27,7 @@
 
 var internal = require("internal");
 var jsunity = require("jsunity");
+var ArangoError = require("org/arangodb").ArangoError; 
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief test suite
@@ -167,7 +168,7 @@ function importTestSuite () {
 ////////////////////////////////////////////////////////////////////////////////
     
     testCsvImport2 : function () {
-      assertEqual(errors.ERROR_QUERY_COLLECTION_NOT_FOUND.code, getErrorCode(function() { executeQuery("FOR i IN UnitTestsImportCsv2 SORT i.id RETURN i"); } ));
+      assertEqual(errors.ERROR_ARANGO_COLLECTION_NOT_FOUND.code, getErrorCode(function() { executeQuery("FOR i IN UnitTestsImportCsv2 SORT i.id RETURN i"); } ));
     },
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -189,6 +190,22 @@ function importTestSuite () {
       var expected = [ { "  fox" : "dog", "brown  " : " the lazy", "the quick": " jumped over" }, { "  fox" : " end", "brown  " : "\"\"\"", "the quick" : "\"'.,;" } ];
       var actual = getQueryResults("FOR i IN UnitTestsImportTsv2 SORT i.`  fox` DESC RETURN i");
 
+      assertEqual(expected, actual);
+    },
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief test json edge import
+////////////////////////////////////////////////////////////////////////////////
+    
+    testJsonEdgesImport : function () {
+      var expected = [ 
+        { _from : "UnitTestsImportVertex/v1", _to: "UnitTestsImportVertex/v2", id: 1, what: "v1->v2" },
+        { _from : "UnitTestsImportVertex/v2", _to: "UnitTestsImportVertex/v3", id: 2, what: "v2->v3" },
+        { _from : "UnitTestsImportVertex/v9", _to: "UnitTestsImportVertex/v4", extra: "foo", id: 3, what: "v9->v4" },
+        { _from : "UnitTestsImportVertex/v12", _to: "UnitTestsImportVertex/what", id: 4 }
+      ];
+
+      var actual = getQueryResults("FOR i IN UnitTestsImportEdge SORT i.id RETURN i");
       assertEqual(expected, actual);
     }
 

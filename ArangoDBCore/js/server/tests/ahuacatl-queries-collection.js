@@ -26,6 +26,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 var jsunity = require("jsunity");
+var internal = require("internal");
+var ArangoError = require("org/arangodb").ArangoError; 
+var QUERY = internal.AQL_QUERY;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief test suite
@@ -40,7 +43,7 @@ function ahuacatlQueryCollectionTestSuite () {
 ////////////////////////////////////////////////////////////////////////////////
 
   function executeQuery (query) {
-    var cursor = AHUACATL_RUN(query, undefined);
+    var cursor = QUERY(query, undefined);
     if (cursor instanceof ArangoError) {
       print(query, cursor.errorMessage);
     }
@@ -68,7 +71,7 @@ function ahuacatlQueryCollectionTestSuite () {
       else {
         var keys = [ ];
         for (var k in row) {
-          if (row.hasOwnProperty(k) && k != '_id' && k != '_rev') {
+          if (row.hasOwnProperty(k) && k != '_id' && k != '_rev' && k != '_key') {
             keys.push(k);
           }
         }
@@ -95,76 +98,74 @@ function ahuacatlQueryCollectionTestSuite () {
 ////////////////////////////////////////////////////////////////////////////////
 
     setUp : function () {
-      users = internal.db.UnitTestsAhuacatlUsers;
-      relations = internal.db.UnitTestsAhuacatlUserRelations;
+      internal.db._drop("UnitTestsAhuacatlUsers");
+      internal.db._drop("UnitTestsAhuacatlUserRelations");
 
-      if (users.count() == 0) {
-        users.save({ "id" : 100, "name" : "John", "age" : 37, "active" : true, "gender" : "m" });
-        users.save({ "id" : 101, "name" : "Fred", "age" : 36, "active" : true, "gender" : "m" });
-        users.save({ "id" : 102, "name" : "Jacob", "age" : 35, "active" : false, "gender" : "m" });
-        users.save({ "id" : 103, "name" : "Ethan", "age" : 34, "active" : false, "gender" : "m" });
-        users.save({ "id" : 104, "name" : "Michael", "age" : 33, "active" : true, "gender" : "m" });
-        users.save({ "id" : 105, "name" : "Alexander", "age" : 32, "active" : true, "gender" : "m" });
-        users.save({ "id" : 106, "name" : "Daniel", "age" : 31, "active" : true, "gender" : "m" });
-        users.save({ "id" : 107, "name" : "Anthony", "age" : 30, "active" : true, "gender" : "m" });
-        users.save({ "id" : 108, "name" : "Jim", "age" : 29, "active" : true, "gender" : "m" });
-        users.save({ "id" : 109, "name" : "Diego", "age" : 28, "active" : true, "gender" : "m" });
+      users = internal.db._create("UnitTestsAhuacatlUsers");
+      relations = internal.db._create("UnitTestsAhuacatlUserRelations");
 
-        users.save({ "id" : 200, "name" : "Sophia", "age" : 37, "active" : true, "gender" : "f" });
-        users.save({ "id" : 201, "name" : "Emma", "age" : 36,  "active" : true, "gender" : "f" });
-        users.save({ "id" : 202, "name" : "Olivia", "age" : 35, "active" : false, "gender" : "f" });
-        users.save({ "id" : 203, "name" : "Madison", "age" : 34, "active" : true, "gender": "f" });
-        users.save({ "id" : 204, "name" : "Chloe", "age" : 33, "active" : true, "gender" : "f" });
-        users.save({ "id" : 205, "name" : "Eva", "age" : 32, "active" : false, "gender" : "f" });
-        users.save({ "id" : 206, "name" : "Abigail", "age" : 31, "active" : true, "gender" : "f" });
-        users.save({ "id" : 207, "name" : "Isabella", "age" : 30, "active" : true, "gender" : "f" });
-        users.save({ "id" : 208, "name" : "Mary", "age" : 29, "active" : true, "gender" : "f" });
-        users.save({ "id" : 209, "name" : "Mariah", "age" : 28, "active" : true, "gender" : "f" });
-      }
+      users.save({ "id" : 100, "name" : "John", "age" : 37, "active" : true, "gender" : "m" });
+      users.save({ "id" : 101, "name" : "Fred", "age" : 36, "active" : true, "gender" : "m" });
+      users.save({ "id" : 102, "name" : "Jacob", "age" : 35, "active" : false, "gender" : "m" });
+      users.save({ "id" : 103, "name" : "Ethan", "age" : 34, "active" : false, "gender" : "m" });
+      users.save({ "id" : 104, "name" : "Michael", "age" : 33, "active" : true, "gender" : "m" });
+      users.save({ "id" : 105, "name" : "Alexander", "age" : 32, "active" : true, "gender" : "m" });
+      users.save({ "id" : 106, "name" : "Daniel", "age" : 31, "active" : true, "gender" : "m" });
+      users.save({ "id" : 107, "name" : "Anthony", "age" : 30, "active" : true, "gender" : "m" });
+      users.save({ "id" : 108, "name" : "Jim", "age" : 29, "active" : true, "gender" : "m" });
+      users.save({ "id" : 109, "name" : "Diego", "age" : 28, "active" : true, "gender" : "m" });
 
-      if (relations.count() == 0) {
-        relations.save({ "from" : 209, "to" : 205, "type" : "friend" });
-        relations.save({ "from" : 206, "to" : 108, "type" : "friend" });
-        relations.save({ "from" : 202, "to" : 204, "type" : "friend" });
-        relations.save({ "from" : 200, "to" : 100, "type" : "friend" });
-        relations.save({ "from" : 205, "to" : 101, "type" : "friend" });
-        relations.save({ "from" : 209, "to" : 203, "type" : "friend" });
-        relations.save({ "from" : 200, "to" : 203, "type" : "friend" });
-        relations.save({ "from" : 100, "to" : 208, "type" : "friend" });
-        relations.save({ "from" : 101, "to" : 209, "type" : "friend" });
-        relations.save({ "from" : 206, "to" : 102, "type" : "friend" });
-        relations.save({ "from" : 104, "to" : 100, "type" : "friend" });
-        relations.save({ "from" : 104, "to" : 108, "type" : "friend" });
-        relations.save({ "from" : 108, "to" : 209, "type" : "friend" });
-        relations.save({ "from" : 206, "to" : 106, "type" : "friend" });
-        relations.save({ "from" : 204, "to" : 105, "type" : "friend" });
-        relations.save({ "from" : 208, "to" : 207, "type" : "friend" });
-        relations.save({ "from" : 102, "to" : 108, "type" : "friend" });
-        relations.save({ "from" : 207, "to" : 203, "type" : "friend" });
-        relations.save({ "from" : 203, "to" : 106, "type" : "friend" });
-        relations.save({ "from" : 202, "to" : 108, "type" : "friend" });
-        relations.save({ "from" : 201, "to" : 203, "type" : "friend" });
-        relations.save({ "from" : 105, "to" : 100, "type" : "friend" });
-        relations.save({ "from" : 100, "to" : 109, "type" : "friend" });
-        relations.save({ "from" : 207, "to" : 109, "type" : "friend" });
-        relations.save({ "from" : 103, "to" : 203, "type" : "friend" });
-        relations.save({ "from" : 208, "to" : 104, "type" : "friend" });
-        relations.save({ "from" : 105, "to" : 104, "type" : "friend" });
-        relations.save({ "from" : 103, "to" : 208, "type" : "friend" });
-        relations.save({ "from" : 203, "to" : 107, "type" : "boyfriend" });
-        relations.save({ "from" : 107, "to" : 203, "type" : "girlfriend" });
-        relations.save({ "from" : 208, "to" : 109, "type" : "boyfriend" });
-        relations.save({ "from" : 109, "to" : 208, "type" : "girlfriend" });
-        relations.save({ "from" : 106, "to" : 205, "type" : "girlfriend" });
-        relations.save({ "from" : 205, "to" : 106, "type" : "boyfriend" });
-        relations.save({ "from" : 103, "to" : 209, "type" : "girlfriend" });
-        relations.save({ "from" : 209, "to" : 103, "type" : "boyfriend" });
-        relations.save({ "from" : 201, "to" : 102, "type" : "boyfriend" });
-        relations.save({ "from" : 102, "to" : 201, "type" : "girlfriend" });
-        relations.save({ "from" : 206, "to" : 100, "type" : "boyfriend" });
-        relations.save({ "from" : 100, "to" : 206, "type" : "girlfriend" });
+      users.save({ "id" : 200, "name" : "Sophia", "age" : 37, "active" : true, "gender" : "f" });
+      users.save({ "id" : 201, "name" : "Emma", "age" : 36,  "active" : true, "gender" : "f" });
+      users.save({ "id" : 202, "name" : "Olivia", "age" : 35, "active" : false, "gender" : "f" });
+      users.save({ "id" : 203, "name" : "Madison", "age" : 34, "active" : true, "gender": "f" });
+      users.save({ "id" : 204, "name" : "Chloe", "age" : 33, "active" : true, "gender" : "f" });
+      users.save({ "id" : 205, "name" : "Eva", "age" : 32, "active" : false, "gender" : "f" });
+      users.save({ "id" : 206, "name" : "Abigail", "age" : 31, "active" : true, "gender" : "f" });
+      users.save({ "id" : 207, "name" : "Isabella", "age" : 30, "active" : true, "gender" : "f" });
+      users.save({ "id" : 208, "name" : "Mary", "age" : 29, "active" : true, "gender" : "f" });
+      users.save({ "id" : 209, "name" : "Mariah", "age" : 28, "active" : true, "gender" : "f" });
 
-      }
+      relations.save({ "from" : 209, "to" : 205, "type" : "friend" });
+      relations.save({ "from" : 206, "to" : 108, "type" : "friend" });
+      relations.save({ "from" : 202, "to" : 204, "type" : "friend" });
+      relations.save({ "from" : 200, "to" : 100, "type" : "friend" });
+      relations.save({ "from" : 205, "to" : 101, "type" : "friend" });
+      relations.save({ "from" : 209, "to" : 203, "type" : "friend" });
+      relations.save({ "from" : 200, "to" : 203, "type" : "friend" });
+      relations.save({ "from" : 100, "to" : 208, "type" : "friend" });
+      relations.save({ "from" : 101, "to" : 209, "type" : "friend" });
+      relations.save({ "from" : 206, "to" : 102, "type" : "friend" });
+      relations.save({ "from" : 104, "to" : 100, "type" : "friend" });
+      relations.save({ "from" : 104, "to" : 108, "type" : "friend" });
+      relations.save({ "from" : 108, "to" : 209, "type" : "friend" });
+      relations.save({ "from" : 206, "to" : 106, "type" : "friend" });
+      relations.save({ "from" : 204, "to" : 105, "type" : "friend" });
+      relations.save({ "from" : 208, "to" : 207, "type" : "friend" });
+      relations.save({ "from" : 102, "to" : 108, "type" : "friend" });
+      relations.save({ "from" : 207, "to" : 203, "type" : "friend" });
+      relations.save({ "from" : 203, "to" : 106, "type" : "friend" });
+      relations.save({ "from" : 202, "to" : 108, "type" : "friend" });
+      relations.save({ "from" : 201, "to" : 203, "type" : "friend" });
+      relations.save({ "from" : 105, "to" : 100, "type" : "friend" });
+      relations.save({ "from" : 100, "to" : 109, "type" : "friend" });
+      relations.save({ "from" : 207, "to" : 109, "type" : "friend" });
+      relations.save({ "from" : 103, "to" : 203, "type" : "friend" });
+      relations.save({ "from" : 208, "to" : 104, "type" : "friend" });
+      relations.save({ "from" : 105, "to" : 104, "type" : "friend" });
+      relations.save({ "from" : 103, "to" : 208, "type" : "friend" });
+      relations.save({ "from" : 203, "to" : 107, "type" : "boyfriend" });
+      relations.save({ "from" : 107, "to" : 203, "type" : "girlfriend" });
+      relations.save({ "from" : 208, "to" : 109, "type" : "boyfriend" });
+      relations.save({ "from" : 109, "to" : 208, "type" : "girlfriend" });
+      relations.save({ "from" : 106, "to" : 205, "type" : "girlfriend" });
+      relations.save({ "from" : 205, "to" : 106, "type" : "boyfriend" });
+      relations.save({ "from" : 103, "to" : 209, "type" : "girlfriend" });
+      relations.save({ "from" : 209, "to" : 103, "type" : "boyfriend" });
+      relations.save({ "from" : 201, "to" : 102, "type" : "boyfriend" });
+      relations.save({ "from" : 102, "to" : 201, "type" : "girlfriend" });
+      relations.save({ "from" : 206, "to" : 100, "type" : "boyfriend" });
+      relations.save({ "from" : 100, "to" : 206, "type" : "girlfriend" });
     },
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -172,6 +173,8 @@ function ahuacatlQueryCollectionTestSuite () {
 ////////////////////////////////////////////////////////////////////////////////
 
     tearDown : function () {
+      internal.db._drop("UnitTestsAhuacatlUsers");
+      internal.db._drop("UnitTestsAhuacatlUserRelations");
     },
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -27,6 +27,7 @@
 
 var internal = require("internal");
 var jsunity = require("jsunity");
+var QUERY = internal.AQL_QUERY;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief test suite
@@ -41,7 +42,7 @@ function ahuacatlSkiplistTestSuite () {
 ////////////////////////////////////////////////////////////////////////////////
 
   function executeQuery (query, bindVars) {
-    var cursor = AHUACATL_RUN(query, bindVars);
+    var cursor = QUERY(query, bindVars);
     return cursor;
   }
 
@@ -72,17 +73,16 @@ function ahuacatlSkiplistTestSuite () {
 ////////////////////////////////////////////////////////////////////////////////
 
     setUp : function () {
-      skiplist = internal.db.UnitTestsAhuacatlSkiplist;
+      internal.db._drop("UnitTestsAhuacatlSkiplist");
+      skiplist = internal.db._create("UnitTestsAhuacatlSkiplist");
 
-      if (skiplist.count() == 0) {
-        for (var i = 1; i <= 5; ++i) {
-          for (var j = 1; j <= 5; ++j) {
-            skiplist.save({ "a" : i, "b": j });
-          }
+      for (var i = 1; i <= 5; ++i) {
+        for (var j = 1; j <= 5; ++j) {
+          skiplist.save({ "a" : i, "b": j });
         }
-
-        skiplist.ensureSkiplist("a", "b");
       }
+
+      skiplist.ensureSkiplist("a", "b");
     },
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -90,6 +90,8 @@ function ahuacatlSkiplistTestSuite () {
 ////////////////////////////////////////////////////////////////////////////////
 
     tearDown : function () {
+      internal.db._drop("UnitTestsAhuacatlSkiplist");
+      skiplist = null;
     },
 
 ////////////////////////////////////////////////////////////////////////////////

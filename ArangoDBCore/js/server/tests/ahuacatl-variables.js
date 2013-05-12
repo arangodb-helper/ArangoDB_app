@@ -27,6 +27,7 @@
 
 var internal = require("internal");
 var jsunity = require("jsunity");
+var QUERY = internal.AQL_QUERY;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief test suite
@@ -66,11 +67,41 @@ function ahuacatlVariablesTestSuite () {
     },
 
 ////////////////////////////////////////////////////////////////////////////////
+/// @brief test valid declaration
+////////////////////////////////////////////////////////////////////////////////
+
+    testValid1 : function () {
+      var result = QUERY("LET a = 1 RETURN a").getRows();
+
+      assertEqual([ 1 ], result);
+    },
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief test valid declaration
+////////////////////////////////////////////////////////////////////////////////
+
+    testValid2 : function () {
+      var result = QUERY("LET a = 1 LET b = 2 RETURN [ a, b ]").getRows();
+
+      assertEqual([ [ 1, 2 ] ], result);
+    },
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief test valid declaration
+////////////////////////////////////////////////////////////////////////////////
+
+    testValid3 : function () {
+      var result = QUERY("LET `a b c` = 1 RETURN `a b c`").getRows();
+
+      assertEqual([ 1 ], result);
+    },
+
+////////////////////////////////////////////////////////////////////////////////
 /// @brief test redeclaration
 ////////////////////////////////////////////////////////////////////////////////
 
     testRedeclare1 : function () {
-      assertEqual(errors.ERROR_QUERY_VARIABLE_REDECLARED.code, getErrorCode(function() { AHUACATL_RUN("LET a = 1 LET a = 1 RETURN 0"); }));
+      assertEqual(errors.ERROR_QUERY_VARIABLE_REDECLARED.code, getErrorCode(function() { QUERY("LET a = 1 LET a = 1 RETURN 0"); }));
     },
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -78,7 +109,7 @@ function ahuacatlVariablesTestSuite () {
 ////////////////////////////////////////////////////////////////////////////////
 
     testRedeclare2 : function () {
-      assertEqual(errors.ERROR_QUERY_VARIABLE_REDECLARED.code, getErrorCode(function() { AHUACATL_RUN("LET a = 1 LET b = 1 LET c = 1 LET b = a RETURN 0"); }));
+      assertEqual(errors.ERROR_QUERY_VARIABLE_REDECLARED.code, getErrorCode(function() { QUERY("LET a = 1 LET b = 1 LET c = 1 LET b = a RETURN 0"); }));
     },
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -86,7 +117,7 @@ function ahuacatlVariablesTestSuite () {
 ////////////////////////////////////////////////////////////////////////////////
 
     testRedeclare3 : function () {
-      assertEqual(errors.ERROR_QUERY_VARIABLE_REDECLARED.code, getErrorCode(function() { AHUACATL_RUN("LET a = 1 FOR a IN [ 1 ] RETURN 0"); }));
+      assertEqual(errors.ERROR_QUERY_VARIABLE_REDECLARED.code, getErrorCode(function() { QUERY("LET a = 1 FOR a IN [ 1 ] RETURN 0"); }));
     }
 
   };

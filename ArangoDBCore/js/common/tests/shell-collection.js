@@ -26,7 +26,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 var jsunity = require("jsunity");
-var internal = require("internal");
+
+var arangodb = require("org/arangodb");
+
+var ArangoCollection = arangodb.ArangoCollection;
+var db = arangodb.db;
+var ERRORS = arangodb.errors;
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                collection methods
@@ -37,8 +42,6 @@ var internal = require("internal");
 ////////////////////////////////////////////////////////////////////////////////
 
 function CollectionSuiteErrorHandling () {
-  var ERRORS = internal.errors;
-
   return {
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -48,7 +51,7 @@ function CollectionSuiteErrorHandling () {
     testErrorHandlingBadNameTooLong : function () {
       try {
         // one char too long
-        internal.db._create("a1234567890123456789012345678901234567890123456789012345678901234");
+        db._create("a1234567890123456789012345678901234567890123456789012345678901234");
       }
       catch (err) {
         assertEqual(ERRORS.ERROR_ARANGO_ILLEGAL_NAME.code, err.errorNum);
@@ -62,7 +65,7 @@ function CollectionSuiteErrorHandling () {
     testErrorHandlingBadNameSystem : function () {
       try {
         // one char too long
-        internal.db._create("1234");
+        db._create("1234");
       }
       catch (err) {
         assertEqual(ERRORS.ERROR_ARANGO_ILLEGAL_NAME.code, err.errorNum);
@@ -75,7 +78,7 @@ function CollectionSuiteErrorHandling () {
 
     testErrorHandlingBadNameUnderscore : function () {
       try {
-        internal.db._create("_illegal");
+        db._create("_illegal");
       }
       catch (err) {
         assertEqual(ERRORS.ERROR_ARANGO_ILLEGAL_NAME.code, err.errorNum);
@@ -88,7 +91,7 @@ function CollectionSuiteErrorHandling () {
 
     testErrorHandlingBadNameEmpty : function () {
       try {
-        internal.db._create("");
+        db._create("");
       }
       catch (err) {
         assertEqual(ERRORS.ERROR_ARANGO_ILLEGAL_NAME.code, err.errorNum);
@@ -101,7 +104,7 @@ function CollectionSuiteErrorHandling () {
 
     testErrorHandlingBadNameNumber : function () {
       try {
-        internal.db._create("12345");
+        db._create("12345");
       }
       catch (err) {
         assertEqual(ERRORS.ERROR_ARANGO_ILLEGAL_NAME.code, err.errorNum);
@@ -114,7 +117,7 @@ function CollectionSuiteErrorHandling () {
 
     testErrorHandlingBadNameUnderscoreShortCut : function () {
       try {
-        internal.db["_illegal"];
+        db["_illegal"];
       }
       catch (err) {
         assertEqual(ERRORS.ERROR_ARANGO_ILLEGAL_NAME.code, err.errorNum);
@@ -127,7 +130,7 @@ function CollectionSuiteErrorHandling () {
 
     testErrorHandlingBadNameEmptyShortCut : function () {
       try {
-        internal.db[""];
+        db[""];
       }
       catch (err) {
         assertEqual(ERRORS.ERROR_ARANGO_ILLEGAL_NAME.code, err.errorNum);
@@ -140,12 +143,30 @@ function CollectionSuiteErrorHandling () {
 
     testErrorHandlingBadNameNumberShortCut : function () {
       try {
-        internal.db["12345"];
+        db["12345"];
       }
       catch (err) {
         assertEqual(ERRORS.ERROR_ARANGO_ILLEGAL_NAME.code, err.errorNum);
       }
-    }
+    },
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief creating with too small journal size
+////////////////////////////////////////////////////////////////////////////////
+
+    testErrorInvalidJournalSize : function () {
+      var cn = "example";
+
+      db._drop(cn);
+      try {
+        db._create(cn, { waitForSync : false, journalSize : 1024 });
+        fail();
+      }
+      catch (err) {
+        assertEqual(ERRORS.ERROR_BAD_PARAMETER.code, err.errorNum);
+      }
+    },
+
   };
 }
 
@@ -154,8 +175,6 @@ function CollectionSuiteErrorHandling () {
 ////////////////////////////////////////////////////////////////////////////////
 
 function CollectionSuite () {
-  var ERRORS = require("internal").errors;
-
   return {
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -165,11 +184,11 @@ function CollectionSuite () {
     testCreateLongName : function () {
       var cn = "a123456789012345678901234567890123456789012345678901234567890123";
 
-      internal.db._drop(cn);
-      var c1 = internal.db._create(cn);
+      db._drop(cn);
+      var c1 = db._create(cn);
       assertEqual(cn, c1.name());
 
-      internal.db._drop(cn);
+      db._drop(cn);
     },
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -179,20 +198,20 @@ function CollectionSuite () {
     testReadingByName : function () {
       var cn = "example";
 
-      internal.db._drop(cn);
-      var c1 = internal.db._create(cn);
+      db._drop(cn);
+      var c1 = db._create(cn);
 
-      assertTypeOf("number", c1._id);
+      assertTypeOf("string", c1._id);
       assertEqual(cn, c1.name());
       assertTypeOf("number", c1.status());
 
-      var c2 = internal.db._collection(cn);
+      var c2 = db._collection(cn);
 
       assertEqual(c1._id, c2._id);
       assertEqual(c1.name(), c2.name());
       assertEqual(c1.status(), c2.status());
 
-      internal.db._drop(cn);
+      db._drop(cn);
     },
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -202,23 +221,23 @@ function CollectionSuite () {
     testReadingByIdentifier : function () {
       var cn = "example";
 
-      internal.db._drop(cn);
-      var c1 = internal.db._create(cn);
+      db._drop(cn);
+      var c1 = db._create(cn);
 
-      assertTypeOf("number", c1._id);
+      assertTypeOf("string", c1._id);
       assertEqual(cn, c1.name());
       assertTypeOf("number", c1.status());
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
       assertTypeOf("number", c1.type());
 
-      var c2 = internal.db._collection(c1._id);
+      var c2 = db._collection(c1._id);
 
       assertEqual(c1._id, c2._id);
       assertEqual(c1.name(), c2.name());
       assertEqual(c1.status(), c2.status());
       assertEqual(c1.type(), c2.type());
 
-      internal.db._drop(cn);
+      db._drop(cn);
     },
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -228,23 +247,23 @@ function CollectionSuite () {
     testReadingByNameShortCut : function () {
       var cn = "example";
 
-      internal.db._drop(cn);
-      var c1 = internal.db._create(cn);
+      db._drop(cn);
+      var c1 = db._create(cn);
 
-      assertTypeOf("number", c1._id);
+      assertTypeOf("string", c1._id);
       assertEqual(cn, c1.name());
       assertTypeOf("number", c1.status());
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
       assertTypeOf("number", c1.type());
 
-      var c2 = internal.db[cn];
+      var c2 = db[cn];
 
       assertEqual(c1._id, c2._id);
       assertEqual(c1.name(), c2.name());
       assertEqual(c1.status(), c2.status());
       assertEqual(c1.type(), c2.type());
 
-      internal.db._drop(cn);
+      db._drop(cn);
     },
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -254,20 +273,20 @@ function CollectionSuite () {
     testReadingAll : function () {
       var cn = "example";
 
-      internal.db._drop(cn);
-      var c1 = internal.db._create(cn);
+      db._drop(cn);
+      var c1 = db._create(cn);
 
-      assertTypeOf("number", c1._id);
+      assertTypeOf("string", c1._id);
       assertEqual(cn, c1.name());
       assertTypeOf("number", c1.status());
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
       assertTypeOf("number", c1.type());
 
-      var l = internal.db._collections();
+      var l = db._collections();
 
       assertNotEqual(0, l.length);
 
-      internal.db._drop(cn);
+      db._drop(cn);
     },
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -277,10 +296,10 @@ function CollectionSuite () {
     testCreatingDocumentCollection : function () {
       var cn = "example";
 
-      internal.db._drop(cn);
-      var c1 = internal.db._createDocumentCollection(cn);
+      db._drop(cn);
+      var c1 = db._createDocumentCollection(cn);
 
-      assertTypeOf("number", c1._id);
+      assertTypeOf("string", c1._id);
       assertEqual(cn, c1.name());
       assertTypeOf("number", c1.status());
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
@@ -289,8 +308,9 @@ function CollectionSuite () {
       var p = c1.properties();
 
       assertEqual(false, p.waitForSync);
+      assertEqual(false, p.isVolatile);
 
-      internal.db._drop(cn);
+      db._drop(cn);
     },
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -300,10 +320,10 @@ function CollectionSuite () {
     testCreatingEdgeCollection : function () {
       var cn = "example";
 
-      internal.db._drop(cn);
-      var c1 = internal.db._createEdgeCollection(cn);
+      db._drop(cn);
+      var c1 = db._createEdgeCollection(cn);
 
-      assertTypeOf("number", c1._id);
+      assertTypeOf("string", c1._id);
       assertEqual(cn, c1.name());
       assertTypeOf("number", c1.status());
       assertEqual(ArangoCollection.TYPE_EDGE, c1.type());
@@ -312,8 +332,9 @@ function CollectionSuite () {
       var p = c1.properties();
 
       assertEqual(false, p.waitForSync);
+      assertEqual(false, p.isVolatile);
 
-      internal.db._drop(cn);
+      db._drop(cn);
     },
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -323,15 +344,15 @@ function CollectionSuite () {
     testTypeDocumentCollection : function () {
       var cn = "example";
 
-      internal.db._drop(cn);
-      var c1 = internal.db._createDocumentCollection(cn);
+      db._drop(cn);
+      var c1 = db._createDocumentCollection(cn);
       c1.unload();
       c1 = null;
 
-      c2 = internal.db[cn];
+      c2 = db[cn];
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c2.type());
 
-      internal.db._drop(cn);
+      db._drop(cn);
     },
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -341,15 +362,15 @@ function CollectionSuite () {
     testTypeEdgeCollection : function () {
       var cn = "example";
 
-      internal.db._drop(cn);
-      var c1 = internal.db._createEdgeCollection(cn);
+      db._drop(cn);
+      var c1 = db._createEdgeCollection(cn);
       c1.unload();
       c1 = null;
 
-      c2 = internal.db[cn];
+      c2 = db[cn];
       assertEqual(ArangoCollection.TYPE_EDGE, c2.type());
 
-      internal.db._drop(cn);
+      db._drop(cn);
     },
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -359,10 +380,10 @@ function CollectionSuite () {
     testCreatingDefaults : function () {
       var cn = "example";
 
-      internal.db._drop(cn);
-      var c1 = internal.db._create(cn);
+      db._drop(cn);
+      var c1 = db._create(cn);
 
-      assertTypeOf("number", c1._id);
+      assertTypeOf("string", c1._id);
       assertEqual(cn, c1.name());
       assertTypeOf("number", c1.status());
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
@@ -371,8 +392,10 @@ function CollectionSuite () {
       var p = c1.properties();
 
       assertEqual(false, p.waitForSync);
+      assertEqual(false, p.isVolatile);
+      assertEqual(1048576, p.journalSize);
 
-      internal.db._drop(cn);
+      db._drop(cn);
     },
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -382,10 +405,10 @@ function CollectionSuite () {
     testCreatingProperties : function () {
       var cn = "example";
 
-      internal.db._drop(cn);
-      var c1 = internal.db._create(cn, { waitForSync : true, journalSize : 1024 * 1024 });
+      db._drop(cn);
+      var c1 = db._create(cn, { waitForSync : true, journalSize : 1024 * 1024 });
 
-      assertTypeOf("number", c1._id);
+      assertTypeOf("string", c1._id);
       assertEqual(cn, c1.name());
       assertTypeOf("number", c1.status());
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
@@ -394,16 +417,33 @@ function CollectionSuite () {
       var p = c1.properties();
 
       assertEqual(true, p.waitForSync);
+      assertEqual(false, p.isVolatile);
+      assertEqual(1048576, p.journalSize);
 
-      if (p.journalSize < 1024 * 1024) {
-        fail();
-      }
+      db._drop(cn);
+    },
 
-      if (1024 * 1025 < p.journalSize) {
-        fail();
-      }
+////////////////////////////////////////////////////////////////////////////////
+/// @brief creating with properties
+////////////////////////////////////////////////////////////////////////////////
 
-      internal.db._drop(cn);
+    testCreatingProperties2 : function () {
+      var cn = "example";
+
+      db._drop(cn);
+      var c1 = db._create(cn, { isVolatile : true });
+
+      assertTypeOf("string", c1._id);
+      assertEqual(cn, c1.name());
+      assertTypeOf("number", c1.status());
+      assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
+      assertTypeOf("number", c1.type());
+
+      var p = c1.properties();
+
+      assertEqual(true, p.isVolatile);
+      assertEqual(1048576, p.journalSize);
+      db._drop(cn);
     },
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -413,10 +453,10 @@ function CollectionSuite () {
     testDroppingNewBorn : function () {
       var cn = "example";
 
-      internal.db._drop(cn);
-      var c1 = internal.db._create(cn);
+      db._drop(cn);
+      var c1 = db._create(cn);
 
-      assertTypeOf("number", c1._id);
+      assertTypeOf("string", c1._id);
       assertEqual(cn, c1.name());
       assertTypeOf("number", c1.status());
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
@@ -427,7 +467,7 @@ function CollectionSuite () {
       assertEqual(ArangoCollection.STATUS_DELETED, c1.status());
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
 
-      var c2 = internal.db._collection(cn);
+      var c2 = db._collection(cn);
 
       assertEqual(null, c2);
     },
@@ -439,12 +479,12 @@ function CollectionSuite () {
     testDroppingLoaded : function () {
       var cn = "example";
 
-      internal.db._drop(cn);
-      var c1 = internal.db._create(cn);
+      db._drop(cn);
+      var c1 = db._create(cn);
 
       c1.save({ a : 1 });
 
-      assertTypeOf("number", c1._id);
+      assertTypeOf("string", c1._id);
       assertEqual(cn, c1.name());
       assertTypeOf("number", c1.status());
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
@@ -455,7 +495,7 @@ function CollectionSuite () {
       assertEqual(ArangoCollection.STATUS_DELETED, c1.status());
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
 
-      var c2 = internal.db._collection(cn);
+      var c2 = db._collection(cn);
 
       assertEqual(null, c2);
     },
@@ -467,13 +507,13 @@ function CollectionSuite () {
     testDroppingUnloaded : function () {
       var cn = "example";
 
-      internal.db._drop(cn);
-      var c1 = internal.db._create(cn);
+      db._drop(cn);
+      var c1 = db._create(cn);
 
       c1.save({ a : 1 });
       c1.unload();
 
-      assertTypeOf("number", c1._id);
+      assertTypeOf("string", c1._id);
       assertEqual(cn, c1.name());
       assertTypeOf("number", c1.status());
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
@@ -484,7 +524,7 @@ function CollectionSuite () {
       assertEqual(ArangoCollection.STATUS_DELETED, c1.status());
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
 
-      var c2 = internal.db._collection(cn);
+      var c2 = db._collection(cn);
 
       assertEqual(null, c2);
     },
@@ -496,10 +536,10 @@ function CollectionSuite () {
     testTruncatingNewBorn : function () {
       var cn = "example";
 
-      internal.db._drop(cn);
-      var c1 = internal.db._create(cn);
+      db._drop(cn);
+      var c1 = db._create(cn);
 
-      assertTypeOf("number", c1._id);
+      assertTypeOf("string", c1._id);
       assertEqual(cn, c1.name());
       assertTypeOf("number", c1.status());
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
@@ -511,7 +551,7 @@ function CollectionSuite () {
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
       assertEqual(0, c1.count());
 
-      internal.db._drop(cn);
+      db._drop(cn);
     },
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -521,12 +561,12 @@ function CollectionSuite () {
     testTruncatingLoaded : function () {
       var cn = "example";
 
-      internal.db._drop(cn);
-      var c1 = internal.db._create(cn);
+      db._drop(cn);
+      var c1 = db._create(cn);
 
       c1.save({ a : 1 });
 
-      assertTypeOf("number", c1._id);
+      assertTypeOf("string", c1._id);
       assertEqual(cn, c1.name());
       assertTypeOf("number", c1.status());
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
@@ -538,7 +578,7 @@ function CollectionSuite () {
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
       assertEqual(0, c1.count());
 
-      internal.db._drop(cn);
+      db._drop(cn);
     },
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -548,13 +588,13 @@ function CollectionSuite () {
     testTruncatingUnloaded : function () {
       var cn = "example";
 
-      internal.db._drop(cn);
-      var c1 = internal.db._create(cn);
+      db._drop(cn);
+      var c1 = db._create(cn);
 
       c1.save({ a : 1 });
       c1.unload();
 
-      assertTypeOf("number", c1._id);
+      assertTypeOf("string", c1._id);
       assertEqual(cn, c1.name());
       assertTypeOf("number", c1.status());
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
@@ -566,7 +606,7 @@ function CollectionSuite () {
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
       assertEqual(0, c1.count());
 
-      internal.db._drop(cn);
+      db._drop(cn);
     },
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -576,8 +616,8 @@ function CollectionSuite () {
     testFigures : function () {
       var cn = "example";
 
-      internal.db._drop(cn);
-      var c1 = internal.db._create(cn);
+      db._drop(cn);
+      var c1 = db._create(cn);
 
       c1.load();
 
@@ -646,7 +686,7 @@ function CollectionSuite () {
       assertNotEqual(0, f.dead.size);
       assertEqual(2, f.dead.deletion);
 
-      internal.db._drop(cn);
+      db._drop(cn);
     },
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -657,13 +697,13 @@ function CollectionSuite () {
       var cn = "example";
       var nn = "example2";
 
-      internal.db._drop(cn);
-      internal.db._drop(nn);
-      var c1 = internal.db._create(cn);
+      db._drop(cn);
+      db._drop(nn);
+      var c1 = db._create(cn);
 
       c1.save({ a : 1 });
 
-      assertTypeOf("number", c1._id);
+      assertTypeOf("string", c1._id);
       assertEqual(cn, c1.name());
       assertTypeOf("number", c1.status());
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
@@ -679,11 +719,11 @@ function CollectionSuite () {
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
       assertTypeOf("number", c1.type());
 
-      var c2 = internal.db._collection(cn);
+      var c2 = db._collection(cn);
 
       assertEqual(null, c2);
 
-      internal.db._drop(nn);
+      db._drop(nn);
     },
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -694,14 +734,14 @@ function CollectionSuite () {
       var cn = "example";
       var nn = "example2";
 
-      internal.db._drop(cn);
-      internal.db._drop(nn);
-      var c1 = internal.db._create(cn);
+      db._drop(cn);
+      db._drop(nn);
+      var c1 = db._create(cn);
 
       c1.save({ a : 1 });
       c1.unload();
 
-      assertTypeOf("number", c1._id);
+      assertTypeOf("string", c1._id);
       assertEqual(cn, c1.name());
       assertTypeOf("number", c1.status());
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
@@ -717,11 +757,11 @@ function CollectionSuite () {
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
       assertTypeOf("number", c1.type());
 
-      var c2 = internal.db._collection(cn);
+      var c2 = db._collection(cn);
 
       assertEqual(null, c2);
 
-      internal.db._drop(nn);
+      db._drop(nn);
     },
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -732,10 +772,10 @@ function CollectionSuite () {
       var cn1 = "example";
       var cn2 = "example2";
 
-      internal.db._drop(cn1);
-      internal.db._drop(cn2);
-      var c1 = internal.db._create(cn1);
-      var c2 = internal.db._create(cn2);
+      db._drop(cn1);
+      db._drop(cn2);
+      var c1 = db._create(cn1);
+      var c2 = db._create(cn2);
 
       try {
         c1.rename(cn2);
@@ -743,13 +783,50 @@ function CollectionSuite () {
       catch (err) {
         assertEqual(ERRORS.ERROR_ARANGO_DUPLICATE_NAME.code, err.errorNum);
       }
-      internal.db._drop(cn1);
-      internal.db._drop(cn2);
+      db._drop(cn1);
+      db._drop(cn2);
+    },
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief test revision id
+////////////////////////////////////////////////////////////////////////////////
+
+    testRevision : function () {
+      var cn = "example";
+
+      db._drop(cn);
+      var c1 = db._create(cn);
+
+      var r1 = c1.revision();
+      assertTypeOf("string", r1);
+      assertTrue(r1 !== "");
+      assertTrue(r1.match(/^[0-9]+$/));
+
+      c1.save({ a : 1 });
+      var r2 = c1.revision();
+      assertTrue(r1 != r2);
+      assertTypeOf("string", r2);
+      assertTrue(r2 !== "");
+      assertTrue(r2.match(/^[0-9]+$/));
+      
+      c1.save({ a : 2 });
+      var r3 = c1.revision();
+      assertTrue(r1 != r3);
+      assertTrue(r2 != r3);
+      assertTypeOf("string", r3);
+      assertTrue(r3 !== "");
+      assertTrue(r3.match(/^[0-9]+$/));
+
+      c1.unload();
+      var r4 = c1.revision();
+      assertTypeOf("string", r4);
+      assertEqual(r3, r4);
     }
+
   };
 }
 
-////////////////////////////////////////////////////////////////////////////////
+// -----------------------------------------------------------------------------
 // --SECTION--                                                   vocbase methods
 // -----------------------------------------------------------------------------
 
@@ -758,8 +835,6 @@ function CollectionSuite () {
 ////////////////////////////////////////////////////////////////////////////////
 
 function CollectionDbSuite () {
-  var ERRORS = require("internal").errors;
-
   return {
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -770,12 +845,12 @@ function CollectionDbSuite () {
       var cn1 = "example1";
       var cn2 = "example2";
 
-      internal.db._drop(cn1);
-      internal.db._drop(cn2);
-      var c1 = internal.db._createDocumentCollection(cn1);
-      var c2 = internal.db._createEdgeCollection(cn2);
+      db._drop(cn1);
+      db._drop(cn2);
+      var c1 = db._createDocumentCollection(cn1);
+      var c2 = db._createEdgeCollection(cn2);
 
-      var collections = internal.db._collections();
+      var collections = db._collections();
       for (var i in collections) {
         var c = collections[i];
 
@@ -791,8 +866,8 @@ function CollectionDbSuite () {
         }
       }
 
-      internal.db._drop(cn1);
-      internal.db._drop(cn2);
+      db._drop(cn1);
+      db._drop(cn2);
     },
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -802,21 +877,21 @@ function CollectionDbSuite () {
     testDroppingNewBornDB : function () {
       var cn = "example";
 
-      internal.db._drop(cn);
-      var c1 = internal.db._create(cn);
+      db._drop(cn);
+      var c1 = db._create(cn);
 
-      assertTypeOf("number", c1._id);
+      assertTypeOf("string", c1._id);
       assertEqual(cn, c1.name());
       assertTypeOf("number", c1.status());
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
       assertTypeOf("number", c1.type());
 
-      internal.db._drop(cn);
+      db._drop(cn);
 
       assertEqual(ArangoCollection.STATUS_DELETED, c1.status());
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
 
-      var c2 = internal.db._collection(cn);
+      var c2 = db._collection(cn);
 
       assertEqual(null, c2);
     },
@@ -828,23 +903,23 @@ function CollectionDbSuite () {
     testDroppingLoadedDB : function () {
       var cn = "example";
 
-      internal.db._drop(cn);
-      var c1 = internal.db._create(cn);
+      db._drop(cn);
+      var c1 = db._create(cn);
 
       c1.save({ a : 1 });
 
-      assertTypeOf("number", c1._id);
+      assertTypeOf("string", c1._id);
       assertEqual(cn, c1.name());
       assertTypeOf("number", c1.status());
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
       assertTypeOf("number", c1.type());
 
-      internal.db._drop(cn);
+      db._drop(cn);
 
       assertEqual(ArangoCollection.STATUS_DELETED, c1.status());
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
 
-      var c2 = internal.db._collection(cn);
+      var c2 = db._collection(cn);
 
       assertEqual(null, c2);
     },
@@ -856,24 +931,24 @@ function CollectionDbSuite () {
     testDroppingUnloadedDB : function () {
       var cn = "example";
 
-      internal.db._drop(cn);
-      var c1 = internal.db._create(cn);
+      db._drop(cn);
+      var c1 = db._create(cn);
 
       c1.save({ a : 1 });
       c1.unload();
 
-      assertTypeOf("number", c1._id);
+      assertTypeOf("string", c1._id);
       assertEqual(cn, c1.name());
       assertTypeOf("number", c1.status());
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
       assertTypeOf("number", c1.type());
 
-      internal.db._drop(cn);
+      db._drop(cn);
 
       assertEqual(ArangoCollection.STATUS_DELETED, c1.status());
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
 
-      var c2 = internal.db._collection(cn);
+      var c2 = db._collection(cn);
 
       assertEqual(null, c2);
     },
@@ -885,22 +960,22 @@ function CollectionDbSuite () {
     testTruncatingNewBornDB : function () {
       var cn = "example";
 
-      internal.db._drop(cn);
-      var c1 = internal.db._create(cn);
+      db._drop(cn);
+      var c1 = db._create(cn);
 
-      assertTypeOf("number", c1._id);
+      assertTypeOf("string", c1._id);
       assertEqual(cn, c1.name());
       assertTypeOf("number", c1.status());
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
       assertTypeOf("number", c1.type());
 
-      internal.db._truncate(cn);
+      db._truncate(cn);
 
       assertEqual(ArangoCollection.STATUS_LOADED, c1.status());
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
       assertEqual(0, c1.count());
 
-      internal.db._drop(cn);
+      db._drop(cn);
     },
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -910,24 +985,24 @@ function CollectionDbSuite () {
     testTruncatingLoadedDB : function () {
       var cn = "example";
 
-      internal.db._drop(cn);
-      var c1 = internal.db._create(cn);
+      db._drop(cn);
+      var c1 = db._create(cn);
 
       c1.save({ a : 1 });
 
-      assertTypeOf("number", c1._id);
+      assertTypeOf("string", c1._id);
       assertEqual(cn, c1.name());
       assertTypeOf("number", c1.status());
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
       assertTypeOf("number", c1.type());
 
-      internal.db._truncate(cn);
+      db._truncate(cn);
 
       assertEqual(ArangoCollection.STATUS_LOADED, c1.status());
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
       assertEqual(0, c1.count());
 
-      internal.db._drop(cn);
+      db._drop(cn);
     },
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -937,25 +1012,25 @@ function CollectionDbSuite () {
     testTruncatingUnloadedDB : function () {
       var cn = "example";
 
-      internal.db._drop(cn);
-      var c1 = internal.db._create(cn);
+      db._drop(cn);
+      var c1 = db._create(cn);
 
       c1.save({ a : 1 });
       c1.unload();
 
-      assertTypeOf("number", c1._id);
+      assertTypeOf("string", c1._id);
       assertEqual(cn, c1.name());
       assertTypeOf("number", c1.status());
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
       assertTypeOf("number", c1.type());
 
-      internal.db._truncate(cn);
+      db._truncate(cn);
 
       assertEqual(ArangoCollection.STATUS_LOADED, c1.status());
       assertEqual(ArangoCollection.TYPE_DOCUMENT, c1.type());
       assertEqual(0, c1.count());
 
-      internal.db._drop(cn);
+      db._drop(cn);
     }
   };
 }

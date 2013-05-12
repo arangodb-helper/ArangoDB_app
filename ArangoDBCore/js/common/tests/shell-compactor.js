@@ -86,11 +86,11 @@ function CompactionSuite () {
       require("console").log("waiting for compactor to run");
 
       // set max wait time
-      if (VALGRIND) {
+      if (internal.valgrind) {
         maxWait = 750;
       }
       else {
-        maxWait = 75;
+        maxWait = 90;
       }
 
       waited = 0;
