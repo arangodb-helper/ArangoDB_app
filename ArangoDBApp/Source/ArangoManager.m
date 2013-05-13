@@ -495,7 +495,17 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     _arangoDBAdminDir = [path stringByAppendingString:@"/html/admin"];
     _arangoDBJsActionDir = [path stringByAppendingString:@"/js/actions/system"];
     _arangoDBJsStartupDir = [path stringByAppendingString:@"/js"];
-    _arangoDBJsModuleDir = [[path stringByAppendingString:@"/js/server/modules:"] stringByAppendingString:[path stringByAppendingString:@"/js/common/modules"]];
+    
+    NSString* path1 = [path stringByAppendingString:@"/js/server/modules"];
+    NSString* path2 = [path stringByAppendingString:@"/js/common/modules"];
+    NSString* path3 = [path stringByAppendingString:@"/js/node"];
+    
+    _arangoDBJsModuleDir = [[[[path1 stringByAppendingString: @";"]
+                              stringByAppendingString: path2]
+                              stringByAppendingString: @";"]
+                              stringByAppendingString: path3];
+    
+    _arangoDBJsPackageDir = [path stringByAppendingString: @"/js/npm"];
 
     BOOL ok = [self loadConfigurations];
 
@@ -1043,6 +1053,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
                         @"--javascript.action-directory", _arangoDBJsActionDir,
                         @"--javascript.startup-directory", _arangoDBJsStartupDir,
                         @"--javascript.modules-path", _arangoDBJsModuleDir,
+                        @"--javascript.package-path", _arangoDBJsPackageDir,
                         database, nil];
   [task setArguments:arguments];
 
