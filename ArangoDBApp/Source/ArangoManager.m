@@ -493,7 +493,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     _arangoDBBinary = [path stringByAppendingString:_arangoDBVersion];
     _arangoDBConfig = [path stringByAppendingString:@"/arangod.conf"];
     _arangoDBAdminDir = [path stringByAppendingString:@"/html/admin"];
-    _arangoDBJsActionDir = [path stringByAppendingString:@"/js/actions/system"];
+    _arangoDBJsActionDir = [path stringByAppendingString:@"/js/actions"];
     _arangoDBJsStartupDir = [path stringByAppendingString:@"/js"];
     
     NSString* path1 = [path stringByAppendingString:@"/js/server/modules"];
