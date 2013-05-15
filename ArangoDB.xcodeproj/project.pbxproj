@@ -73,6 +73,10 @@
 		8A9499711607214A00A0ABA7 /* Logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 8A9499701607214A00A0ABA7 /* Logo.png */; };
 		8A9499791609DAD500A0ABA7 /* arangod_10_8 in Resources */ = {isa = PBXBuildFile; fileRef = 8A9499771609DAD500A0ABA7 /* arangod_10_8 */; };
 		8AE2060016109E53003CF0AA /* arangod.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = 8AE205FF16109E53003CF0AA /* arangod.entitlements */; };
+		8AF4A63C17438C9900447481 /* ArangoUpgradeInfoController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8AF4A63A17438C9800447481 /* ArangoUpgradeInfoController.m */; };
+		8AF4A63D17438C9900447481 /* ArangoUpgradeInfoController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8AF4A63A17438C9800447481 /* ArangoUpgradeInfoController.m */; };
+		8AF4A63E17438C9900447481 /* ArangoUpgradeInfoView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8AF4A63B17438C9800447481 /* ArangoUpgradeInfoView.xib */; };
+		8AF4A63F17438C9900447481 /* ArangoUpgradeInfoView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8AF4A63B17438C9800447481 /* ArangoUpgradeInfoView.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -128,6 +132,9 @@
 		8A9499761609DAD500A0ABA7 /* arangod_10_7 */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = arangod_10_7; sourceTree = "<group>"; };
 		8A9499771609DAD500A0ABA7 /* arangod_10_8 */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = arangod_10_8; sourceTree = "<group>"; };
 		8AE205FF16109E53003CF0AA /* arangod.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = arangod.entitlements; sourceTree = "<group>"; };
+		8AF4A63917438C9700447481 /* ArangoUpgradeInfoController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArangoUpgradeInfoController.h; sourceTree = "<group>"; };
+		8AF4A63A17438C9800447481 /* ArangoUpgradeInfoController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ArangoUpgradeInfoController.m; sourceTree = "<group>"; };
+		8AF4A63B17438C9800447481 /* ArangoUpgradeInfoView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ArangoUpgradeInfoView.xib; path = ../Source/ArangoUpgradeInfoView.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -163,6 +170,8 @@
 		2C29AF0E1668F0BD00036073 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				8AF4A63917438C9700447481 /* ArangoUpgradeInfoController.h */,
+				8AF4A63A17438C9800447481 /* ArangoUpgradeInfoController.m */,
 				2C21DBDF1680C65800728A04 /* ArangoAppDelegate.h */,
 				2C21DBE01680C65800728A04 /* ArangoAppDelegate.m */,
 				2C14F371167D1C6E00D474D0 /* ArangoIntroductionController.m */,
@@ -289,6 +298,7 @@
 		8A9499DE1609F3CE00A0ABA7 /* Interfaces */ = {
 			isa = PBXGroup;
 			children = (
+				8AF4A63B17438C9800447481 /* ArangoUpgradeInfoView.xib */,
 				8A293B5B15F64C27008959B1 /* ArangoNewInstanceView.xib */,
 				2C76DAB8167A26D200505954 /* ArangoHelpView.xib */,
 				2C29AF101668F97800036073 /* ArangoIntroductionView.xib */,
@@ -386,6 +396,7 @@
 				2C138E7D1684AD8200FB0B9F /* Logo.png in Resources */,
 				2C138E7E1684AD8200FB0B9F /* html in Resources */,
 				2C138E7F1684AD8200FB0B9F /* js in Resources */,
+				8AF4A63F17438C9900447481 /* ArangoUpgradeInfoView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -410,6 +421,7 @@
 				8A9499711607214A00A0ABA7 /* Logo.png in Resources */,
 				8A293B5215F619B4008959B1 /* html in Resources */,
 				8A293B5315F619B4008959B1 /* js in Resources */,
+				8AF4A63E17438C9900447481 /* ArangoUpgradeInfoView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -450,6 +462,7 @@
 				2C138E671684AD8200FB0B9F /* ArangoUserConfigController.m in Sources */,
 				2C138E681684AD8200FB0B9F /* ArangoIntroductionController.m in Sources */,
 				2C138E691684AD8200FB0B9F /* ArangoAppDelegate.m in Sources */,
+				8AF4A63D17438C9900447481 /* ArangoUpgradeInfoController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -471,6 +484,7 @@
 				2C76DABE167A3BC900505954 /* ArangoUserConfigController.m in Sources */,
 				2C14F374167D1C7000D474D0 /* ArangoIntroductionController.m in Sources */,
 				2C21DBE11680C65800728A04 /* ArangoAppDelegate.m in Sources */,
+				8AF4A63C17438C9900447481 /* ArangoUpgradeInfoController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -510,7 +524,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = ArangoDBApp/ArangoDB.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				INFOPLIST_FILE = "Arango copy2-Info.plist";
+				INFOPLIST_FILE = "ArangoDBApp/PropertyLists/ArangoDB-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "ArangoDB copy";
 				STRIP_INSTALLED_PRODUCT = YES;
@@ -522,7 +536,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = ArangoDBApp/ArangoDB.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				INFOPLIST_FILE = "Arango copy2-Info.plist";
+				INFOPLIST_FILE = "ArangoDBApp/PropertyLists/ArangoDB-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "ArangoDB copy";
 				STRIP_INSTALLED_PRODUCT = YES;
@@ -599,7 +613,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "ArangoDBApp/PropertyLists/ArangoDB-Info.plist";
 				PRODUCT_NAME = ArangoDB;
-				PROVISIONING_PROFILE = "1976C438-A402-4E2C-AA1F-73B3CE877DC3";
+				PROVISIONING_PROFILE = "6F48D42F-FBC1-4037-A6D0-7A9B52A9DCC8";
 				STRIP_INSTALLED_PRODUCT = YES;
 			};
 			name = Debug;
@@ -612,7 +626,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "ArangoDBApp/PropertyLists/ArangoDB-Info.plist";
 				PRODUCT_NAME = ArangoDB;
-				PROVISIONING_PROFILE = "1976C438-A402-4E2C-AA1F-73B3CE877DC3";
+				PROVISIONING_PROFILE = "6F48D42F-FBC1-4037-A6D0-7A9B52A9DCC8";
 				STRIP_INSTALLED_PRODUCT = YES;
 			};
 			name = Release;

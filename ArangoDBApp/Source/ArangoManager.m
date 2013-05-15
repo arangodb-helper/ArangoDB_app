@@ -36,6 +36,7 @@
 #import "ArangoStatus.h"
 #import "User.h"
 #import "Bookmarks.h"
+#import "ArangoUpgradeInfoController.h"
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                  database version
@@ -1098,10 +1099,19 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
       NSTask* upgrade = [[NSTask alloc] init];
       [upgrade setLaunchPath:_arangoDBBinary];
       [upgrade setArguments:upgradeArguments];
+      ArangoUpgradeInfoController* infoScreen = [[ArangoUpgradeInfoController alloc]
+                                                 initWithArangoManager:self
+                                                 andAppDelegate:(ArangoAppDelegate*)[[NSApplication sharedApplication] delegate]];
       [upgrade launch];
       [upgrade waitUntilExit];
       int upgradeStatus = [upgrade terminationStatus];
-      NSLog(@"Status: %i", upgradeStatus);
+      [infoScreen closeInfo:nil];
+      if (upgradeStatus != 0) {
+        NSLog(@"Upgrade failed with status: %i", upgradeStatus);
+        self.lastError = @"Upgrade process failed, see log for details";
+        return NO;
+      }
+      
     }
   } else {
     self.lastError = @"Could not parse version information";
