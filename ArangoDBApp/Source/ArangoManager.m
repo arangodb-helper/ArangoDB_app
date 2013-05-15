@@ -38,6 +38,17 @@
 #import "Bookmarks.h"
 
 // -----------------------------------------------------------------------------
+// --SECTION--                                                  database version
+// -----------------------------------------------------------------------------
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief deployed version of ArangoDB
+////////////////////////////////////////////////////////////////////////////////
+
+const float _currentVersion = 1.3f;
+
+
+// -----------------------------------------------------------------------------
 // --SECTION--                                                     notifications
 // -----------------------------------------------------------------------------
 
@@ -1039,6 +1050,64 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     }
   }
 
+  // check if upgrade is necessary.
+  NSError* versionReadError;
+  NSString* versionFile = [database stringByAppendingString:@"/VERSION"];
+  NSData* versionInfo = [NSData dataWithContentsOfFile:versionFile];
+  if (versionReadError != nil) {
+    self.lastError = @"Version information error";
+    NSLog(@"Version information error: %@", versionReadError);
+    return NO;
+  }
+  id obj = [NSJSONSerialization JSONObjectWithData:versionInfo options:0 error:&versionReadError];
+  if (versionReadError != nil) {
+    self.lastError = @"Version information error";
+    NSLog(@"Version information error while parsing JSON: %@", versionReadError);
+    return NO;
+  }
+  if ([obj isKindOfClass:[NSDictionary class]]) {
+    NSDictionary* json = obj;
+    NSString* versionString = [json objectForKey:@"version"];
+    float dbVersion = [versionString floatValue];
+    if (dbVersion < _currentVersion) {
+      NSAlert* confirmUpgrade = [NSAlert
+                                 alertWithMessageText:@"Datafiles have to be upgraded"
+                                 defaultButton:@"Upgrade"
+                                 alternateButton:@"Cancel"
+                                 otherButton:nil
+                                 informativeTextWithFormat:@"The files in your database directory have been created with ArangoDB version %.1f and should be upgraded to version %.1f. If you cancel this operation your ArangoDB will not be started.", dbVersion, _currentVersion];
+      NSInteger clicked = [confirmUpgrade runModal];
+      if (clicked == NSAlertAlternateReturn) {
+        // User did Cancel the operation
+        self.lastError = @"Upgrade canceled";
+        NSLog(@"User did cancel the upgrade.");
+        return NO;
+      }
+      // Database needs upgrade
+      NSArray* upgradeArguments = [NSArray arrayWithObjects:
+                                   @"--config", _arangoDBConfig,
+                                   @"--exit-on-parent-death", @"true",
+                                   @"--server.endpoint", [NSString stringWithFormat:@"tcp://0.0.0.0:%@", config.port.stringValue],
+                                   @"--server.admin-directory", _arangoDBAdminDir,
+                                   @"--javascript.modules-path", _arangoDBJsModuleDir,
+                                   @"--javascript.startup-directory", _arangoDBJsStartupDir,
+                                   @"--javascript.action-directory", _arangoDBJsActionDir,
+                                   @"--upgrade",
+                                   database,
+                                   nil];
+      NSTask* upgrade = [[NSTask alloc] init];
+      [upgrade setLaunchPath:_arangoDBBinary];
+      [upgrade setArguments:upgradeArguments];
+      [upgrade launch];
+      [upgrade waitUntilExit];
+      int upgradeStatus = [upgrade terminationStatus];
+      NSLog(@"Status: %i", upgradeStatus);
+    }
+  } else {
+    self.lastError = @"Could not parse version information";
+    NSLog(@"JSON Parsing failed...: %@", obj);
+    return NO;
+  }
   // prepare task
   task = [[NSTask alloc] init];
   [task setLaunchPath:_arangoDBBinary];
@@ -1054,7 +1123,8 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
                         @"--javascript.startup-directory", _arangoDBJsStartupDir,
                         @"--javascript.modules-path", _arangoDBJsModuleDir,
                         @"--javascript.package-path", _arangoDBJsPackageDir,
-                        database, nil];
+                        database,
+                        nil];
   [task setArguments:arguments];
 
   // callback if the ArangoDB is terminated for whatever reason.

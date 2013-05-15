@@ -253,6 +253,12 @@ extern NSString* ArangoConfigurationDidChange;
 - (void) setRunOnStartup: (int) runOnStartup
        setStartupOnLogin: (BOOL) startupOnLogin;
 
+// -----------------------------------------------------------------------------
+// --SECTION--                                            User Interface Actions
+// -----------------------------------------------------------------------------
+
+
+
 @end
 
 // -----------------------------------------------------------------------------
