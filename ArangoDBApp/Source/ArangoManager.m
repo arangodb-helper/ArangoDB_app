@@ -116,23 +116,49 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// @brief creates folder for FOXX apps
+////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL) createServerJSFolders {
+  NSError* err = nil;
+  if (! [[NSFileManager defaultManager] fileExistsAtPath:[_js path]]) {
+    [[NSFileManager defaultManager] createDirectoryAtURL:_js withIntermediateDirectories:YES attributes:nil error:&err];
+    if (err != nil) {
+      self.lastError = [@"failed to create js scripts folder: " stringByAppendingString:err.localizedDescription];
+      return NO;
+    }
+  }
+  NSURL* apps = [_js URLByAppendingPathComponent:@"apps"];
+  if (! [[NSFileManager defaultManager] fileExistsAtPath:[apps path]]) {
+    [[NSFileManager defaultManager] createDirectoryAtURL:apps withIntermediateDirectories:YES attributes:nil error:&err];
+    if (err != nil) {
+      self.lastError = [@"failed to create js apps folder: " stringByAppendingString:err.localizedDescription];
+      return NO;
+    }
+  }
+  NSURL* tempPath = [_js URLByAppendingPathComponent:@"tmp"];
+  if (! [[NSFileManager defaultManager] fileExistsAtPath:[tempPath path]]) {
+    [[NSFileManager defaultManager] createDirectoryAtURL:tempPath withIntermediateDirectories:YES attributes:nil error:&err];
+    if (err != nil) {
+      self.lastError = [@"failed to create temp folder: " stringByAppendingString:err.localizedDescription];
+      return NO;
+    }
+  }
+  return YES;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// @brief creates the context necessary for persistent storage
 ////////////////////////////////////////////////////////////////////////////////
 
 - (BOOL) createManagedObjectContext {
   if (_managedObjectContext == nil) {
     NSError* err = nil;
-    NSURL *storeURL = [[[[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"ArangoDB"];
+    NSURL* storeURL = [[[[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"ArangoDB"];
 
     // create storage path
     if (! [[NSFileManager defaultManager] fileExistsAtPath:[storeURL path]]) {
-      if ([[NSFileManager defaultManager] respondsToSelector:@selector(createDirectoryAtURL:withIntermediateDirectories:attributes:error:)]) {
-        [[NSFileManager defaultManager] createDirectoryAtURL:storeURL withIntermediateDirectories:YES attributes:nil error:&err];
-      }
-      else {
-        [[NSFileManager defaultManager] createDirectoryAtPath:[storeURL path] withIntermediateDirectories:YES attributes:nil error:&err];
-      }
-      
+      [[NSFileManager defaultManager] createDirectoryAtURL:storeURL withIntermediateDirectories:YES attributes:nil error:&err];
       if (err != nil) {
         self.lastError = [@"failed to create SQLITE application storage: " stringByAppendingString:err.localizedDescription];
         return NO;
@@ -500,13 +526,26 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
       _version = 106;
     }
 
+    NSURL* appSupportURL = [[[[NSFileManager defaultManager]
+                              URLsForDirectory:NSApplicationSupportDirectory
+                              inDomains:NSUserDomainMask]
+                             lastObject]
+                            URLByAppendingPathComponent:@"ArangoDB"];
+    // create js path
+    _js = [appSupportURL URLByAppendingPathComponent:@"js"];
+    [self createServerJSFolders];
+    
     NSString* path = [[NSBundle mainBundle] resourcePath];
+    NSString* jsPath = [_js path];
 
     _arangoDBBinary = [path stringByAppendingString:_arangoDBVersion];
     _arangoDBConfig = [path stringByAppendingString:@"/arangod.conf"];
     _arangoDBAdminDir = [path stringByAppendingString:@"/html/admin"];
-    _arangoDBJsActionDir = [path stringByAppendingString:@"/js/actions"];
+    
     _arangoDBJsStartupDir = [path stringByAppendingString:@"/js"];
+    _arangoDBJsActionDir = [path stringByAppendingString:@"/js/actions"];
+    _arangoDBJsAppDir = [jsPath stringByAppendingString:@"/apps"];
+    _arangoDBTempDir = [jsPath stringByAppendingString:@"/tmp"];
     
     NSString* path1 = [path stringByAppendingString:@"/js/server/modules"];
     NSString* path2 = [path stringByAppendingString:@"/js/common/modules"];
@@ -1133,6 +1172,8 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
                         @"--javascript.startup-directory", _arangoDBJsStartupDir,
                         @"--javascript.modules-path", _arangoDBJsModuleDir,
                         @"--javascript.package-path", _arangoDBJsPackageDir,
+                        @"--javascript.app-path", _arangoDBJsAppDir,
+                        @"--temp-path", _arangoDBTempDir,
                         database,
                         nil];
   [task setArguments:arguments];
