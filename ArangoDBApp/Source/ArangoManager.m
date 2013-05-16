@@ -46,7 +46,7 @@
 /// @brief deployed version of ArangoDB
 ////////////////////////////////////////////////////////////////////////////////
 
-const float _currentVersion = 1.3f;
+const float _currentVersion = 1.4f;
 
 
 // -----------------------------------------------------------------------------
@@ -121,28 +121,46 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
 - (BOOL) createServerJSFolders {
   NSError* err = nil;
-  if (! [[NSFileManager defaultManager] fileExistsAtPath:[_js path]]) {
-    [[NSFileManager defaultManager] createDirectoryAtURL:_js withIntermediateDirectories:YES attributes:nil error:&err];
+  NSFileManager* fm = [NSFileManager defaultManager];
+  if (! [fm fileExistsAtPath:[_js path]]) {
+    [fm createDirectoryAtURL:_js withIntermediateDirectories:YES attributes:nil error:&err];
     if (err != nil) {
       self.lastError = [@"failed to create js scripts folder: " stringByAppendingString:err.localizedDescription];
       return NO;
     }
   }
   NSURL* apps = [_js URLByAppendingPathComponent:@"apps"];
-  if (! [[NSFileManager defaultManager] fileExistsAtPath:[apps path]]) {
-    [[NSFileManager defaultManager] createDirectoryAtURL:apps withIntermediateDirectories:YES attributes:nil error:&err];
+  if (! [fm fileExistsAtPath:[apps path]]) {
+    [fm createDirectoryAtURL:apps withIntermediateDirectories:YES attributes:nil error:&err];
     if (err != nil) {
       self.lastError = [@"failed to create js apps folder: " stringByAppendingString:err.localizedDescription];
       return NO;
     }
   }
   NSURL* tempPath = [_js URLByAppendingPathComponent:@"tmp"];
-  if (! [[NSFileManager defaultManager] fileExistsAtPath:[tempPath path]]) {
-    [[NSFileManager defaultManager] createDirectoryAtURL:tempPath withIntermediateDirectories:YES attributes:nil error:&err];
+  if (! [fm fileExistsAtPath:[tempPath path]]) {
+    [fm createDirectoryAtURL:tempPath withIntermediateDirectories:YES attributes:nil error:&err];
     if (err != nil) {
       self.lastError = [@"failed to create temp folder: " stringByAppendingString:err.localizedDescription];
       return NO;
     }
+  }
+  NSURL* tempDownload = [tempPath URLByAppendingPathComponent:@"downloads"];
+  if (! [fm fileExistsAtPath:[tempDownload path]]) {
+    [fm createDirectoryAtURL:tempDownload withIntermediateDirectories:YES attributes:nil error:&err];
+    if (err != nil) {
+      self.lastError = [@"failed to create downloads folder: " stringByAppendingString:err.localizedDescription];
+      return NO;
+    }
+  }
+  NSURL* aardvark = [[[[[NSBundle mainBundle] resourceURL]
+     URLByAppendingPathComponent:@"js"]
+    URLByAppendingPathComponent:@"apps"]
+   URLByAppendingPathComponent:@"aardvark"];
+  [fm createSymbolicLinkAtURL:[apps URLByAppendingPathComponent:@"aardvark"] withDestinationURL:aardvark error:&err];
+  if (err != nil) {
+    self.lastError = [@"failed to create symbolic link to foxx manager: " stringByAppendingString:err.localizedDescription];
+    return NO;
   }
   return YES;
 }
