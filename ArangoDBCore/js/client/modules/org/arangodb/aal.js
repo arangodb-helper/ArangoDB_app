@@ -327,7 +327,7 @@ function processGithubRepository (source) {
 
   var url = buildGithubUrl(source.location, source.version);
   var tempFile = fs.getTempFile("downloads", false); 
-
+  require("console").log(tempFile);
   try {
     var result = internal.download(url, "get", tempFile);
 
@@ -511,7 +511,6 @@ function updateFishbowl () {
 
 exports.load = function (type, location, version) {
   'use strict';
-
   var source;
   var filename;
   var req;

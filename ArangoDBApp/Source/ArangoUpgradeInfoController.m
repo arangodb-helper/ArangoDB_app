@@ -46,9 +46,13 @@
 - (id) initWithArangoManager: (ArangoManager*) manager
               andAppDelegate: (ArangoAppDelegate*) delegate
                  andNibNamed: (NSString*) nib {
-  return [super initWithArangoManager:manager
+  self = [super initWithArangoManager:manager
                        andAppDelegate:delegate
                           andNibNamed:nib];
+  if (self) {
+    [_progressBar startAnimation:self];
+  }
+  return self;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

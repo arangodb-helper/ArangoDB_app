@@ -46,7 +46,7 @@
 /// @brief deployed version of ArangoDB
 ////////////////////////////////////////////////////////////////////////////////
 
-const float _currentVersion = 1.4f;
+const float _currentVersion = 1.3f;
 
 
 // -----------------------------------------------------------------------------
@@ -1112,68 +1112,65 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   NSError* versionReadError;
   NSString* versionFile = [database stringByAppendingString:@"/VERSION"];
   NSData* versionInfo = [NSData dataWithContentsOfFile:versionFile];
-  if (versionReadError != nil) {
-    self.lastError = @"Version information error";
-    NSLog(@"Version information error: %@", versionReadError);
-    return NO;
-  }
-  id obj = [NSJSONSerialization JSONObjectWithData:versionInfo options:0 error:&versionReadError];
-  if (versionReadError != nil) {
-    self.lastError = @"Version information error";
-    NSLog(@"Version information error while parsing JSON: %@", versionReadError);
-    return NO;
-  }
-  if ([obj isKindOfClass:[NSDictionary class]]) {
-    NSDictionary* json = obj;
-    NSString* versionString = [json objectForKey:@"version"];
-    float dbVersion = [versionString floatValue];
-    if (dbVersion < _currentVersion) {
-      NSAlert* confirmUpgrade = [NSAlert
-                                 alertWithMessageText:@"Datafiles have to be upgraded"
-                                 defaultButton:@"Upgrade"
-                                 alternateButton:@"Cancel"
-                                 otherButton:nil
-                                 informativeTextWithFormat:@"The files in your database directory have been created with ArangoDB version %.1f and should be upgraded to version %.1f. If you cancel this operation your ArangoDB will not be started.", dbVersion, _currentVersion];
-      NSInteger clicked = [confirmUpgrade runModal];
-      if (clicked == NSAlertAlternateReturn) {
-        // User did Cancel the operation
-        self.lastError = @"Upgrade canceled";
-        NSLog(@"User did cancel the upgrade.");
-        return NO;
-      }
-      // Database needs upgrade
-      NSArray* upgradeArguments = [NSArray arrayWithObjects:
-                                   @"--config", _arangoDBConfig,
-                                   @"--exit-on-parent-death", @"true",
-                                   @"--server.endpoint", [NSString stringWithFormat:@"tcp://0.0.0.0:%@", config.port.stringValue],
-                                   @"--server.admin-directory", _arangoDBAdminDir,
-                                   @"--javascript.modules-path", _arangoDBJsModuleDir,
-                                   @"--javascript.startup-directory", _arangoDBJsStartupDir,
-                                   @"--javascript.action-directory", _arangoDBJsActionDir,
-                                   @"--upgrade",
-                                   database,
-                                   nil];
-      NSTask* upgrade = [[NSTask alloc] init];
-      [upgrade setLaunchPath:_arangoDBBinary];
-      [upgrade setArguments:upgradeArguments];
-      ArangoUpgradeInfoController* infoScreen = [[ArangoUpgradeInfoController alloc]
-                                                 initWithArangoManager:self
-                                                 andAppDelegate:(ArangoAppDelegate*)[[NSApplication sharedApplication] delegate]];
-      [upgrade launch];
-      [upgrade waitUntilExit];
-      int upgradeStatus = [upgrade terminationStatus];
-      [infoScreen closeInfo:nil];
-      if (upgradeStatus != 0) {
-        NSLog(@"Upgrade failed with status: %i", upgradeStatus);
-        self.lastError = @"Upgrade process failed, see log for details";
-        return NO;
-      }
-      
+  if (versionInfo != nil) {
+    id obj = [NSJSONSerialization JSONObjectWithData:versionInfo options:0 error:&versionReadError];
+    if (versionReadError != nil) {
+      self.lastError = @"Version information error";
+      NSLog(@"Version information error while parsing JSON: %@", versionReadError);
+      return NO;
     }
-  } else {
-    self.lastError = @"Could not parse version information";
-    NSLog(@"JSON Parsing failed...: %@", obj);
-    return NO;
+    if ([obj isKindOfClass:[NSDictionary class]]) {
+      NSDictionary* json = obj;
+      NSString* versionString = [json objectForKey:@"version"];
+      float dbVersion = [versionString floatValue];
+      if (dbVersion < _currentVersion) {
+        NSAlert* confirmUpgrade = [NSAlert
+                                   alertWithMessageText:@"Datafiles have to be upgraded"
+                                   defaultButton:@"Upgrade"
+                                   alternateButton:@"Cancel"
+                                   otherButton:nil
+                                   informativeTextWithFormat:@"The files in your database directory have been created with ArangoDB version %.1f and should be upgraded to version %.1f. If you cancel this operation your ArangoDB will not be started.", dbVersion, _currentVersion];
+        NSInteger clicked = [confirmUpgrade runModal];
+        if (clicked == NSAlertAlternateReturn) {
+          // User did Cancel the operation
+          self.lastError = @"Upgrade canceled";
+          NSLog(@"User did cancel the upgrade.");
+          return NO;
+        }
+        // Database needs upgrade
+        NSArray* upgradeArguments = [NSArray arrayWithObjects:
+                                     @"--config", _arangoDBConfig,
+                                     @"--exit-on-parent-death", @"true",
+                                     @"--server.endpoint", [NSString stringWithFormat:@"tcp://0.0.0.0:%@", config.port.stringValue],
+                                     @"--server.admin-directory", _arangoDBAdminDir,
+                                     @"--javascript.modules-path", _arangoDBJsModuleDir,
+                                     @"--javascript.startup-directory", _arangoDBJsStartupDir,
+                                     @"--javascript.action-directory", _arangoDBJsActionDir,
+                                     @"--upgrade",
+                                     database,
+                                     nil];
+        NSTask* upgrade = [[NSTask alloc] init];
+        [upgrade setLaunchPath:_arangoDBBinary];
+        [upgrade setArguments:upgradeArguments];
+        ArangoUpgradeInfoController* infoScreen = [[ArangoUpgradeInfoController alloc]
+                                                   initWithArangoManager:self
+                                                   andAppDelegate:(ArangoAppDelegate*)[[NSApplication sharedApplication] delegate]];
+        [upgrade launch];
+        [upgrade waitUntilExit];
+        int upgradeStatus = [upgrade terminationStatus];
+        [infoScreen closeInfo:nil];
+        if (upgradeStatus != 0) {
+          NSLog(@"Upgrade failed with status: %i", upgradeStatus);
+          self.lastError = @"Upgrade process failed, see log for details";
+          return NO;
+        }
+        
+      }
+    } else {
+      self.lastError = @"Could not parse version information";
+      NSLog(@"JSON Parsing failed...: %@", obj);
+      return NO;
+    }
   }
   // prepare task
   task = [[NSTask alloc] init];
@@ -1226,7 +1223,6 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 - (BOOL) stopArangoDB: (NSString*) name
               andWait: (BOOL) waitForTerminate {
   NSLog(@"Stopping ArangoDB instance '%@'", name);
-
   // load configuration for name (might already be deleted)
   ArangoConfiguration* config = [_configurations objectForKey:name];
   

@@ -33,6 +33,12 @@
 
 @interface ArangoUpgradeInfoController : ArangoBaseController
 
+// -----------------------------------------------------------------------------
+// --SECTION--                                                interface elements
+// -----------------------------------------------------------------------------
+
+
+@property (weak) IBOutlet NSProgressIndicator *progressBar;
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                    public methods
@@ -41,6 +47,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
+
 
 - (id) initWithArangoManager: (ArangoManager*) manager
               andAppDelegate: (ArangoAppDelegate*) delegate
