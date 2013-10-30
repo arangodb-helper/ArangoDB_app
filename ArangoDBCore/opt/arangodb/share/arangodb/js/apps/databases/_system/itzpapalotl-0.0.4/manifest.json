@@ -1,0 +1,10 @@
+{
+  "name": "itzpapalotl",
+  "version": "0.0.4",
+  "author": "jsteemann",
+  "description": "random aztec god service",
+
+  "controllers": {
+    "/": "itzpapalotl.js"
+  }
+}
