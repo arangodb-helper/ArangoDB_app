@@ -122,6 +122,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 - (BOOL) createServerJSFolders {
   NSError* err = nil;
   NSFileManager* fm = [NSFileManager defaultManager];
+
   if (! [fm fileExistsAtPath:[_js path]]) {
     [fm createDirectoryAtURL:_js withIntermediateDirectories:YES attributes:nil error:&err];
     if (err != nil) {
@@ -129,7 +130,9 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
       return NO;
     }
   }
+
   NSURL* apps = [_js URLByAppendingPathComponent:@"apps"];
+  
   if (! [fm fileExistsAtPath:[apps path]]) {
     [fm createDirectoryAtURL:apps withIntermediateDirectories:YES attributes:nil error:&err];
     if (err != nil) {
@@ -137,7 +140,9 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
       return NO;
     }
   }
+  
   NSURL* tempPath = [_js URLByAppendingPathComponent:@"tmp"];
+  
   if (! [fm fileExistsAtPath:[tempPath path]]) {
     [fm createDirectoryAtURL:tempPath withIntermediateDirectories:YES attributes:nil error:&err];
     if (err != nil) {
@@ -145,7 +150,9 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
       return NO;
     }
   }
+  
   NSURL* tempDownload = [tempPath URLByAppendingPathComponent:@"downloads"];
+  
   if (! [fm fileExistsAtPath:[tempDownload path]]) {
     [fm createDirectoryAtURL:tempDownload withIntermediateDirectories:YES attributes:nil error:&err];
     if (err != nil) {
@@ -153,15 +160,19 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
       return NO;
     }
   }
+  
   NSURL* aardvark = [[[[[NSBundle mainBundle] resourceURL]
-     URLByAppendingPathComponent:@"js"]
-    URLByAppendingPathComponent:@"apps"]
-   URLByAppendingPathComponent:@"aardvark"];
+                        URLByAppendingPathComponent:@"js"]
+                        URLByAppendingPathComponent:@"apps"]
+                        URLByAppendingPathComponent:@"aardvark"];
+
   [fm createSymbolicLinkAtURL:[apps URLByAppendingPathComponent:@"aardvark"] withDestinationURL:aardvark error:&err];
+  
   if (err != nil) {
     self.lastError = [@"failed to create symbolic link to foxx manager: " stringByAppendingString:err.localizedDescription];
     return NO;
   }
+  
   return YES;
 }
 
@@ -532,23 +543,24 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
   if (self != nil) {
     if ([[NSBundle mainBundle] respondsToSelector:@selector(loadNibNamed:owner:topLevelObjects:)]) {
-      _arangoDBVersion = @"/arangod_10_8";
+      _arangoDBVersion = @"/opt/arangodb/sbin/arangodb";
       _version = 108;
     } 
     else if ([[NSFileManager defaultManager] respondsToSelector:@selector(createDirectoryAtURL:withIntermediateDirectories:attributes:error:)]) {
-      _arangoDBVersion = @"/arangod_10_7";
+      _arangoDBVersion = @"/opt/arangodb/sbin/arangodb";
       _version = 107;
     }
     else {
-      _arangoDBVersion = @"/arangod_10_6";
+      _arangoDBVersion = @"/opt/arangodb/sbin/arangodb";
       _version = 106;
     }
 
     NSURL* appSupportURL = [[[[NSFileManager defaultManager]
                               URLsForDirectory:NSApplicationSupportDirectory
                               inDomains:NSUserDomainMask]
-                             lastObject]
+                            lastObject]
                             URLByAppendingPathComponent:@"ArangoDB"];
+    
     // create js path
     _js = [appSupportURL URLByAppendingPathComponent:@"js"];
     [self createServerJSFolders];
@@ -766,12 +778,12 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
   // everything ready to start
   return [[ArangoStatus alloc] initWithName:alias
-                                     andPath:path
-                                     andPort:port
-                                  andLogPath:logPath
-                                 andLogLevel:logLevel
-                             andRunOnStartup:NO
-                                  andRunning:NO];
+                                    andPath:path
+                                    andPort:port
+                                 andLogPath:logPath
+                                andLogLevel:logLevel
+                            andRunOnStartup:NO
+                                 andRunning:NO];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -810,12 +822,12 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   }
 
   return [[ArangoStatus alloc] initWithName:config.alias
-                                     andPath:config.path
-                                     andPort:[config.port intValue]
-                                  andLogPath:config.log
-                                 andLogLevel:config.loglevel
-                             andRunOnStartup:([config.runOnStartUp intValue] != 0)
-                                  andRunning:isRunning];
+                                    andPath:config.path
+                                    andPort:[config.port intValue]
+                                 andLogPath:config.log
+                                andLogLevel:config.loglevel
+                            andRunOnStartup:([config.runOnStartUp intValue] != 0)
+                                 andRunning:isRunning];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1114,11 +1126,13 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   NSData* versionInfo = [NSData dataWithContentsOfFile:versionFile];
   if (versionInfo != nil) {
     id obj = [NSJSONSerialization JSONObjectWithData:versionInfo options:0 error:&versionReadError];
+    
     if (versionReadError != nil) {
       self.lastError = @"Version information error";
       NSLog(@"Version information error while parsing JSON: %@", versionReadError);
       return NO;
     }
+    
     if ([obj isKindOfClass:[NSDictionary class]]) {
       NSDictionary* json = obj;
       NSString* versionString = [json objectForKey:@"version"];
@@ -1131,12 +1145,14 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
                                    otherButton:nil
                                    informativeTextWithFormat:@"The files in your database directory have been created with ArangoDB version %.1f and should be upgraded to version %.1f. If you cancel this operation your ArangoDB will not be started.", dbVersion, _currentVersion];
         NSInteger clicked = [confirmUpgrade runModal];
+
+        // User did Cancel the operation
         if (clicked == NSAlertAlternateReturn) {
-          // User did Cancel the operation
           self.lastError = @"Upgrade canceled";
           NSLog(@"User did cancel the upgrade.");
           return NO;
         }
+
         // Database needs upgrade
         NSArray* upgradeArguments = [NSArray arrayWithObjects:
                                      @"--config", _arangoDBConfig,
@@ -1149,6 +1165,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
                                      @"--upgrade",
                                      database,
                                      nil];
+
         NSTask* upgrade = [[NSTask alloc] init];
         [upgrade setLaunchPath:_arangoDBBinary];
         [upgrade setArguments:upgradeArguments];
@@ -1159,19 +1176,21 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
         [upgrade waitUntilExit];
         int upgradeStatus = [upgrade terminationStatus];
         [infoScreen closeInfo:nil];
+
         if (upgradeStatus != 0) {
           NSLog(@"Upgrade failed with status: %i", upgradeStatus);
           self.lastError = @"Upgrade process failed, see log for details";
           return NO;
         }
-        
       }
-    } else {
+    }
+    else {
       self.lastError = @"Could not parse version information";
       NSLog(@"JSON Parsing failed...: %@", obj);
       return NO;
     }
   }
+
   // prepare task
   task = [[NSTask alloc] init];
   [task setLaunchPath:_arangoDBBinary];
