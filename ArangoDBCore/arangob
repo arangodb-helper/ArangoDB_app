@@ -1,8 +1,0 @@
-#!/bin/bash
-
-export ARANGODB_ROOT="/Applications/ArangoDB.app/Contents/MacOS/"
-export DATABASEDIR="${ARANGODB_ROOT}opt/arangodb/var/lib/arangodb"
-export LOGDIR="${ARANGODB_ROOT}opt/arangodb/var/log/arangodb"
-export PKGDATADIR="${ARANGODB_ROOT}opt/arangodb/share/arangodb"
-
-exec "${ARANGODB_ROOT}opt/arangodb/bin/arangob" -c "${ARANGODB_ROOT}opt/arangodb/etc/arangodb/arangob-relative.conf" $*

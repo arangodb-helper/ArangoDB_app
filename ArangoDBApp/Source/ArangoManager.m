@@ -46,7 +46,7 @@
 /// @brief deployed version of ArangoDB
 ////////////////////////////////////////////////////////////////////////////////
 
-const float _currentVersion = 1.3f;
+const float _currentVersion = 1.4f;
 
 
 // -----------------------------------------------------------------------------
@@ -543,15 +543,15 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
   if (self != nil) {
     if ([[NSBundle mainBundle] respondsToSelector:@selector(loadNibNamed:owner:topLevelObjects:)]) {
-      _arangoDBVersion = @"/opt/arangodb/sbin/arangodb";
+      _arangoDBVersion = @"/sbin/arangod";
       _version = 108;
     } 
     else if ([[NSFileManager defaultManager] respondsToSelector:@selector(createDirectoryAtURL:withIntermediateDirectories:attributes:error:)]) {
-      _arangoDBVersion = @"/opt/arangodb/sbin/arangodb";
+      _arangoDBVersion = @"/sbin/arangod";
       _version = 107;
     }
     else {
-      _arangoDBVersion = @"/opt/arangodb/sbin/arangodb";
+      _arangoDBVersion = @"/sbin/arangod";
       _version = 106;
     }
 
@@ -565,28 +565,27 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     _js = [appSupportURL URLByAppendingPathComponent:@"js"];
     [self createServerJSFolders];
     
-    NSString* path = [[NSBundle mainBundle] resourcePath];
+    NSString* path = [[[NSBundle mainBundle] bundlePath] stringByAppendingString:@"/Contents/MacOS/opt/arangodb"];
     NSString* jsPath = [_js path];
 
     _arangoDBBinary = [path stringByAppendingString:_arangoDBVersion];
-    _arangoDBConfig = [path stringByAppendingString:@"/arangod.conf"];
-    _arangoDBAdminDir = [path stringByAppendingString:@"/html/admin"];
+    _arangoDBConfig = [path stringByAppendingString:@"/etc/arangodb/arangod.conf"];
     
-    _arangoDBJsStartupDir = [path stringByAppendingString:@"/js"];
-    _arangoDBJsActionDir = [path stringByAppendingString:@"/js/actions"];
-    _arangoDBJsAppDir = [path stringByAppendingString:@"/js/apps"];
+    _arangoDBJsStartupDir = [path stringByAppendingString:@"/share/arangodb/js"];
+    _arangoDBJsActionDir = [path stringByAppendingString:@"/share/arangodb/js/actions"];
+    _arangoDBJsAppDir = [path stringByAppendingString:@"/share/arangodb/js/apps"];
     _arangoDBTempDir = [jsPath stringByAppendingString:@"/tmp"];
     
-    NSString* path1 = [path stringByAppendingString:@"/js/server/modules"];
-    NSString* path2 = [path stringByAppendingString:@"/js/common/modules"];
-    NSString* path3 = [path stringByAppendingString:@"/js/node"];
+    NSString* path1 = [path stringByAppendingString:@"/share/arangodb/js/server/modules"];
+    NSString* path2 = [path stringByAppendingString:@"/share/arangodb/js/common/modules"];
+    NSString* path3 = [path stringByAppendingString:@"/share/arangodb/js/node"];
     
     _arangoDBJsModuleDir = [[[[path1 stringByAppendingString: @";"]
                               stringByAppendingString: path2]
                               stringByAppendingString: @";"]
                               stringByAppendingString: path3];
     
-    _arangoDBJsPackageDir = [path stringByAppendingString: @"/js/npm"];
+    _arangoDBJsPackageDir = [path stringByAppendingString: @"/share/arangodb/js/npm"];
 
     BOOL ok = [self loadConfigurations];
 
@@ -1096,6 +1095,33 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
       return NO;
     }
   }
+  
+  // create apps path for user apps
+  NSString* userApps = [config.path stringByAppendingString:@"/apps"];
+  
+  if (! [[NSFileManager defaultManager] isReadableFileAtPath:userApps]) {
+    int res = mkdir([userApps fileSystemRepresentation], 0777);
+    
+    if (res != 0) {
+      NSLog(@"Cannot create apps directory: %@", database);
+      return NO;
+    }
+
+    NSString* userAppsDatabases = [config.path stringByAppendingString:@"/apps/databases"];
+    
+    if (! [[NSFileManager defaultManager] isReadableFileAtPath:userAppsDatabases]) {
+      int res = mkdir([userAppsDatabases fileSystemRepresentation], 0777);
+      
+      if (res != 0) {
+        NSLog(@"Cannot create database-specific apps directory: %@", database);
+        return NO;
+      }
+    }
+  }
+  
+  NSString* userAppsSystem = [config.path stringByAppendingString:@"/apps/system"];
+  unlink([userAppsSystem fileSystemRepresentation]);
+  symlink([[_arangoDBJsAppDir stringByAppendingString:@"/system"] fileSystemRepresentation], [userAppsSystem fileSystemRepresentation]);
 
   // create log path
   NSString* logPath = config.log;
@@ -1124,6 +1150,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   NSError* versionReadError;
   NSString* versionFile = [database stringByAppendingString:@"/VERSION"];
   NSData* versionInfo = [NSData dataWithContentsOfFile:versionFile];
+
   if (versionInfo != nil) {
     id obj = [NSJSONSerialization JSONObjectWithData:versionInfo options:0 error:&versionReadError];
     
@@ -1158,10 +1185,13 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
                                      @"--config", _arangoDBConfig,
                                      @"--exit-on-parent-death", @"true",
                                      @"--server.endpoint", [NSString stringWithFormat:@"tcp://0.0.0.0:%@", config.port.stringValue],
-                                     @"--server.admin-directory", _arangoDBAdminDir,
-                                     @"--javascript.modules-path", _arangoDBJsModuleDir,
-                                     @"--javascript.startup-directory", _arangoDBJsStartupDir,
+                                     @"--log.file", logPath,
+                                     @"--log.level", config.loglevel,
                                      @"--javascript.action-directory", _arangoDBJsActionDir,
+                                     @"--javascript.startup-directory", _arangoDBJsStartupDir,
+                                     @"--javascript.modules-path", _arangoDBJsModuleDir,
+                                     @"--javascript.package-path", _arangoDBJsPackageDir,
+                                     @"--javascript.app-path", userApps,
                                      @"--upgrade",
                                      database,
                                      nil];
@@ -1201,12 +1231,11 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
                         @"--server.endpoint", [NSString stringWithFormat:@"tcp://0.0.0.0:%@", config.port.stringValue],
                         @"--log.file", logPath,
                         @"--log.level", config.loglevel,
-                        @"--server.admin-directory", _arangoDBAdminDir,
                         @"--javascript.action-directory", _arangoDBJsActionDir,
                         @"--javascript.startup-directory", _arangoDBJsStartupDir,
                         @"--javascript.modules-path", _arangoDBJsModuleDir,
                         @"--javascript.package-path", _arangoDBJsPackageDir,
-                        @"--javascript.app-path", _arangoDBJsAppDir,
+                        @"--javascript.app-path", userApps,
                         @"--temp-path", _arangoDBTempDir,
                         database,
                         nil];
