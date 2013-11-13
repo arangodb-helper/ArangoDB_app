@@ -1,0 +1,4 @@
+[submodule "ArangoDB"]
+	path = ArangoDB
+	url = https://github.com/triAGENS/ArangoDB
+	branch = 1.4
