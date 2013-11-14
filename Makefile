@@ -1,7 +1,7 @@
 NAME = ArangoDB
 VERSION = 1.4.1
 
-SOURCE_FILES = build/ArangoDB.app CHANGELOG ArangoDB/README
+SOURCE_FILES = build/ArangoDB.app ArangoDB/CHANGELOG ArangoDB/README
 
 
 ################################################################################
@@ -9,8 +9,8 @@ SOURCE_FILES = build/ArangoDB.app CHANGELOG ArangoDB/README
 ################################################################################
 
 MASTER_DMG = $(NAME)-$(VERSION).dmg
-WC_DMG = wc.dmg
-WC_DIR = wc
+WC_DMG = build/wc.dmg
+WC_DIR = build/wc
 
 .PHONY: all
 
