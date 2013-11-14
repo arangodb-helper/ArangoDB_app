@@ -1,7 +1,12 @@
-V1.1.0 (2012-12-XX)
+V1.4.1 (2013-11-13)
 -------------------
 
-* fixed issue #3: "Help" menu entry
+* replication support
+
+* multi-database support
+
+* FOXX: lightweight API framework
+
 
 V1.0.0 (2012-08-01)
 -------------------
