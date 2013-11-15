@@ -32,10 +32,20 @@
 		2C3B9462183398F4009BBBF4 /* arangod.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = 2C3B9461183398F4009BBBF4 /* arangod.entitlements */; };
 		2C76DAB9167A26D200505954 /* ArangoHelpView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2C76DAB8167A26D200505954 /* ArangoHelpView.xib */; };
 		2C76DABE167A3BC900505954 /* ArangoUserConfigController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C76DABD167A3BC800505954 /* ArangoUserConfigController.m */; };
-		2C8D03CD1833F7D10037755E /* etc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C8D03C41833F7AF0037755E /* etc */; };
-		2C8D03CE1833F7DA0037755E /* sbin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C8D03C51833F7AF0037755E /* sbin */; };
-		2C8D03CF1833F7E00037755E /* share in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C8D03C61833F7AF0037755E /* share */; };
-		2C8D03D01833F7E60037755E /* var in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C8D03C71833F7AF0037755E /* var */; };
+		2C79EDC918358C6000DB4CD6 /* bin in Resources */ = {isa = PBXBuildFile; fileRef = 2C79EDC418358C6000DB4CD6 /* bin */; };
+		2C79EDCA18358C6000DB4CD6 /* etc in Resources */ = {isa = PBXBuildFile; fileRef = 2C79EDC518358C6000DB4CD6 /* etc */; };
+		2C79EDCB18358C6000DB4CD6 /* sbin in Resources */ = {isa = PBXBuildFile; fileRef = 2C79EDC618358C6000DB4CD6 /* sbin */; };
+		2C79EDCC18358C6000DB4CD6 /* share in Resources */ = {isa = PBXBuildFile; fileRef = 2C79EDC718358C6000DB4CD6 /* share */; };
+		2C79EDCD18358C6000DB4CD6 /* var in Resources */ = {isa = PBXBuildFile; fileRef = 2C79EDC818358C6000DB4CD6 /* var */; };
+		2C79EDCE18358C7500DB4CD6 /* etc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC518358C6000DB4CD6 /* etc */; };
+		2C79EDCF18358C7500DB4CD6 /* sbin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC618358C6000DB4CD6 /* sbin */; };
+		2C79EDD018358C7500DB4CD6 /* share in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC718358C6000DB4CD6 /* share */; };
+		2C79EDD118358C7500DB4CD6 /* var in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC818358C6000DB4CD6 /* var */; };
+		2C79EDD218358C9F00DB4CD6 /* bin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC418358C6000DB4CD6 /* bin */; };
+		2C79EDD318358C9F00DB4CD6 /* etc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC518358C6000DB4CD6 /* etc */; };
+		2C79EDD418358C9F00DB4CD6 /* sbin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC618358C6000DB4CD6 /* sbin */; };
+		2C79EDD518358C9F00DB4CD6 /* share in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC718358C6000DB4CD6 /* share */; };
+		2C79EDD618358C9F00DB4CD6 /* var in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC818358C6000DB4CD6 /* var */; };
 		2C91EB901673A2F10007EFC0 /* ArangoBaseController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C91EB8F1673A2F10007EFC0 /* ArangoBaseController.m */; };
 		2C91EB971673A4910007EFC0 /* ArangoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C91EB961673A4910007EFC0 /* ArangoManager.m */; };
 		2CA9A86A183578A0006D0322 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A539DBF15ECEE6500A267B6 /* main.m */; };
@@ -68,11 +78,6 @@
 		2CA9A887183578A0006D0322 /* arangod.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = 2C3B9461183398F4009BBBF4 /* arangod.entitlements */; };
 		2CA9A888183578A0006D0322 /* Logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 8A9499701607214A00A0ABA7 /* Logo.png */; };
 		2CA9A889183578A0006D0322 /* ArangoUpgradeInfoView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8AF4A63B17438C9800447481 /* ArangoUpgradeInfoView.xib */; };
-		2CA9A88B183578A0006D0322 /* var in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C8D03C71833F7AF0037755E /* var */; };
-		2CA9A88C183578A0006D0322 /* share in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C8D03C61833F7AF0037755E /* share */; };
-		2CA9A88D183578A0006D0322 /* sbin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C8D03C51833F7AF0037755E /* sbin */; };
-		2CA9A88E183578A0006D0322 /* etc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C8D03C41833F7AF0037755E /* etc */; };
-		2CA9A89518357A51006D0322 /* bin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C8D03C31833F7AF0037755E /* bin */; };
 		2CE35791167777C200F2EA64 /* ArangoStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = 2CE35790167777C200F2EA64 /* ArangoStatus.m */; };
 		8A293B4F15F5FD1A008959B1 /* IconColor.png in Resources */ = {isa = PBXBuildFile; fileRef = 8A293B4E15F5FD1A008959B1 /* IconColor.png */; };
 		8A293B5C15F64C28008959B1 /* ArangoInstanceController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A293B5A15F64C27008959B1 /* ArangoInstanceController.m */; };
@@ -103,10 +108,10 @@
 			dstPath = opt/arangodb;
 			dstSubfolderSpec = 6;
 			files = (
-				2C8D03D01833F7E60037755E /* var in CopyFiles */,
-				2C8D03CF1833F7E00037755E /* share in CopyFiles */,
-				2C8D03CE1833F7DA0037755E /* sbin in CopyFiles */,
-				2C8D03CD1833F7D10037755E /* etc in CopyFiles */,
+				2C79EDCE18358C7500DB4CD6 /* etc in CopyFiles */,
+				2C79EDCF18358C7500DB4CD6 /* sbin in CopyFiles */,
+				2C79EDD018358C7500DB4CD6 /* share in CopyFiles */,
+				2C79EDD118358C7500DB4CD6 /* var in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -116,11 +121,11 @@
 			dstPath = opt/arangodb;
 			dstSubfolderSpec = 6;
 			files = (
-				2CA9A89518357A51006D0322 /* bin in CopyFiles */,
-				2CA9A88B183578A0006D0322 /* var in CopyFiles */,
-				2CA9A88C183578A0006D0322 /* share in CopyFiles */,
-				2CA9A88D183578A0006D0322 /* sbin in CopyFiles */,
-				2CA9A88E183578A0006D0322 /* etc in CopyFiles */,
+				2C79EDD218358C9F00DB4CD6 /* bin in CopyFiles */,
+				2C79EDD318358C9F00DB4CD6 /* etc in CopyFiles */,
+				2C79EDD418358C9F00DB4CD6 /* sbin in CopyFiles */,
+				2C79EDD518358C9F00DB4CD6 /* share in CopyFiles */,
+				2C79EDD618358C9F00DB4CD6 /* var in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -164,12 +169,12 @@
 		2C3B9461183398F4009BBBF4 /* arangod.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = arangod.entitlements; sourceTree = "<group>"; };
 		2C76DAB8167A26D200505954 /* ArangoHelpView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ArangoHelpView.xib; sourceTree = "<group>"; };
 		2C76DABD167A3BC800505954 /* ArangoUserConfigController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ArangoUserConfigController.m; sourceTree = "<group>"; };
+		2C79EDC418358C6000DB4CD6 /* bin */ = {isa = PBXFileReference; lastKnownFileType = folder; name = bin; path = build/opt/arangodb/bin; sourceTree = "<group>"; };
+		2C79EDC518358C6000DB4CD6 /* etc */ = {isa = PBXFileReference; lastKnownFileType = folder; name = etc; path = build/opt/arangodb/etc; sourceTree = "<group>"; };
+		2C79EDC618358C6000DB4CD6 /* sbin */ = {isa = PBXFileReference; lastKnownFileType = folder; name = sbin; path = build/opt/arangodb/sbin; sourceTree = "<group>"; };
+		2C79EDC718358C6000DB4CD6 /* share */ = {isa = PBXFileReference; lastKnownFileType = folder; name = share; path = build/opt/arangodb/share; sourceTree = "<group>"; };
+		2C79EDC818358C6000DB4CD6 /* var */ = {isa = PBXFileReference; lastKnownFileType = folder; name = var; path = build/opt/arangodb/var; sourceTree = "<group>"; };
 		2C856979167B6F79005FECCE /* ArangoInstanceController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArangoInstanceController.h; sourceTree = "<group>"; };
-		2C8D03C31833F7AF0037755E /* bin */ = {isa = PBXFileReference; lastKnownFileType = folder; name = bin; path = opt/arangodb/bin; sourceTree = "<group>"; };
-		2C8D03C41833F7AF0037755E /* etc */ = {isa = PBXFileReference; lastKnownFileType = folder; name = etc; path = opt/arangodb/etc; sourceTree = "<group>"; };
-		2C8D03C51833F7AF0037755E /* sbin */ = {isa = PBXFileReference; lastKnownFileType = folder; name = sbin; path = opt/arangodb/sbin; sourceTree = "<group>"; };
-		2C8D03C61833F7AF0037755E /* share */ = {isa = PBXFileReference; lastKnownFileType = folder; name = share; path = opt/arangodb/share; sourceTree = "<group>"; };
-		2C8D03C71833F7AF0037755E /* var */ = {isa = PBXFileReference; lastKnownFileType = folder; name = var; path = opt/arangodb/var; sourceTree = "<group>"; };
 		2C91EB8E1673A2F10007EFC0 /* ArangoBaseController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArangoBaseController.h; sourceTree = "<group>"; };
 		2C91EB8F1673A2F10007EFC0 /* ArangoBaseController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ArangoBaseController.m; sourceTree = "<group>"; };
 		2C91EB951673A4910007EFC0 /* ArangoManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArangoManager.h; sourceTree = "<group>"; };
@@ -310,11 +315,11 @@
 		2C8D03C21833F79E0037755E /* arangodb */ = {
 			isa = PBXGroup;
 			children = (
-				2C8D03C31833F7AF0037755E /* bin */,
-				2C8D03C41833F7AF0037755E /* etc */,
-				2C8D03C51833F7AF0037755E /* sbin */,
-				2C8D03C61833F7AF0037755E /* share */,
-				2C8D03C71833F7AF0037755E /* var */,
+				2C79EDC418358C6000DB4CD6 /* bin */,
+				2C79EDC518358C6000DB4CD6 /* etc */,
+				2C79EDC618358C6000DB4CD6 /* sbin */,
+				2C79EDC718358C6000DB4CD6 /* share */,
+				2C79EDC818358C6000DB4CD6 /* var */,
 			);
 			name = arangodb;
 			sourceTree = "<group>";
@@ -510,9 +515,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2C79EDCD18358C6000DB4CD6 /* var in Resources */,
 				2C1A33F0183586D4005DA0DE /* arangob in Resources */,
 				8A539DBE15ECEE6500A267B6 /* InfoPlist.strings in Resources */,
+				2C79EDC918358C6000DB4CD6 /* bin in Resources */,
 				8A539DC415ECEE6500A267B6 /* Credits.rtf in Resources */,
+				2C79EDCB18358C6000DB4CD6 /* sbin in Resources */,
 				2C1A33F1183586D4005DA0DE /* arangod in Resources */,
 				2C76DAB9167A26D200505954 /* ArangoHelpView.xib in Resources */,
 				2C1A33F5183586D4005DA0DE /* arangorestore in Resources */,
@@ -524,9 +532,11 @@
 				8A949953160072B500A0ABA7 /* icon.icns in Resources */,
 				2C1A33EF183586D4005DA0DE /* arango-dfdb in Resources */,
 				8A293B4F15F5FD1A008959B1 /* IconColor.png in Resources */,
+				2C79EDCA18358C6000DB4CD6 /* etc in Resources */,
 				8A9499551600752100A0ABA7 /* IconGrey.png in Resources */,
 				2C1A33F3183586D4005DA0DE /* arangoimp in Resources */,
 				2C1A33F2183586D4005DA0DE /* arangodump in Resources */,
+				2C79EDCC18358C6000DB4CD6 /* share in Resources */,
 				2C1A33F7183586D4005DA0DE /* foxx-manager in Resources */,
 				2C3B9462183398F4009BBBF4 /* arangod.entitlements in Resources */,
 				2C1A33F4183586D4005DA0DE /* arangoirb in Resources */,

@@ -1,20 +1,43 @@
+# -*- mode: Makefile; -*-
+
+## -----------------------------------------------------------------------------
+## --SECTION--                                                    COMMON DEFINES
+## -----------------------------------------------------------------------------
+
 NAME = ArangoDB
 VERSION = 1.4.1
 
 SOURCE_FILES = build/ArangoDB.app ArangoDB/CHANGELOG ArangoDB/README
-
-
-################################################################################
-# DMG building. No editing should be needed beyond this point.
-################################################################################
 
 MASTER_DMG = $(NAME)-$(VERSION).dmg
 WC_DMG = build/wc.dmg
 WC_DIR = build/wc
 
 .PHONY: all
+all: standalone
 
-all: $(MASTER_DMG)
+## -----------------------------------------------------------------------------
+## --SECTION--                                                        STANDALONE
+## -----------------------------------------------------------------------------
+
+.PHONY: standalone
+standalone:
+	rm -rf build
+	mkdir build
+
+	@echo
+	@echo --------------------- Building ArangoDB --------------------
+
+	cd ArangoDB/Build && make DESTDIR=../../build install
+
+	@echo
+	@echo --------------------- Building Standalone --------------------
+
+	xcodebuild -target 'Standalone' -archivePath build/archive -scheme "ArangoDB Standalone" archive
+	mv build/archive.xcarchive/Products/Applications/ArangoDB.app build
+
+	make $(MASTER_DMG)
+
 
 $(MASTER_DMG): $(SOURCE_FILES)
 	@echo
@@ -45,7 +68,19 @@ $(MASTER_DMG): $(SOURCE_FILES)
 	rm -rf $(WC_DIR)
 	@echo
 
+## -----------------------------------------------------------------------------
+## --SECTION--                                                             CLEAN
+## -----------------------------------------------------------------------------
+
 .PHONY: clean
 clean:
 	-rm -rf $(MASTER_DMG) $(WC_DMG)
 
+## -----------------------------------------------------------------------------
+## --SECTION--                                                       END-OF-FILE
+## -----------------------------------------------------------------------------
+
+## Local Variables:
+## mode: outline-minor
+## outline-regexp: "^\\(### @brief\\|## --SECTION--\\|# -\\*- \\)"
+## End:
