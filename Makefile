@@ -43,8 +43,11 @@ $(MASTER_DMG): $(SOURCE_FILES)
 	@echo
 	@echo --------------------- Generating empty template --------------------
 
+	-rmdir template
+	-rm -f "$(WC_DMG)"
+
 	mkdir template
-	hdiutil create -fs HFSX -layout SPUD -size 500m "$(WC_DMG)" -srcfolder template -format UDRW -volname "$(NAME)" -quiet
+	hdiutil create -fs HFSX -layout SPUD -size 500m "$(WC_DMG)" -srcfolder template -format UDRW -volname "$(NAME)"
 	rmdir template
 
 	@echo
