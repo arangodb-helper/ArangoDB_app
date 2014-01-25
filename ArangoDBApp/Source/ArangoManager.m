@@ -568,25 +568,14 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     NSString* path = [[[NSBundle mainBundle] bundlePath] stringByAppendingString:@"/Contents/MacOS/opt/arangodb"];
     NSString* jsPath = [_js path];
 
+    
+    _arangoDBRoot   = path;
     _arangoDBBinary = [path stringByAppendingString:_arangoDBVersion];
     _arangoDBConfig = [path stringByAppendingString:@"/etc/arangodb/arangod.conf"];
     
-    _arangoDBJsStartupDir = [path stringByAppendingString:@"/share/arangodb/js"];
-    _arangoDBJsActionDir = [path stringByAppendingString:@"/share/arangodb/js/actions"];
     _arangoDBJsAppDir = [path stringByAppendingString:@"/share/arangodb/js/apps"];
     _arangoDBTempDir = [jsPath stringByAppendingString:@"/tmp"];
     
-    NSString* path1 = [path stringByAppendingString:@"/share/arangodb/js/server/modules"];
-    NSString* path2 = [path stringByAppendingString:@"/share/arangodb/js/common/modules"];
-    NSString* path3 = [path stringByAppendingString:@"/share/arangodb/js/node"];
-    
-    _arangoDBJsModuleDir = [[[[path1 stringByAppendingString: @";"]
-                              stringByAppendingString: path2]
-                              stringByAppendingString: @";"]
-                              stringByAppendingString: path3];
-    
-    _arangoDBJsPackageDir = [path stringByAppendingString: @"/share/arangodb/js/npm"];
-
     BOOL ok = [self loadConfigurations];
 
     if (! ok) {
@@ -1183,22 +1172,20 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
         // Database needs upgrade
         NSArray* upgradeArguments = [NSArray arrayWithObjects:
                                      @"--config", _arangoDBConfig,
-                                     @"--exit-on-parent-death", @"true",
                                      @"--server.endpoint", [NSString stringWithFormat:@"tcp://0.0.0.0:%@", config.port.stringValue],
                                      @"--log.file", logPath,
                                      @"--log.level", config.loglevel,
-                                     @"--javascript.action-directory", _arangoDBJsActionDir,
-                                     @"--javascript.startup-directory", _arangoDBJsStartupDir,
-                                     @"--javascript.modules-path", _arangoDBJsModuleDir,
-                                     @"--javascript.package-path", _arangoDBJsPackageDir,
                                      @"--javascript.app-path", userApps,
                                      @"--upgrade",
                                      database,
                                      nil];
 
         NSTask* upgrade = [[NSTask alloc] init];
+        
         [upgrade setLaunchPath:_arangoDBBinary];
         [upgrade setArguments:upgradeArguments];
+        setenv("ROOTDIR", [_arangoDBRoot UTF8String], true);
+
         ArangoUpgradeInfoController* infoScreen = [[ArangoUpgradeInfoController alloc]
                                                    initWithArangoManager:self
                                                    andAppDelegate:(ArangoAppDelegate*)[[NSApplication sharedApplication] delegate]];
@@ -1222,24 +1209,22 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   }
 
   // prepare task
-  task = [[NSTask alloc] init];
-  [task setLaunchPath:_arangoDBBinary];
-
   NSArray* arguments = [NSArray arrayWithObjects:
                         @"--config", _arangoDBConfig,
                         @"--exit-on-parent-death", @"true",
                         @"--server.endpoint", [NSString stringWithFormat:@"tcp://0.0.0.0:%@", config.port.stringValue],
                         @"--log.file", logPath,
                         @"--log.level", config.loglevel,
-                        @"--javascript.action-directory", _arangoDBJsActionDir,
-                        @"--javascript.startup-directory", _arangoDBJsStartupDir,
-                        @"--javascript.modules-path", _arangoDBJsModuleDir,
-                        @"--javascript.package-path", _arangoDBJsPackageDir,
                         @"--javascript.app-path", userApps,
                         @"--temp-path", _arangoDBTempDir,
                         database,
                         nil];
+  
+  task = [[NSTask alloc] init];
+  
+  [task setLaunchPath:_arangoDBBinary];
   [task setArguments:arguments];
+  setenv("ROOTDIR", [_arangoDBRoot UTF8String], true);
 
   // callback if the ArangoDB is terminated for whatever reason.
   if ([task respondsToSelector:@selector(setTerminationHandler:)]) {

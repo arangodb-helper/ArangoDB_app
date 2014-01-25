@@ -5,7 +5,7 @@
 ## -----------------------------------------------------------------------------
 
 NAME = ArangoDB
-VERSION = 1.4.2
+VERSION ?= 1.4.2
 
 SOURCE_FILES = build/ArangoDB.app ArangoDB/CHANGELOG ArangoDB/README
 
@@ -14,13 +14,31 @@ WC_DMG = build/wc.dmg
 WC_DIR = build/wc
 
 .PHONY: all
+
 all: standalone
+
+## -----------------------------------------------------------------------------
+## --SECTION--                                                           VERSION
+## -----------------------------------------------------------------------------
+
+.PHONY: update-version
+
+update-version:
+	awk								\
+		-v "VERSION=${VERSION}"  				\
+		-f version.awk						\
+		< ArangoDBApp/PropertyLists/ArangoDB-Info.plist		\
+		> ArangoDBApp/PropertyLists/ArangoDB-Info.plist.tmp	\
+
+	mv ArangoDBApp/PropertyLists/ArangoDB-Info.plist.tmp		\
+	   ArangoDBApp/PropertyLists/ArangoDB-Info.plist
 
 ## -----------------------------------------------------------------------------
 ## --SECTION--                                                        STANDALONE
 ## -----------------------------------------------------------------------------
 
 .PHONY: standalone
+
 standalone:
 	rm -rf build
 	rm -rf ArangoDB/Build
@@ -80,6 +98,7 @@ $(MASTER_DMG): $(SOURCE_FILES)
 ## -----------------------------------------------------------------------------
 
 .PHONY: clean
+
 clean:
 	-rm -rf $(MASTER_DMG) $(WC_DMG)
 
