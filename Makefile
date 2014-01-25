@@ -5,7 +5,7 @@
 ## -----------------------------------------------------------------------------
 
 NAME = ArangoDB
-VERSION = 1.4.1
+VERSION = 1.4.2
 
 SOURCE_FILES = build/ArangoDB.app ArangoDB/CHANGELOG ArangoDB/README
 
@@ -23,12 +23,16 @@ all: standalone
 .PHONY: standalone
 standalone:
 	rm -rf build
+	rm -rf ArangoDB/Build
+
 	mkdir build
 
 	@echo
 	@echo --------------------- Building ArangoDB --------------------
 
-	cd ArangoDB/Build && make DESTDIR=../../build install
+	(cd ArangoDB && ./configure --enable-all-in-one-v8 --enable-all-in-one-icu)
+	(cd ArangoDB && make pack-macosx)
+	(cd ArangoDB/Build && make DESTDIR=../../build install)
 
 	@echo
 	@echo --------------------- Building Standalone --------------------

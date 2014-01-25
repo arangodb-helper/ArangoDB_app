@@ -657,11 +657,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = ArangoDBApp/ArangoDB.entitlements;
-				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "ArangoDBApp/PropertyLists/ArangoDB-Info.plist";
 				PRODUCT_NAME = ArangoDB;
-				PROVISIONING_PROFILE = "1976C438-A402-4E2C-AA1F-73B3CE877DC3";
+				PROVISIONING_PROFILE = "";
 				STRIP_INSTALLED_PRODUCT = YES;
 			};
 			name = Debug;
@@ -670,11 +671,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = ArangoDBApp/ArangoDB.entitlements;
-				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "ArangoDBApp/PropertyLists/ArangoDB-Info.plist";
 				PRODUCT_NAME = ArangoDB;
-				PROVISIONING_PROFILE = "1976C438-A402-4E2C-AA1F-73B3CE877DC3";
+				PROVISIONING_PROFILE = "";
 				STRIP_INSTALLED_PRODUCT = YES;
 			};
 			name = Release;
@@ -744,10 +746,11 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = ArangoDBApp/ArangoDB.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "ArangoDBApp/PropertyLists/ArangoDB-Info.plist";
 				PRODUCT_NAME = ArangoDB;
-				PROVISIONING_PROFILE = "1976C438-A402-4E2C-AA1F-73B3CE877DC3";
+				PROVISIONING_PROFILE = "";
 				STRIP_INSTALLED_PRODUCT = YES;
 			};
 			name = Debug;
@@ -757,10 +760,11 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = ArangoDBApp/ArangoDB.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "ArangoDBApp/PropertyLists/ArangoDB-Info.plist";
 				PRODUCT_NAME = ArangoDB;
-				PROVISIONING_PROFILE = "1976C438-A402-4E2C-AA1F-73B3CE877DC3";
+				PROVISIONING_PROFILE = "";
 				STRIP_INSTALLED_PRODUCT = YES;
 			};
 			name = Release;
