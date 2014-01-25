@@ -55,7 +55,7 @@ standalone:
 	@echo
 	@echo --------------------- Building Standalone --------------------
 
-	xcodebuild -target 'Standalone' -archivePath build/archive -scheme "ArangoDB Standalone" archive
+	xcodebuild -target 'Standalone' -archivePath build/archive -scheme "Standalone" archive
 	mv build/archive.xcarchive/Products/Applications/ArangoDB.app build
 
 	make $(MASTER_DMG)
