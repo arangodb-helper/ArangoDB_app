@@ -34,6 +34,20 @@
 		2C21DBE11680C65800728A04 /* ArangoAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C21DBE01680C65800728A04 /* ArangoAppDelegate.m */; };
 		2C29AF111668F97800036073 /* ArangoIntroductionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2C29AF101668F97800036073 /* ArangoIntroductionView.xib */; };
 		2C29AF171668FA2100036073 /* ArangoHelpController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C29AF161668FA2100036073 /* ArangoHelpController.m */; };
+		2C33CF431895337700190F2D /* arango-dfdb in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C1A33E6183586D4005DA0DE /* arango-dfdb */; };
+		2C33CF441895337700190F2D /* arangob in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C1A33E7183586D4005DA0DE /* arangob */; };
+		2C33CF451895337700190F2D /* arangod in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C1A33E8183586D4005DA0DE /* arangod */; };
+		2C33CF461895337700190F2D /* arangodump in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C1A33E9183586D4005DA0DE /* arangodump */; };
+		2C33CF471895337700190F2D /* arangoimp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C1A33EA183586D4005DA0DE /* arangoimp */; };
+		2C33CF481895337700190F2D /* arangoirb in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C1A33EB183586D4005DA0DE /* arangoirb */; };
+		2C33CF491895337700190F2D /* arangorestore in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C1A33EC183586D4005DA0DE /* arangorestore */; };
+		2C33CF4A1895337700190F2D /* arangosh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C1A33ED183586D4005DA0DE /* arangosh */; };
+		2C33CF4B1895337700190F2D /* foxx-manager in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C1A33EE183586D4005DA0DE /* foxx-manager */; };
+		2C33CF4D1895343A00190F2D /* bin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC418358C6000DB4CD6 /* bin */; };
+		2C33CF4E1895343A00190F2D /* etc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC518358C6000DB4CD6 /* etc */; };
+		2C33CF4F1895343A00190F2D /* sbin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC618358C6000DB4CD6 /* sbin */; };
+		2C33CF501895343A00190F2D /* share in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC718358C6000DB4CD6 /* share */; };
+		2C33CF511895343A00190F2D /* var in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC818358C6000DB4CD6 /* var */; };
 		2C3B9462183398F4009BBBF4 /* arangod.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = 2C3B9461183398F4009BBBF4 /* arangod.entitlements */; };
 		2C76DAB9167A26D200505954 /* ArangoHelpView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2C76DAB8167A26D200505954 /* ArangoHelpView.xib */; };
 		2C76DABE167A3BC900505954 /* ArangoUserConfigController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C76DABD167A3BC800505954 /* ArangoUserConfigController.m */; };
@@ -42,10 +56,7 @@
 		2C79EDCB18358C6000DB4CD6 /* sbin in Resources */ = {isa = PBXBuildFile; fileRef = 2C79EDC618358C6000DB4CD6 /* sbin */; };
 		2C79EDCC18358C6000DB4CD6 /* share in Resources */ = {isa = PBXBuildFile; fileRef = 2C79EDC718358C6000DB4CD6 /* share */; };
 		2C79EDCD18358C6000DB4CD6 /* var in Resources */ = {isa = PBXBuildFile; fileRef = 2C79EDC818358C6000DB4CD6 /* var */; };
-		2C79EDCE18358C7500DB4CD6 /* etc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC518358C6000DB4CD6 /* etc */; };
 		2C79EDCF18358C7500DB4CD6 /* sbin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC618358C6000DB4CD6 /* sbin */; };
-		2C79EDD018358C7500DB4CD6 /* share in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC718358C6000DB4CD6 /* share */; };
-		2C79EDD118358C7500DB4CD6 /* var in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC818358C6000DB4CD6 /* var */; };
 		2C79EDD418358C9F00DB4CD6 /* sbin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC618358C6000DB4CD6 /* sbin */; };
 		2C91EB901673A2F10007EFC0 /* ArangoBaseController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C91EB8F1673A2F10007EFC0 /* ArangoBaseController.m */; };
 		2C91EB971673A4910007EFC0 /* ArangoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C91EB961673A4910007EFC0 /* ArangoManager.m */; };
@@ -117,16 +128,45 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		2C33CF421895335F00190F2D /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = bin;
+			dstSubfolderSpec = 7;
+			files = (
+				2C33CF431895337700190F2D /* arango-dfdb in CopyFiles */,
+				2C33CF441895337700190F2D /* arangob in CopyFiles */,
+				2C33CF451895337700190F2D /* arangod in CopyFiles */,
+				2C33CF461895337700190F2D /* arangodump in CopyFiles */,
+				2C33CF471895337700190F2D /* arangoimp in CopyFiles */,
+				2C33CF481895337700190F2D /* arangoirb in CopyFiles */,
+				2C33CF491895337700190F2D /* arangorestore in CopyFiles */,
+				2C33CF4A1895337700190F2D /* arangosh in CopyFiles */,
+				2C33CF4B1895337700190F2D /* foxx-manager in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2C33CF4C1895342900190F2D /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = opt/arangodb;
+			dstSubfolderSpec = 7;
+			files = (
+				2C33CF4D1895343A00190F2D /* bin in CopyFiles */,
+				2C33CF4E1895343A00190F2D /* etc in CopyFiles */,
+				2C33CF4F1895343A00190F2D /* sbin in CopyFiles */,
+				2C33CF501895343A00190F2D /* share in CopyFiles */,
+				2C33CF511895343A00190F2D /* var in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		2C90639B18216CC5005D0DDF /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 12;
 			dstPath = opt/arangodb;
 			dstSubfolderSpec = 6;
 			files = (
-				2C79EDCE18358C7500DB4CD6 /* etc in CopyFiles */,
 				2C79EDCF18358C7500DB4CD6 /* sbin in CopyFiles */,
-				2C79EDD018358C7500DB4CD6 /* share in CopyFiles */,
-				2C79EDD118358C7500DB4CD6 /* var in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -455,6 +495,8 @@
 				8A539DAC15ECEE6500A267B6 /* Frameworks */,
 				8A539DAD15ECEE6500A267B6 /* Resources */,
 				2C90639B18216CC5005D0DDF /* CopyFiles */,
+				2C33CF421895335F00190F2D /* CopyFiles */,
+				2C33CF4C1895342900190F2D /* CopyFiles */,
 				2C21DBF11682727F00728A04 /* ShellScript */,
 			);
 			buildRules = (
