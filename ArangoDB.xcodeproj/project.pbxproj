@@ -8,6 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		2C14F374167D1C7000D474D0 /* ArangoIntroductionController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C14F371167D1C6E00D474D0 /* ArangoIntroductionController.m */; };
+		2C15486C18948277000F8950 /* etc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC518358C6000DB4CD6 /* etc */; };
+		2C15486D18948287000F8950 /* share in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC718358C6000DB4CD6 /* share */; };
+		2C15486E1894829A000F8950 /* var in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC818358C6000DB4CD6 /* var */; };
+		2C15486F18950812000F8950 /* bin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC418358C6000DB4CD6 /* bin */; };
+		2C1548701895081F000F8950 /* sbin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC618358C6000DB4CD6 /* sbin */; };
 		2C1A33EF183586D4005DA0DE /* arango-dfdb in Resources */ = {isa = PBXBuildFile; fileRef = 2C1A33E6183586D4005DA0DE /* arango-dfdb */; };
 		2C1A33F0183586D4005DA0DE /* arangob in Resources */ = {isa = PBXBuildFile; fileRef = 2C1A33E7183586D4005DA0DE /* arangob */; };
 		2C1A33F1183586D4005DA0DE /* arangod in Resources */ = {isa = PBXBuildFile; fileRef = 2C1A33E8183586D4005DA0DE /* arangod */; };
@@ -41,11 +46,7 @@
 		2C79EDCF18358C7500DB4CD6 /* sbin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC618358C6000DB4CD6 /* sbin */; };
 		2C79EDD018358C7500DB4CD6 /* share in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC718358C6000DB4CD6 /* share */; };
 		2C79EDD118358C7500DB4CD6 /* var in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC818358C6000DB4CD6 /* var */; };
-		2C79EDD218358C9F00DB4CD6 /* bin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC418358C6000DB4CD6 /* bin */; };
-		2C79EDD318358C9F00DB4CD6 /* etc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC518358C6000DB4CD6 /* etc */; };
 		2C79EDD418358C9F00DB4CD6 /* sbin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC618358C6000DB4CD6 /* sbin */; };
-		2C79EDD518358C9F00DB4CD6 /* share in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC718358C6000DB4CD6 /* share */; };
-		2C79EDD618358C9F00DB4CD6 /* var in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC818358C6000DB4CD6 /* var */; };
 		2C91EB901673A2F10007EFC0 /* ArangoBaseController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C91EB8F1673A2F10007EFC0 /* ArangoBaseController.m */; };
 		2C91EB971673A4910007EFC0 /* ArangoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C91EB961673A4910007EFC0 /* ArangoManager.m */; };
 		2CA9A86A183578A0006D0322 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A539DBF15ECEE6500A267B6 /* main.m */; };
@@ -102,6 +103,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		2C15486B1894824A000F8950 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = opt/arangodb;
+			dstSubfolderSpec = 7;
+			files = (
+				2C1548701895081F000F8950 /* sbin in CopyFiles */,
+				2C15486F18950812000F8950 /* bin in CopyFiles */,
+				2C15486E1894829A000F8950 /* var in CopyFiles */,
+				2C15486D18948287000F8950 /* share in CopyFiles */,
+				2C15486C18948277000F8950 /* etc in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		2C90639B18216CC5005D0DDF /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 12;
@@ -121,19 +136,15 @@
 			dstPath = opt/arangodb;
 			dstSubfolderSpec = 6;
 			files = (
-				2C79EDD218358C9F00DB4CD6 /* bin in CopyFiles */,
-				2C79EDD318358C9F00DB4CD6 /* etc in CopyFiles */,
 				2C79EDD418358C9F00DB4CD6 /* sbin in CopyFiles */,
-				2C79EDD518358C9F00DB4CD6 /* share in CopyFiles */,
-				2C79EDD618358C9F00DB4CD6 /* var in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		2CA9A89618357A60006D0322 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 12;
-			dstPath = "";
-			dstSubfolderSpec = 6;
+			dstPath = bin;
+			dstSubfolderSpec = 7;
 			files = (
 				2C1A33F8183586EE005DA0DE /* arango-dfdb in CopyFiles */,
 				2C1A33F9183586EE005DA0DE /* arangob in CopyFiles */,
@@ -424,6 +435,7 @@
 				2CA9A87C183578A0006D0322 /* Resources */,
 				2CA9A88A183578A0006D0322 /* CopyFiles */,
 				2CA9A89618357A60006D0322 /* CopyFiles */,
+				2C15486B1894824A000F8950 /* CopyFiles */,
 				2CA9A88F183578A0006D0322 /* Run Script */,
 			);
 			buildRules = (
@@ -573,7 +585,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "codesign --entitlements \"${SOURCE_ROOT}/ArangoDBApp/arangod.entitlements\" -f -v -s \"${CODE_SIGN_IDENTITY}\" \"${TARGET_BUILD_DIR}/${EXECUTABLE_FOLDER_PATH}/opt/arangodb/sbin/arangod\"\n";
+			shellScript = "for i in `find ${TARGET_BUILD_DIR}/${EXECUTABLE_FOLDER_PATH}/opt -type f`; do echo $i; codesign --entitlements \"${SOURCE_ROOT}/ArangoDBApp/arangod.entitlements\" -f -v -s \"${CODE_SIGN_IDENTITY}\" $i; done\n\ncodesign --entitlements \"${SOURCE_ROOT}/ArangoDBApp/arangod.entitlements\" -f -v -s \"${CODE_SIGN_IDENTITY}\" \"${TARGET_BUILD_DIR}/${EXECUTABLE_FOLDER_PATH}/arango-dfdb\"\ncodesign --entitlements \"${SOURCE_ROOT}/ArangoDBApp/arangod.entitlements\" -f -v -s \"${CODE_SIGN_IDENTITY}\" \"${TARGET_BUILD_DIR}/${EXECUTABLE_FOLDER_PATH}/arangob\"\ncodesign --entitlements \"${SOURCE_ROOT}/ArangoDBApp/arangod.entitlements\" -f -v -s \"${CODE_SIGN_IDENTITY}\" \"${TARGET_BUILD_DIR}/${EXECUTABLE_FOLDER_PATH}/arangod\"\ncodesign --entitlements \"${SOURCE_ROOT}/ArangoDBApp/arangod.entitlements\" -f -v -s \"${CODE_SIGN_IDENTITY}\" \"${TARGET_BUILD_DIR}/${EXECUTABLE_FOLDER_PATH}/arangodump\"\ncodesign --entitlements \"${SOURCE_ROOT}/ArangoDBApp/arangod.entitlements\" -f -v -s \"${CODE_SIGN_IDENTITY}\" \"${TARGET_BUILD_DIR}/${EXECUTABLE_FOLDER_PATH}/arangoimp\"\ncodesign --entitlements \"${SOURCE_ROOT}/ArangoDBApp/arangod.entitlements\" -f -v -s \"${CODE_SIGN_IDENTITY}\" \"${TARGET_BUILD_DIR}/${EXECUTABLE_FOLDER_PATH}/arangoirb\"\ncodesign --entitlements \"${SOURCE_ROOT}/ArangoDBApp/arangod.entitlements\" -f -v -s \"${CODE_SIGN_IDENTITY}\" \"${TARGET_BUILD_DIR}/${EXECUTABLE_FOLDER_PATH}/arangorestore\"\ncodesign --entitlements \"${SOURCE_ROOT}/ArangoDBApp/arangod.entitlements\" -f -v -s \"${CODE_SIGN_IDENTITY}\" \"${TARGET_BUILD_DIR}/${EXECUTABLE_FOLDER_PATH}/arangosh\"\ncodesign --entitlements \"${SOURCE_ROOT}/ArangoDBApp/arangod.entitlements\" -f -v -s \"${CODE_SIGN_IDENTITY}\" \"${TARGET_BUILD_DIR}/${EXECUTABLE_FOLDER_PATH}/foxx-manager\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 

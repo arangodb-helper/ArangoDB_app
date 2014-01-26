@@ -1,5 +1,5 @@
 #!/bin/bash
 
-export ROOTDIR="/Applications/ArangoDB-CLI.app/Contents/MacOS/opt/arangodb"
+export ROOTDIR="/Applications/ArangoDB-CLI.app/Contents/Resources/opt/arangodb"
 
 exec "${ROOTDIR}/sbin/arango-dfdb" -c "${ROOTDIR}/etc/arangodb/arango-dfdb.conf" $*

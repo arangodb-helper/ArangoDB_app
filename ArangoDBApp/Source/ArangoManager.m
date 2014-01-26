@@ -565,16 +565,16 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     _js = [appSupportURL URLByAppendingPathComponent:@"js"];
     [self createServerJSFolders];
     
-    NSString* path = [[[NSBundle mainBundle] bundlePath] stringByAppendingString:@"/Contents/MacOS/opt/arangodb"];
-    NSString* jsPath = [_js path];
+    NSString* binPath = [[[NSBundle mainBundle] bundlePath] stringByAppendingString:@"/Contents/MacOS/opt/arangodb"];
+    NSString* resPath = [[[NSBundle mainBundle] bundlePath] stringByAppendingString:@"/Contents/Resources/opt/arangodb"];
+    NSString* jsPath  = [_js path];
 
     
-    _arangoDBRoot   = path;
-    _arangoDBBinary = [path stringByAppendingString:_arangoDBVersion];
-    _arangoDBConfig = [path stringByAppendingString:@"/etc/arangodb/arangod.conf"];
-    
-    _arangoDBJsAppDir = [path stringByAppendingString:@"/share/arangodb/js/apps"];
-    _arangoDBTempDir = [jsPath stringByAppendingString:@"/tmp"];
+    _arangoDBRoot     = resPath;
+    _arangoDBBinary   = [binPath stringByAppendingString:_arangoDBVersion];
+    _arangoDBConfig   = [resPath stringByAppendingString:@"/etc/arangodb/arangod.conf"];
+    _arangoDBJsAppDir = [resPath stringByAppendingString:@"/share/arangodb/js/apps"];
+    _arangoDBTempDir  = [jsPath stringByAppendingString:@"/tmp"];
     
     BOOL ok = [self loadConfigurations];
 

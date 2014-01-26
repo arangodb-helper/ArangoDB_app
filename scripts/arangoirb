@@ -1,5 +1,5 @@
 #!/bin/bash
 
-export ROOTDIR="/Applications/ArangoDB-CLI.app/Contents/MacOS/opt/arangodb"
+export ROOTDIR="/Applications/ArangoDB-CLI.app/Contents/Resources/opt/arangodb"
 
 exec "${ROOTDIR}/bin/arangoirb" -c "${ROOTDIR}/etc/arangodb/arangoirb.conf" $*
