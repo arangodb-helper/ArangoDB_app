@@ -1,5 +1,5 @@
 #!/bin/bash
 
-export ROOTDIR="/Applications/ArangoDB-CLI.app/Contents/Resources/opt/arangodb"
+export ROOTDIR="/Applications/ArangoDB.app/Contents/Resources/opt/arangodb"
 
 exec "${ROOTDIR}/bin/arangosh" -c "${ROOTDIR}/etc/arangodb/arangosh.conf" $*
