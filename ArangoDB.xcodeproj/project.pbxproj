@@ -613,7 +613,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "codesign --entitlements \"${SOURCE_ROOT}/ArangoDBApp/arangod.entitlements\" -f -v -s \"${CODE_SIGN_IDENTITY}\" \"${TARGET_BUILD_DIR}/${EXECUTABLE_FOLDER_PATH}/opt/arangodb/sbin/arangod\"\n";
+			shellScript = "# codesign --entitlements \"${SOURCE_ROOT}/ArangoDBApp/arangod.entitlements\" -f -v -s \"${CODE_SIGN_IDENTITY}\" \"${TARGET_BUILD_DIR}/${EXECUTABLE_FOLDER_PATH}/opt/arangodb/sbin/arangod\"\n";
 		};
 		2CA9A88F183578A0006D0322 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -799,7 +799,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = ArangoDBApp/ArangoDB.entitlements;
-				CODE_SIGN_IDENTITY = "Mac Developer";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "ArangoDBApp/PropertyLists/ArangoDB-Info.plist";
@@ -813,7 +812,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = ArangoDBApp/ArangoDB.entitlements;
-				CODE_SIGN_IDENTITY = "Mac Developer";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "ArangoDBApp/PropertyLists/ArangoDB-Info.plist";
