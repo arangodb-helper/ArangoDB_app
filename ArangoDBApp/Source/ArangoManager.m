@@ -1051,7 +1051,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   if (config.bookmarks != nil  && 106 < _version) {
     NSURL* bmPath = [self urlForBookmark:config.bookmarks.path];
 
-    if (! [bmPath startAccessingSecurityScopedResource]) {
+    if (bmPath != nil && ! [bmPath startAccessingSecurityScopedResource]) {
       self.lastError = [@"not allowed to open database path " stringByAppendingString:config.path];
       return NO;
     }
@@ -1059,7 +1059,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     if (! [config.log isEqualToString:@""]) {
       NSURL* bmLog = [self urlForBookmark:config.bookmarks.log];
 
-      if (! [bmLog startAccessingSecurityScopedResource]) {
+      if (bmLog != nil && ! [bmLog startAccessingSecurityScopedResource]) {
         self.lastError = [@"not allowed to open log path " stringByAppendingString:config.log];
         return NO;
       }
