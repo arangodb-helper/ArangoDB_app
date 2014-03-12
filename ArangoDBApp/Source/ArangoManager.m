@@ -75,6 +75,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
 - (BOOL) moveDatabaseFiles: (NSString*) src 
              toDestination: (NSString*) dst {
+  NSFileManager* fm = [NSFileManager defaultManager];
 
   // TODO use the Mac OS X functions
   DIR * d;
@@ -96,7 +97,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
       NSString* to = [[dst stringByAppendingString:@"/"] stringByAppendingString: component];
 
       NSError* err;
-      BOOL ok = [[NSFileManager defaultManager] moveItemAtPath:from toPath:to error:&err];
+      BOOL ok = [fm moveItemAtPath:from toPath:to error:&err];
       
       if (ok) {
         NSLog(@"Renamed %@ to %@", from, to);
@@ -120,8 +121,8 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 ////////////////////////////////////////////////////////////////////////////////
 
 - (BOOL) createServerJSFolders {
-  NSError* err = nil;
   NSFileManager* fm = [NSFileManager defaultManager];
+  NSError* err = nil;
 
   if (! [fm fileExistsAtPath:[_js path]]) {
     [fm createDirectoryAtURL:_js withIntermediateDirectories:YES attributes:nil error:&err];
@@ -181,13 +182,15 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 ////////////////////////////////////////////////////////////////////////////////
 
 - (BOOL) createManagedObjectContext {
+  NSFileManager* fm = [NSFileManager defaultManager];
+
   if (_managedObjectContext == nil) {
     NSError* err = nil;
-    NSURL* storeURL = [[[[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"ArangoDB"];
+    NSURL* storeURL = [[[fm URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"ArangoDB"];
 
     // create storage path
-    if (! [[NSFileManager defaultManager] fileExistsAtPath:[storeURL path]]) {
-      [[NSFileManager defaultManager] createDirectoryAtURL:storeURL withIntermediateDirectories:YES attributes:nil error:&err];
+    if (! [fm fileExistsAtPath:[storeURL path]]) {
+      [fm createDirectoryAtURL:storeURL withIntermediateDirectories:YES attributes:nil error:&err];
       if (err != nil) {
         self.lastError = [@"failed to create SQLITE application storage: " stringByAppendingString:err.localizedDescription];
         return NO;
@@ -434,6 +437,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 ////////////////////////////////////////////////////////////////////////////////
 
 - (void) deleteFiles: (NSTimer*) timer {
+  NSFileManager* fm = [NSFileManager defaultManager];
   ArangoStatus* status = timer.userInfo;
 
   // check if the instance is still running
@@ -450,7 +454,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
   // delete log file and database path
   NSError* err = nil;
-  [[NSFileManager defaultManager] removeItemAtPath:status.logPath error:&err];
+  [fm removeItemAtPath:status.logPath error:&err];
 
   if (err != nil) {
     NSLog(@"%@", err.localizedDescription);
@@ -458,7 +462,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   }
 
   err = nil;
-  [[NSFileManager defaultManager] removeItemAtPath:status.path error:&err];
+  [fm removeItemAtPath:status.path error:&err];
 
   if (err != nil) {
     NSLog(@"%@", err.localizedDescription);
@@ -472,13 +476,15 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
 - (NSString*) checkLogPath: (NSString*) logPath
                    andName: (NSString*) alias {
+  NSFileManager* fm = [NSFileManager defaultManager];
+
   if ([logPath isEqualToString:@""]) {
     return logPath;
   }
 
   BOOL isDir;
     
-  if ([[NSFileManager defaultManager] fileExistsAtPath:logPath isDirectory:&isDir]) {
+  if ([fm fileExistsAtPath:logPath isDirectory:&isDir]) {
     if (isDir) {
       NSMutableString* tmp = [[NSMutableString alloc] initWithString:logPath];
       [tmp appendString:@"/"];
@@ -486,10 +492,10 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
       [tmp appendString:@".log"];
       logPath = tmp;
 
-      if (![[NSFileManager defaultManager] fileExistsAtPath:logPath]) {
-        BOOL ok = [[NSFileManager defaultManager] createFileAtPath:logPath
-                                                          contents:nil
-                                                        attributes:nil];
+      if (![fm fileExistsAtPath:logPath]) {
+        BOOL ok = [fm createFileAtPath:logPath
+                              contents:nil
+                            attributes:nil];
 
         if (! ok) {
           self.lastError = [[@"cannot create log file '" stringByAppendingString:logPath] stringByAppendingString:@"'"];
@@ -499,7 +505,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     }
   }
   else {
-    BOOL ok = [[NSFileManager defaultManager] createFileAtPath:logPath contents:nil attributes:nil];
+    BOOL ok = [fm createFileAtPath:logPath contents:nil attributes:nil];
     
     if (! ok) {
       self.lastError = [[@"cannot create log file '" stringByAppendingString:logPath] stringByAppendingString:@"'"];
@@ -539,6 +545,8 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 ////////////////////////////////////////////////////////////////////////////////
 
 - (ArangoManager*) init {
+  NSFileManager* fm = [NSFileManager defaultManager];
+
   self = [super init];
 
   if (self != nil) {
@@ -546,7 +554,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
       _arangoDBVersion = @"/sbin/arangod";
       _version = 108;
     } 
-    else if ([[NSFileManager defaultManager] respondsToSelector:@selector(createDirectoryAtURL:withIntermediateDirectories:attributes:error:)]) {
+    else if ([fm respondsToSelector:@selector(createDirectoryAtURL:withIntermediateDirectories:attributes:error:)]) {
       _arangoDBVersion = @"/sbin/arangod";
       _version = 107;
     }
@@ -555,10 +563,9 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
       _version = 106;
     }
 
-    NSURL* appSupportURL = [[[[NSFileManager defaultManager]
-                              URLsForDirectory:NSApplicationSupportDirectory
-                              inDomains:NSUserDomainMask]
-                            lastObject]
+    NSURL* appSupportURL = [[[fm URLsForDirectory:NSApplicationSupportDirectory
+                                        inDomains:NSUserDomainMask]
+                              lastObject]
                             URLByAppendingPathComponent:@"ArangoDB"];
     
     // create js path
@@ -708,6 +715,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
                                andPort: (int) port
                                 andLog: (NSString*) logPath
                            andLogLevel: (NSString*) logLevel {
+  NSFileManager* fm = [NSFileManager defaultManager];
 
   // check the port
   if (port < 1024) {
@@ -732,12 +740,12 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   }
 
   // try to create database directory
-  if (! [[NSFileManager defaultManager] fileExistsAtPath:path]) {
+  if (! [fm fileExistsAtPath:path]) {
     NSError* err = nil;
-    [[NSFileManager defaultManager] createDirectoryAtPath:path
-                              withIntermediateDirectories:YES
-                                               attributes:nil
-                                                    error:&err];
+    [fm createDirectoryAtPath:path
+        withIntermediateDirectories:YES
+                   attributes:nil
+                        error:&err];
 
     if (err != nil) {
       self.lastError = [@"cannot create database path: " stringByAppendingString:err.localizedDescription];
@@ -747,10 +755,10 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
   // database path must be a directory and writeable
   BOOL isDir;
-  [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDir];
+  [fm fileExistsAtPath:path isDirectory:&isDir];
 
   if (isDir) {
-    if (! [[NSFileManager defaultManager] isWritableFileAtPath:path]) {
+    if (! [fm isWritableFileAtPath:path]) {
       self.lastError = @"cannot write into database directory";
       return nil;
     }
@@ -828,6 +836,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
                       andLog: (NSString*) logPath
                  andLogLevel: (NSString*) logLevel
              andRunOnStartUp: (BOOL) ros {
+  NSFileManager* fm = [NSFileManager defaultManager];
 
   // extract configuration
   ArangoConfiguration* config = [_configurations objectForKey:alias];
@@ -862,7 +871,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     }
 
     // path must not already exists
-    if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
+    if ([fm fileExistsAtPath:path]) {
       self.lastError = @"cannot move database files: destination path already exists";
       return NO;
     }
@@ -882,7 +891,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
     // move files
     NSError* err;
-    BOOL ok = [[NSFileManager defaultManager] moveItemAtPath:config.path toPath:path error:&err];
+    BOOL ok = [fm moveItemAtPath:config.path toPath:path error:&err];
 
     if (! ok) {
       self.lastError = [@"cannot move database files: " stringByAppendingString:err.localizedDescription];
@@ -912,7 +921,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
     if (! [config.path isEqualToString:path]) {
       NSError* err;
-      [[NSFileManager defaultManager] moveItemAtPath:path toPath:config.path error:&err];
+      [fm moveItemAtPath:path toPath:config.path error:&err];
     }
   }
 
@@ -956,6 +965,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
 - (BOOL) deleteDatabasePath: (NSString*) path
                  andLogFile: (NSString*) logPath {
+  NSFileManager* fm = [NSFileManager defaultManager];
 
   NSLog(@"Starting to remove database files");
 
@@ -973,7 +983,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   BOOL ok;
 
   if (! [logPath isEqualToString:@""]) {
-    ok = [[NSFileManager defaultManager] removeItemAtPath:logPath error:&err];
+    ok = [fm removeItemAtPath:logPath error:&err];
 
     if (! ok) {
       NSLog(@"cannot log file %@", err.localizedDescription);
@@ -981,7 +991,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     }
   }
 
-  ok = [[NSFileManager defaultManager] removeItemAtPath:path error:&err];
+  ok = [fm removeItemAtPath:path error:&err];
 
   if (! ok) {
     NSLog(@"cannot remove database files %@", err.localizedDescription);
@@ -1028,6 +1038,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 ////////////////////////////////////////////////////////////////////////////////
 
 - (BOOL) startArangoDB: (NSString*) name {
+  NSFileManager* fm = [NSFileManager defaultManager];
 
   // load configuration for name
   ArangoConfiguration* config = [_configurations objectForKey:name];
@@ -1066,10 +1077,10 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     }
   }
 
-  // cleanup path from version 1.0
+  // create database path
   NSString* database = [config.path stringByAppendingString:@"/database"];
   
-  if (! [[NSFileManager defaultManager] isReadableFileAtPath:database]) {
+  if (! [fm isReadableFileAtPath:database]) {
     int res = mkdir([database fileSystemRepresentation], 0777);
 
     if (res != 0) {
@@ -1088,7 +1099,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   // create apps path for user apps
   NSString* userApps = [config.path stringByAppendingString:@"/apps"];
   
-  if (! [[NSFileManager defaultManager] isReadableFileAtPath:userApps]) {
+  if (! [fm isReadableFileAtPath:userApps]) {
     int res = mkdir([userApps fileSystemRepresentation], 0777);
     
     if (res != 0) {
@@ -1098,7 +1109,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
     NSString* userAppsDatabases = [config.path stringByAppendingString:@"/apps/databases"];
     
-    if (! [[NSFileManager defaultManager] isReadableFileAtPath:userAppsDatabases]) {
+    if (! [fm isReadableFileAtPath:userAppsDatabases]) {
       int res = mkdir([userAppsDatabases fileSystemRepresentation], 0777);
       
       if (res != 0) {
@@ -1123,10 +1134,10 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     [tmp appendString:@".log"];
     logPath = tmp;
     
-    if (! [[NSFileManager defaultManager] fileExistsAtPath:logPath]) {
-      BOOL ok = [[NSFileManager defaultManager] createFileAtPath:logPath
-                                                        contents:nil
-                                                      attributes:nil];
+    if (! [fm fileExistsAtPath:logPath]) {
+      BOOL ok = [fm createFileAtPath:logPath
+                            contents:nil
+                          attributes:nil];
 
       if (! ok) {
         self.lastError = [[@"cannot create log file '" stringByAppendingString:logPath] stringByAppendingString:@"'"];
@@ -1136,74 +1147,97 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   }
 
   // check if upgrade is necessary.
+  NSString* databases = [database stringByAppendingPathComponent:@"databases"];
   NSError* versionReadError;
-  NSString* versionFile = [database stringByAppendingString:@"/VERSION"];
-  NSData* versionInfo = [NSData dataWithContentsOfFile:versionFile];
+  NSArray *contents = [fm contentsOfDirectoryAtPath:databases error:NULL];
+  NSEnumerator *enumeratorContent = [contents objectEnumerator];
+  NSString *file;
+  BOOL fileIsDirectory = FALSE;
+  float lowestVersion = _currentVersion;
+  
+  while ( ( file = [ enumeratorContent nextObject ] ) ) {
+    NSString* filename = [databases stringByAppendingPathComponent: file];
 
-  if (versionInfo != nil) {
-    id obj = [NSJSONSerialization JSONObjectWithData:versionInfo options:0 error:&versionReadError];
-    
-    if (versionReadError != nil) {
-      self.lastError = @"Version information error";
-      NSLog(@"Version information error while parsing JSON: %@", versionReadError);
-      return NO;
-    }
-    
-    if ([obj isKindOfClass:[NSDictionary class]]) {
-      NSDictionary* json = obj;
-      NSString* versionString = [json objectForKey:@"version"];
-      float dbVersion = [versionString floatValue];
-      if (dbVersion < _currentVersion) {
-        NSAlert* confirmUpgrade = [NSAlert
-                                   alertWithMessageText:@"Datafiles have to be upgraded"
-                                   defaultButton:@"Upgrade"
-                                   alternateButton:@"Cancel"
-                                   otherButton:nil
-                                   informativeTextWithFormat:@"The files in your database directory have been created with ArangoDB version %.1f and should be upgraded to version %.1f. If you cancel this operation your ArangoDB will not be started.", dbVersion, _currentVersion];
-        NSInteger clicked = [confirmUpgrade runModal];
+    if ([fm fileExistsAtPath:filename isDirectory:&fileIsDirectory]) {
+      if (fileIsDirectory ) {
+        NSString* versionFile = [filename stringByAppendingString:@"/VERSION"];
+        NSData* versionInfo = [NSData dataWithContentsOfFile:versionFile];
 
-        // User did Cancel the operation
-        if (clicked == NSAlertAlternateReturn) {
-          self.lastError = @"Upgrade canceled";
-          NSLog(@"User did cancel the upgrade.");
-          return NO;
-        }
+        if (versionInfo != nil) {
+          id obj = [NSJSONSerialization JSONObjectWithData:versionInfo options:0 error:&versionReadError];
+          
+          if (versionReadError != nil) {
+            self.lastError = @"Version information error";
+            NSLog(@"Version information error while parsing JSON: %@", versionReadError);
+            return NO;
+          }
 
-        // Database needs upgrade
-        NSArray* upgradeArguments = [NSArray arrayWithObjects:
-                                     @"--config", _arangoDBConfig,
-                                     @"--server.endpoint", [NSString stringWithFormat:@"tcp://0.0.0.0:%@", config.port.stringValue],
-                                     @"--log.file", logPath,
-                                     @"--log.level", config.loglevel,
-                                     @"--javascript.app-path", userApps,
-                                     @"--upgrade",
-                                     database,
-                                     nil];
-
-        NSTask* upgrade = [[NSTask alloc] init];
-        
-        [upgrade setLaunchPath:_arangoDBBinary];
-        [upgrade setArguments:upgradeArguments];
-        setenv("ROOTDIR", [_arangoDBRoot UTF8String], true);
-
-        ArangoUpgradeInfoController* infoScreen = [[ArangoUpgradeInfoController alloc]
-                                                   initWithArangoManager:self
-                                                   andAppDelegate:(ArangoAppDelegate*)[[NSApplication sharedApplication] delegate]];
-        [upgrade launch];
-        [upgrade waitUntilExit];
-        int upgradeStatus = [upgrade terminationStatus];
-        [infoScreen closeInfo:nil];
-
-        if (upgradeStatus != 0) {
-          NSLog(@"Upgrade failed with status: %i", upgradeStatus);
-          self.lastError = @"Upgrade process failed, see log for details";
-          return NO;
+          if ([obj isKindOfClass:[NSDictionary class]]) {
+            NSDictionary* json = obj;
+            NSString* versionString = [json objectForKey:@"version"];
+            float dbVersion = [versionString floatValue];
+            
+            if (dbVersion < lowestVersion) {
+              lowestVersion = dbVersion;
+            }
+          }
+          else {
+            self.lastError = @"Could not parse version information";
+            NSLog(@"JSON Parsing failed...: %@", obj);
+            return NO;
+          }
         }
       }
     }
-    else {
-      self.lastError = @"Could not parse version information";
-      NSLog(@"JSON Parsing failed...: %@", obj);
+  }
+
+  if (lowestVersion < _currentVersion) {
+    NSAlert* confirmUpgrade = [NSAlert
+                                alertWithMessageText:@"Datafiles have to be upgraded"
+                                       defaultButton:@"Upgrade"
+                                     alternateButton:@"Cancel"
+                                         otherButton:nil
+                           informativeTextWithFormat:@"The files in your database directory have been created with ArangoDB version %.1f and should be upgraded to version %.1f. If you cancel this operation your ArangoDB will not be started.",
+                                lowestVersion,
+                                _currentVersion];
+    NSInteger clicked = [confirmUpgrade runModal];
+
+    // User did Cancel the operation
+    if (clicked == NSAlertAlternateReturn) {
+      self.lastError = @"Upgrade canceled";
+      NSLog(@"User did cancel the upgrade.");
+      return NO;
+    }
+
+    // Database needs upgrade
+    NSArray* upgradeArguments = [NSArray arrayWithObjects:
+                                         @"--config", _arangoDBConfig,
+                                         @"--server.endpoint", [NSString stringWithFormat:@"tcp://0.0.0.0:%@", config.port.stringValue],
+                                         @"--log.file", logPath,
+                                         @"--log.level", config.loglevel,
+                                         @"--javascript.app-path", userApps,
+                                         @"--upgrade",
+                                         database,
+                                         nil];
+
+    NSTask* upgrade = [[NSTask alloc] init];
+        
+    [upgrade setLaunchPath:_arangoDBBinary];
+    [upgrade setArguments:upgradeArguments];
+    setenv("ROOTDIR", [_arangoDBRoot UTF8String], true);
+
+    ArangoUpgradeInfoController* infoScreen = [[ArangoUpgradeInfoController alloc]
+                                                   initWithArangoManager:self
+                                                          andAppDelegate:(ArangoAppDelegate*)[[NSApplication sharedApplication] delegate]];
+    [upgrade launch];
+    [upgrade waitUntilExit];
+
+    int upgradeStatus = [upgrade terminationStatus];
+    [infoScreen closeInfo:nil];
+
+    if (upgradeStatus != 0) {
+      NSLog(@"Upgrade failed with status: %i", upgradeStatus);
+      self.lastError = @"Upgrade process failed, see log for details";
       return NO;
     }
   }
