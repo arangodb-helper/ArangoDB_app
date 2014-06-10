@@ -1149,10 +1149,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   // set the root directory of the installation
   setenv("ROOTDIR", [_arangoDBRoot UTF8String], true);
   
-  // check if upgrade is necessary.
-  NSString* databases = [database stringByAppendingPathComponent:@"databases"];
-  NSArray *contents = [fm contentsOfDirectoryAtPath:databases error:NULL];
-  
+  // check if upgrade is necessary.  
   NSArray* checkArguments = [NSArray arrayWithObjects:
                              @"--config", _arangoDBConfig,
                              @"--no-server",

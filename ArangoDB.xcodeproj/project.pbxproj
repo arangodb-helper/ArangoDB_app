@@ -28,7 +28,6 @@
 		2C33CF4E1895343A00190F2D /* etc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC518358C6000DB4CD6 /* etc */; };
 		2C33CF501895343A00190F2D /* share in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC718358C6000DB4CD6 /* share */; };
 		2C33CF511895343A00190F2D /* var in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC818358C6000DB4CD6 /* var */; };
-		2C3B9462183398F4009BBBF4 /* arangod.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = 2C3B9461183398F4009BBBF4 /* arangod.entitlements */; };
 		2C76DAB9167A26D200505954 /* ArangoHelpView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2C76DAB8167A26D200505954 /* ArangoHelpView.xib */; };
 		2C76DABE167A3BC900505954 /* ArangoUserConfigController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C76DABD167A3BC800505954 /* ArangoUserConfigController.m */; };
 		2C79EDCF18358C7500DB4CD6 /* sbin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC618358C6000DB4CD6 /* sbin */; };
@@ -62,7 +61,6 @@
 		2CA9A884183578A0006D0322 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8A949952160072B500A0ABA7 /* icon.icns */; };
 		2CA9A885183578A0006D0322 /* IconColor.png in Resources */ = {isa = PBXBuildFile; fileRef = 8A293B4E15F5FD1A008959B1 /* IconColor.png */; };
 		2CA9A886183578A0006D0322 /* IconGrey.png in Resources */ = {isa = PBXBuildFile; fileRef = 8A9499541600752100A0ABA7 /* IconGrey.png */; };
-		2CA9A887183578A0006D0322 /* arangod.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = 2C3B9461183398F4009BBBF4 /* arangod.entitlements */; };
 		2CA9A888183578A0006D0322 /* Logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 8A9499701607214A00A0ABA7 /* Logo.png */; };
 		2CA9A889183578A0006D0322 /* ArangoUpgradeInfoView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8AF4A63B17438C9800447481 /* ArangoUpgradeInfoView.xib */; };
 		2CE35791167777C200F2EA64 /* ArangoStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = 2CE35790167777C200F2EA64 /* ArangoStatus.m */; };
@@ -512,7 +510,6 @@
 				2CA9A884183578A0006D0322 /* icon.icns in Resources */,
 				2CA9A885183578A0006D0322 /* IconColor.png in Resources */,
 				2CA9A886183578A0006D0322 /* IconGrey.png in Resources */,
-				2CA9A887183578A0006D0322 /* arangod.entitlements in Resources */,
 				2CA9A888183578A0006D0322 /* Logo.png in Resources */,
 				2CA9A889183578A0006D0322 /* ArangoUpgradeInfoView.xib in Resources */,
 			);
@@ -532,7 +529,6 @@
 				8A949953160072B500A0ABA7 /* icon.icns in Resources */,
 				8A293B4F15F5FD1A008959B1 /* IconColor.png in Resources */,
 				8A9499551600752100A0ABA7 /* IconGrey.png in Resources */,
-				2C3B9462183398F4009BBBF4 /* arangod.entitlements in Resources */,
 				8A9499711607214A00A0ABA7 /* Logo.png in Resources */,
 				8AF4A63E17438C9900447481 /* ArangoUpgradeInfoView.xib in Resources */,
 			);
@@ -722,12 +718,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = ArangoDBApp/ArangoDB.entitlements;
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
+				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application: triAGENS GmbH (VV6QAXP22C)";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "3rd Party Mac Developer Application: triAGENS GmbH (VV6QAXP22C)";
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "ArangoDBApp/PropertyLists/ArangoDB-Info.plist";
 				PRODUCT_NAME = ArangoDB;
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "8A9318F0-D72F-43BB-90E9-A435169669ED";
 				STRIP_INSTALLED_PRODUCT = YES;
 			};
 			name = Debug;
@@ -736,12 +732,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = ArangoDBApp/ArangoDB.entitlements;
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
+				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application: triAGENS GmbH (VV6QAXP22C)";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "3rd Party Mac Developer Application: triAGENS GmbH (VV6QAXP22C)";
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "ArangoDBApp/PropertyLists/ArangoDB-Info.plist";
 				PRODUCT_NAME = ArangoDB;
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "8A9318F0-D72F-43BB-90E9-A435169669ED";
 				STRIP_INSTALLED_PRODUCT = YES;
 			};
 			name = Release;
