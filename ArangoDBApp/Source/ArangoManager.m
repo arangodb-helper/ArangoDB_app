@@ -1146,60 +1146,40 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     }
   }
 
+  // set the root directory of the installation
+  setenv("ROOTDIR", [_arangoDBRoot UTF8String], true);
+  
   // check if upgrade is necessary.
   NSString* databases = [database stringByAppendingPathComponent:@"databases"];
-  NSError* versionReadError;
   NSArray *contents = [fm contentsOfDirectoryAtPath:databases error:NULL];
-  NSEnumerator *enumeratorContent = [contents objectEnumerator];
-  NSString *file;
-  BOOL fileIsDirectory = FALSE;
-  float lowestVersion = _currentVersion;
   
-  while ( ( file = [ enumeratorContent nextObject ] ) ) {
-    NSString* filename = [databases stringByAppendingPathComponent: file];
+  NSArray* checkArguments = [NSArray arrayWithObjects:
+                             @"--config", _arangoDBConfig,
+                             @"--no-server",
+                             @"--log.file", logPath,
+                             @"--log.level", config.loglevel,
+                             @"--javascript.app-path", userApps,
+                             @"--check-version",
+                             database,
+                             nil];
+  
+  NSTask* checkVersion = [[NSTask alloc] init];
+  
+  [checkVersion setLaunchPath:_arangoDBBinary];
+  [checkVersion setArguments:checkArguments];
+  
+  [checkVersion launch];
+  [checkVersion waitUntilExit];
+  
+  int checkVersionStatus = [checkVersion terminationStatus];
 
-    if ([fm fileExistsAtPath:filename isDirectory:&fileIsDirectory]) {
-      if (fileIsDirectory ) {
-        NSString* versionFile = [filename stringByAppendingString:@"/VERSION"];
-        NSData* versionInfo = [NSData dataWithContentsOfFile:versionFile];
-
-        if (versionInfo != nil) {
-          id obj = [NSJSONSerialization JSONObjectWithData:versionInfo options:0 error:&versionReadError];
-          
-          if (versionReadError != nil) {
-            self.lastError = @"Version information error";
-            NSLog(@"Version information error while parsing JSON: %@", versionReadError);
-            return NO;
-          }
-
-          if ([obj isKindOfClass:[NSDictionary class]]) {
-            NSDictionary* json = obj;
-            NSString* versionString = [json objectForKey:@"version"];
-            float dbVersion = [versionString floatValue];
-            
-            if (dbVersion < lowestVersion) {
-              lowestVersion = dbVersion;
-            }
-          }
-          else {
-            self.lastError = @"Could not parse version information";
-            NSLog(@"JSON Parsing failed...: %@", obj);
-            return NO;
-          }
-        }
-      }
-    }
-  }
-
-  if (lowestVersion < _currentVersion) {
+  if (checkVersionStatus == 3) {
     NSAlert* confirmUpgrade = [NSAlert
                                 alertWithMessageText:@"Datafiles have to be upgraded"
                                        defaultButton:@"Upgrade"
                                      alternateButton:@"Cancel"
                                          otherButton:nil
-                           informativeTextWithFormat:@"The files in your database directory have been created with ArangoDB version %.1f and should be upgraded to version %.1f. If you cancel this operation your ArangoDB will not be started.",
-                                lowestVersion,
-                                _currentVersion];
+                           informativeTextWithFormat:@"The files in your database directory have been created with a previous ArangoDB version and should be upgraded. If you cancel this operation your ArangoDB will not be started."];
     NSInteger clicked = [confirmUpgrade runModal];
 
     // User did Cancel the operation
@@ -1212,7 +1192,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     // Database needs upgrade
     NSArray* upgradeArguments = [NSArray arrayWithObjects:
                                          @"--config", _arangoDBConfig,
-                                         @"--server.endpoint", [NSString stringWithFormat:@"tcp://0.0.0.0:%@", config.port.stringValue],
+                                         @"--no-server",
                                          @"--log.file", logPath,
                                          @"--log.level", config.loglevel,
                                          @"--javascript.app-path", userApps,
@@ -1224,7 +1204,6 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
         
     [upgrade setLaunchPath:_arangoDBBinary];
     [upgrade setArguments:upgradeArguments];
-    setenv("ROOTDIR", [_arangoDBRoot UTF8String], true);
 
     ArangoUpgradeInfoController* infoScreen = [[ArangoUpgradeInfoController alloc]
                                                    initWithArangoManager:self
@@ -1258,7 +1237,6 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   
   [task setLaunchPath:_arangoDBBinary];
   [task setArguments:arguments];
-  setenv("ROOTDIR", [_arangoDBRoot UTF8String], true);
 
   // callback if the ArangoDB is terminated for whatever reason.
   if ([task respondsToSelector:@selector(setTerminationHandler:)]) {
