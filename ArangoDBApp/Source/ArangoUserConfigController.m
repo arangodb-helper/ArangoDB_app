@@ -75,7 +75,7 @@ static const NSString* NON = @"Do not start instances";
   }
 
   [self.manager setRunOnStartup:ros
-               setStartupOnLogin:(self.startOnLoginButton.state == NSOnState)];
+              setStartupOnLogin:(self.startOnLoginButton.state == NSOnState)];
 
   [self.window close];
 }

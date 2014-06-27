@@ -31,6 +31,7 @@
 #import "ArangoToolbarMenu.h"
 #import "ArangoManager.h"
 #import "ArangoIntroductionController.h"
+#import "ArangoUserConfigController.h"
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                 ArangoAppDelegate
@@ -83,9 +84,6 @@
     return;
   }
   
-  // create the controllers
-  _controllers = [[NSMutableArray alloc] init];
-  
   // check for changes in the configuration
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(configurationDidChange:)
@@ -104,7 +102,7 @@
   // without any configuration, display some help
   if (0 == _manager.configurations.count) {
     // will autorelease on close
-    [self addController:[[ArangoIntroductionController alloc] initWithArangoManager:_manager andAppDelegate:self]];
+    [[ArangoIntroductionController alloc] initWithArangoManager:_manager andAppDelegate:self];
   }
   else {
     [_manager startupInstances];
@@ -120,22 +118,6 @@
 
   [_statusItem setImage: [NSImage imageNamed:@"IconColor"]];
   [_statusItem setHighlightMode:YES];
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief adds a controller
-////////////////////////////////////////////////////////////////////////////////
-
-- (void) addController: (NSWindowController*) controller {
-  [_controllers addObject:controller];
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief removes a controller
-////////////////////////////////////////////////////////////////////////////////
-
-- (void) removeController: (NSWindowController*) controller {
-  [_controllers removeObject:controller];
 }
 
 @end

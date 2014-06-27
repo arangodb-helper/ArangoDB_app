@@ -50,9 +50,16 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 - (void) createNewInstance: (id) sender {
-  // will autorelease on close
-  [self.delegate addController:[[ArangoInstanceController alloc] initWithArangoManager:self.manager
-                                                                        andAppDelegate:self.delegate]];
+  if (self.instanceController) {
+    [self.instanceController.window makeKeyAndOrderFront:self];
+    [self.instanceController showWindow:self.instanceController.window];
+  }
+  else {
+    self.instanceController = [[ArangoInstanceController alloc] initWithArangoManager:self.manager
+                                                                       andAppDelegate:self.delegate];
+  }
+
+  [NSApp activateIgnoringOtherApps:YES];  
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -67,9 +74,9 @@
   }
 
   // will autorelease on close
-  [self.delegate addController:[[ArangoInstanceController alloc] initWithArangoManager:self.manager
-                                                                        andAppDelegate:self.delegate
-                                                                             andStatus:status]];
+  [[ArangoInstanceController alloc] initWithArangoManager:self.manager
+                                           andAppDelegate:self.delegate
+                                                andStatus:status];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -163,9 +170,17 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 - (void) showConfiguration: (id) sender {
-  // will autorelease on close
-  [self.delegate addController:[[ArangoUserConfigController alloc] initWithArangoManager:self.manager
-                                                                          andAppDelegate:self.delegate]];
+  if (self.configController) {
+    [self.configController.window makeKeyAndOrderFront:self];
+    [self.configController showWindow:self.configController.window];
+  }
+  else {
+    self.configController = [[ArangoUserConfigController alloc] initWithArangoManager:self.manager
+                                                                       andAppDelegate:self.delegate];
+
+  }
+
+  [NSApp activateIgnoringOtherApps:YES];  
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -174,8 +189,6 @@
 
 - (void) showHelp: (id) sender {
   if (self.helpController) {
-    [NSApp activateIgnoringOtherApps:YES];
-
     [self.helpController.window makeKeyAndOrderFront:self];
     [self.helpController showWindow:self.helpController.window];
   }
@@ -184,6 +197,8 @@
                                                                andAppDelegate:self.delegate
                                                                     andNibNamed:@"ArangoHelpView"];
   }
+
+  [NSApp activateIgnoringOtherApps:YES];  
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -234,7 +249,7 @@
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief quits the application
+/// @brief opens a browser window to the administration interface
 ////////////////////////////////////////////////////////////////////////////////
 
 - (void) openBrowser: (id) sender {

@@ -43,7 +43,7 @@
 				<int key="NSWindowBacking">2</int>
 				<string key="NSWindowRect">{{196, 240}, {483, 287}}</string>
 				<int key="NSWTFlags">1618477056</int>
-				<string key="NSWindowTitle">Configuration</string>
+				<string key="NSWindowTitle">More about ArangoDB</string>
 				<string key="NSWindowClass">NSWindow</string>
 				<nil key="NSViewClass"/>
 				<nil key="NSUserInterfaceItemIdentifier"/>

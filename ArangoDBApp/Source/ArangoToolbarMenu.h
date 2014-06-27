@@ -30,7 +30,9 @@
 
 @class ArangoAppDelegate;
 @class ArangoHelpController;
+@class ArangoInstanceController;
 @class ArangoManager;
+@class ArangoUserConfigController;
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                 ArangoToolbarMenu
@@ -55,10 +57,22 @@
 @property (nonatomic, weak, readonly) ArangoAppDelegate* delegate;
 
 ////////////////////////////////////////////////////////////////////////////////
+/// @brief instance controller
+////////////////////////////////////////////////////////////////////////////////
+
+@property (nonatomic, strong) ArangoInstanceController* instanceController;
+
+////////////////////////////////////////////////////////////////////////////////
 /// @brief help controller
 ////////////////////////////////////////////////////////////////////////////////
 
 @property (nonatomic, strong) ArangoHelpController* helpController;
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief config controller
+////////////////////////////////////////////////////////////////////////////////
+
+@property (nonatomic, strong) ArangoUserConfigController* configController;
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                    public methods
