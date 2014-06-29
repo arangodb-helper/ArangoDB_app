@@ -5,7 +5,8 @@
 ///
 /// DISCLAIMER
 ///
-/// Copyright 2012 triAGENS GmbH, Cologne, Germany
+/// Copyright 2014 ArangoDB GmbH, Cologne, Germany
+/// Copyright 2004-2014 triAGENS GmbH, Cologne, Germany
 ///
 /// Licensed under the Apache License, Version 2.0 (the "License");
 /// you may not use this file except in compliance with the License.
@@ -19,10 +20,11 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 ///
-/// Copyright holder is triAGENS GmbH, Cologne, Germany
+/// Copyright holder is ArangoDB GmbH, Cologne, Germany
 ///
 /// @author Dr. Frank Celler
 /// @author Michael Hackstein
+/// @author Copyright 2014, ArangoDB GmbH, Cologne, Germany
 /// @author Copyright 2012, triAGENS GmbH, Cologne, Germany
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -84,7 +86,7 @@ static const double HeightCorrection = 10;
   NSRect abortRect = _abortButton.frame;
   abortRect.origin.y -= height;
   _abortButton.frame = abortRect;
-  
+
   [_okButton setHidden:NO];
   [_abortButton setHidden:NO];
 
@@ -101,7 +103,7 @@ static const double HeightCorrection = 10;
   NSRect okRect = _okButton.frame;
   okRect.origin.y += height;
   _okButton.frame = okRect;
-  
+
   NSRect abortRect = _abortButton.frame;
   abortRect.origin.y += height;
   _abortButton.frame = abortRect;
@@ -193,7 +195,7 @@ static const double HeightCorrection = 10;
   if (ok) {
     [self.window close];
   }
-  
+
   return ok;
 }
 
@@ -220,7 +222,7 @@ static const double HeightCorrection = 10;
 
   if (status.isRunning) {
     NSAlert* info = [[NSAlert alloc] init];
-      
+
     [info setMessageText:@"ArangoDB instance must be stopped!"];
     [info setInformativeText:@"The ArangoDB instance must be stopped before moving the database directory."];
 
@@ -243,13 +245,13 @@ static const double HeightCorrection = 10;
   if (! ok) {
     return NO;
   }
-  
+
   [self.window close];
   return YES;
 }
 
 // -----------------------------------------------------------------------------
-// --SECTION--                                                    public methods
+// --SECTION--                                      constructors and destructors
 // -----------------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -285,11 +287,13 @@ static const double HeightCorrection = 10;
 
 - (id) initWithArangoManager: (ArangoManager*) manager
               andAppDelegate: (ArangoAppDelegate*) delegate
+               andConfigName: (NSString*) config
                    andStatus: (ArangoStatus*) status {
   self = [self initWithArangoManager:manager
             andAppDelegate:delegate];
 
   if (self) {
+    _oldConfigName = config;
     _status = status;
 
     self.window.title = @"Edit ArangoDB";
@@ -318,6 +322,23 @@ static const double HeightCorrection = 10;
 - (void) awakeFromNib {
   [_portField setFormatter:_portFormatter];
   [self toggleAdvancedBox:NO];
+}
+
+// -----------------------------------------------------------------------------
+// --SECTION--                                                    public methods
+// -----------------------------------------------------------------------------
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief windows is about to close
+////////////////////////////////////////////////////////////////////////////////
+
+- (void) windowWillClose: (NSNotification*) notification {
+  if (_oldConfigName == nil) {
+    [self.delegate clearNewInstanceDialog];
+  }
+  else {
+    [self.delegate clearEditInstanceDialog:_oldConfigName];
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -355,7 +376,7 @@ static const double HeightCorrection = 10;
 
 - (IBAction) saveInstance: (id) sender {
   BOOL ok;
-  
+
   if (_status == nil) {
     ok = [self createNewInstance];
   }
@@ -365,7 +386,7 @@ static const double HeightCorrection = 10;
 
   if (! ok) {
       NSAlert* info = [[NSAlert alloc] init];
-      
+
       [info setMessageText:@"Cannot create new ArangoDB instance!"];
       [info setInformativeText:[NSString stringWithFormat:@"Encountered error: \"%@\", please correct and try again.",self.manager.lastError]];
 
@@ -400,5 +421,5 @@ static const double HeightCorrection = 10;
 
 // Local Variables:
 // mode: outline-minor
-// outline-regexp: "^\\(/// @brief\\|/// {@inheritDoc}\\|/// @addtogroup\\|/// @page\\|// --SECTION--\\|/// @\\}\\)"
+// outline-regexp: "/// @brief\\|/// {@inheritDoc}\\|/// @page\\|// --SECTION--\\|/// @\\}"
 // End:

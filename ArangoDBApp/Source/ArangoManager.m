@@ -1,11 +1,12 @@
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 /// @brief ArangoDB instance manager
 ///
 /// @file
 ///
 /// DISCLAIMER
 ///
-/// Copyright 2012 triAGENS GmbH, Cologne, Germany
+/// Copyright 2014 ArangoDB GmbH, Cologne, Germany
+/// Copyright 2004-2014 triAGENS GmbH, Cologne, Germany
 ///
 /// Licensed under the Apache License, Version 2.0 (the "License");
 /// you may not use this file except in compliance with the License.
@@ -19,10 +20,11 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 ///
-/// Copyright holder is triAGENS GmbH, Cologne, Germany
+/// Copyright holder is ArangoDB GmbH, Cologne, Germany
 ///
 /// @author Dr. Frank Celler
 /// @author Michael Hackstein
+/// @author Copyright 2014, ArangoDB GmbH, Cologne, Germany
 /// @author Copyright 2012, triAGENS GmbH, Cologne, Germany
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -73,7 +75,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 /// @brief moves database files to new destination
 ////////////////////////////////////////////////////////////////////////////////
 
-- (BOOL) moveDatabaseFiles: (NSString*) src 
+- (BOOL) moveDatabaseFiles: (NSString*) src
              toDestination: (NSString*) dst {
   NSFileManager* fm = [NSFileManager defaultManager];
 
@@ -98,7 +100,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
       NSError* err;
       BOOL ok = [fm moveItemAtPath:from toPath:to error:&err];
-      
+
       if (ok) {
         NSLog(@"Renamed %@ to %@", from, to);
       }
@@ -133,7 +135,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   }
 
   NSURL* apps = [_js URLByAppendingPathComponent:@"apps"];
-  
+
   if (! [fm fileExistsAtPath:[apps path]]) {
     [fm createDirectoryAtURL:apps withIntermediateDirectories:YES attributes:nil error:&err];
     if (err != nil) {
@@ -141,9 +143,9 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
       return NO;
     }
   }
-  
+
   NSURL* tempPath = [_js URLByAppendingPathComponent:@"tmp"];
-  
+
   if (! [fm fileExistsAtPath:[tempPath path]]) {
     [fm createDirectoryAtURL:tempPath withIntermediateDirectories:YES attributes:nil error:&err];
     if (err != nil) {
@@ -151,9 +153,9 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
       return NO;
     }
   }
-  
+
   NSURL* tempDownload = [tempPath URLByAppendingPathComponent:@"downloads"];
-  
+
   if (! [fm fileExistsAtPath:[tempDownload path]]) {
     [fm createDirectoryAtURL:tempDownload withIntermediateDirectories:YES attributes:nil error:&err];
     if (err != nil) {
@@ -161,19 +163,19 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
       return NO;
     }
   }
-  
+
   NSURL* aardvark = [[[[[NSBundle mainBundle] resourceURL]
                         URLByAppendingPathComponent:@"js"]
                         URLByAppendingPathComponent:@"apps"]
                         URLByAppendingPathComponent:@"aardvark"];
 
   [fm createSymbolicLinkAtURL:[apps URLByAppendingPathComponent:@"aardvark"] withDestinationURL:aardvark error:&err];
-  
+
   if (err != nil) {
     self.lastError = [@"failed to create symbolic link to foxx manager: " stringByAppendingString:err.localizedDescription];
     return NO;
   }
-  
+
   return YES;
 }
 
@@ -196,7 +198,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
         return NO;
       }
     }
-    
+
     // create SQLITE
     NSURL* sqliteURL = [storeURL URLByAppendingPathComponent:@"ArangoDB.sqlite"];
     NSURL* modelURL = [[NSBundle mainBundle] URLForResource:@"configurationModel" withExtension:@"momd"];
@@ -207,11 +209,11 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
       self.lastError = [@"cannot create SQLITE storage: " stringByAppendingString:err.localizedDescription];
       return NO;
     }
-    
+
     _managedObjectContext = [[NSManagedObjectContext alloc] init];
     [_managedObjectContext setPersistentStoreCoordinator:coordinator];
   }
-  
+
   return YES;
 }
 
@@ -314,7 +316,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
                                    relativeToURL:nil
                              bookmarkDataIsStale:&isStale
                                            error:&err];
-  
+
   if (err != nil) {
     self.lastError = [@"failed to resolve URL: " stringByAppendingString:err.localizedDescription];
     return nil;
@@ -340,16 +342,16 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   if (! ok) {
     return NO;
   }
-  
+
   // load the global user configuration
   NSFetchRequest *request = [[NSFetchRequest alloc] init];
   NSEntityDescription *entity = [NSEntityDescription entityForName:@"User"
                                             inManagedObjectContext: _managedObjectContext];
   [request setEntity:entity];
-  
+
   NSError *err = nil;
   NSArray *fetchedResults = [_managedObjectContext executeFetchRequest:request error:&err];
-  
+
   if (fetchedResults == nil) {
     self.lastError = [@"cannot load global user configuration: " stringByAppendingString:err.localizedDescription];
     return NO;
@@ -383,7 +385,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
   // update bookmarks if necessary
   BOOL changed = NO;
-  
+
   for (ArangoConfiguration* config in configurations) {
     if (106 < _version) {
       if (config.bookmarks == nil) {
@@ -398,35 +400,35 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
       }
     }
   }
-  
+
   if (changed) {
     BOOL ok = [self saveConfigurations];
-    
+
     if (! ok) {
       return NO;
     }
-    
+
     return [self loadConfigurations];
   }
 
   // map names to configurations
   _configurations = [[NSMutableDictionary alloc] init];
-  
+
   for (ArangoConfiguration* c in configurations) {
     if (c.alias == nil || c.path == nil) {
       continue;
     }
-    
+
     if (c.log == nil) {
       c.log = @"";
     }
-    
+
     if (c.loglevel == nil) {
       c.loglevel = @"info";
     }
     [_configurations setValue:c forKey:c.alias];
   }
-  
+
   [[NSNotificationCenter defaultCenter] postNotificationName:ArangoConfigurationDidChange object:self];
 
   return YES;
@@ -483,7 +485,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   }
 
   BOOL isDir;
-    
+
   if ([fm fileExistsAtPath:logPath isDirectory:&isDir]) {
     if (isDir) {
       NSMutableString* tmp = [[NSMutableString alloc] initWithString:logPath];
@@ -506,7 +508,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   }
   else {
     BOOL ok = [fm createFileAtPath:logPath contents:nil attributes:nil];
-    
+
     if (! ok) {
       self.lastError = [[@"cannot create log file '" stringByAppendingString:logPath] stringByAppendingString:@"'"];
       return nil;
@@ -532,7 +534,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     self.lastError = @"database path must not be empty";
     return nil;
   }
-  
+
   return path;
 }
 
@@ -553,7 +555,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     if ([[NSBundle mainBundle] respondsToSelector:@selector(loadNibNamed:owner:topLevelObjects:)]) {
       _arangoDBVersion = @"/sbin/arangod";
       _version = 108;
-    } 
+    }
     else if ([fm respondsToSelector:@selector(createDirectoryAtURL:withIntermediateDirectories:attributes:error:)]) {
       _arangoDBVersion = @"/sbin/arangod";
       _version = 107;
@@ -567,22 +569,22 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
                                         inDomains:NSUserDomainMask]
                               lastObject]
                             URLByAppendingPathComponent:@"ArangoDB"];
-    
+
     // create js path
     _js = [appSupportURL URLByAppendingPathComponent:@"js"];
     [self createServerJSFolders];
-    
+
     NSString* binPath = [[[NSBundle mainBundle] bundlePath] stringByAppendingString:@"/Contents/MacOS/opt/arangodb"];
     NSString* resPath = [[[NSBundle mainBundle] bundlePath] stringByAppendingString:@"/Contents/Resources/opt/arangodb"];
     NSString* jsPath  = [_js path];
 
-    
+
     _arangoDBRoot     = resPath;
     _arangoDBBinary   = [binPath stringByAppendingString:_arangoDBVersion];
     _arangoDBConfig   = [resPath stringByAppendingString:@"/etc/arangodb/arangod.conf"];
     _arangoDBJsAppDir = [resPath stringByAppendingString:@"/share/arangodb/js/apps"];
     _arangoDBTempDir  = [jsPath stringByAppendingString:@"/tmp"];
-    
+
     BOOL ok = [self loadConfigurations];
 
     if (! ok) {
@@ -592,7 +594,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
     _instances = [[NSMutableDictionary alloc] init];
   }
-  
+
   return self;
 }
 
@@ -608,12 +610,12 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   }
 
   [ports sortedArrayUsingComparator: ^(id obj1, id obj2) {return [obj1 compare:obj2];}];
-  
+
   NSNumber* port = [NSNumber numberWithInt:8000];
-  
+
   for (NSNumber* used in ports) {
     NSComparisonResult cmp = [port compare:used];
-    
+
     if (cmp == NSOrderedAscending) {
       return port;
     }
@@ -722,7 +724,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     self.lastError = @"illegal or privileged port";
     return nil;
   }
-  
+
   // check the instance name, remove spaces
   alias = [alias stringByReplacingOccurrencesOfString:@" " withString: @"_"];
   alias = [alias stringByReplacingOccurrencesOfString:@"/" withString: @"_"];
@@ -792,7 +794,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
   for (NSString* name in configurations) {
     ArangoStatus* status = [self currentStatus:name];
-    
+
     [result addObject:status];
   }
 
@@ -883,7 +885,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     if (task != nil) {
       isRunning = [task isRunning];
     }
-    
+
     if (isRunning) {
       self.lastError = @"cannot change database path while instance is running";
       return NO;
@@ -1042,12 +1044,12 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
   // load configuration for name
   ArangoConfiguration* config = [_configurations objectForKey:name];
-  
+
   if (config == nil) {
     self.lastError = [@"cannot start instance for unknown configuration: " stringByAppendingString:name];
     return NO;
   }
-  
+
   // check if a task with that name exists
   NSTask* task = [_instances objectForKey:name];
 
@@ -1079,7 +1081,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
   // create database path
   NSString* database = [config.path stringByAppendingString:@"/database"];
-  
+
   if (! [fm isReadableFileAtPath:database]) {
     int res = mkdir([database fileSystemRepresentation], 0777);
 
@@ -1095,30 +1097,30 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
       return NO;
     }
   }
-  
+
   // create apps path for user apps
   NSString* userApps = [config.path stringByAppendingString:@"/apps"];
-  
+
   if (! [fm isReadableFileAtPath:userApps]) {
     int res = mkdir([userApps fileSystemRepresentation], 0777);
-    
+
     if (res != 0) {
       NSLog(@"Cannot create apps directory: %@", database);
       return NO;
     }
 
     NSString* userAppsDatabases = [config.path stringByAppendingString:@"/apps/databases"];
-    
+
     if (! [fm isReadableFileAtPath:userAppsDatabases]) {
       int res = mkdir([userAppsDatabases fileSystemRepresentation], 0777);
-      
+
       if (res != 0) {
         NSLog(@"Cannot create database-specific apps directory: %@", database);
         return NO;
       }
     }
   }
-  
+
   NSString* userAppsSystem = [config.path stringByAppendingString:@"/apps/system"];
   unlink([userAppsSystem fileSystemRepresentation]);
   symlink([[_arangoDBJsAppDir stringByAppendingString:@"/system"] fileSystemRepresentation], [userAppsSystem fileSystemRepresentation]);
@@ -1133,7 +1135,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     [tmp appendString:config.alias];
     [tmp appendString:@".log"];
     logPath = tmp;
-    
+
     if (! [fm fileExistsAtPath:logPath]) {
       BOOL ok = [fm createFileAtPath:logPath
                             contents:nil
@@ -1148,8 +1150,8 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
   // set the root directory of the installation
   setenv("ROOTDIR", [_arangoDBRoot UTF8String], true);
-  
-  // check if upgrade is necessary.  
+
+  // check if upgrade is necessary.
   NSArray* checkArguments = [NSArray arrayWithObjects:
                              @"--config", _arangoDBConfig,
                              @"--no-server",
@@ -1159,15 +1161,15 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
                              @"--check-version",
                              database,
                              nil];
-  
+
   NSTask* checkVersion = [[NSTask alloc] init];
-  
+
   [checkVersion setLaunchPath:_arangoDBBinary];
   [checkVersion setArguments:checkArguments];
-  
+
   [checkVersion launch];
   [checkVersion waitUntilExit];
-  
+
   int checkVersionStatus = [checkVersion terminationStatus];
 
   if (checkVersionStatus == 3) {
@@ -1198,7 +1200,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
                                          nil];
 
     NSTask* upgrade = [[NSTask alloc] init];
-        
+
     [upgrade setLaunchPath:_arangoDBBinary];
     [upgrade setArguments:upgradeArguments];
 
@@ -1229,9 +1231,9 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
                         @"--temp-path", _arangoDBTempDir,
                         database,
                         nil];
-  
+
   task = [[NSTask alloc] init];
-  
+
   [task setLaunchPath:_arangoDBBinary];
   [task setArguments:arguments];
 
@@ -1267,12 +1269,12 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   NSLog(@"Stopping ArangoDB instance '%@'", name);
   // load configuration for name (might already be deleted)
   ArangoConfiguration* config = [_configurations objectForKey:name];
-  
+
   if (config != nil) {
     config.isRunning = [NSNumber numberWithBool:NO];
     [self saveConfigurations];
   }
-  
+
   // check if task exists
   NSTask* task = [_instances objectForKey:name];
 
@@ -1289,7 +1291,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   if (waitForTerminate) {
     [task waitUntilExit];
   }
-  
+
   return YES;
 }
 
@@ -1383,5 +1385,5 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
 // Local Variables:
 // mode: outline-minor
-// outline-regexp: "^\\(/// @brief\\|/// {@inheritDoc}\\|/// @addtogroup\\|/// @page\\|// --SECTION--\\|/// @\\}\\)"
+// outline-regexp: "/// @brief\\|/// {@inheritDoc}\\|/// @page\\|// --SECTION--\\|/// @\\}"
 // End:

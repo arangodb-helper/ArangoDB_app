@@ -5,7 +5,8 @@
 ///
 /// DISCLAIMER
 ///
-/// Copyright 2012 triAGENS GmbH, Cologne, Germany
+/// Copyright 2014 ArangoDB GmbH, Cologne, Germany
+/// Copyright 2004-2014 triAGENS GmbH, Cologne, Germany
 ///
 /// Licensed under the Apache License, Version 2.0 (the "License");
 /// you may not use this file except in compliance with the License.
@@ -19,10 +20,11 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 ///
-/// Copyright holder is triAGENS GmbH, Cologne, Germany
+/// Copyright holder is ArangoDB GmbH, Cologne, Germany
 ///
 /// @author Dr. Frank Celler
 /// @author Michael Hackstein
+/// @author Copyright 2014, ArangoDB GmbH, Cologne, Germany
 /// @author Copyright 2012, triAGENS GmbH, Cologne, Germany
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -38,7 +40,7 @@
 @implementation ArangoIntroductionController
 
 // -----------------------------------------------------------------------------
-// --SECTION--                                                    public methods
+// --SECTION--                                      constructors and destructors
 // -----------------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -52,15 +54,25 @@
                          andNibNamed:@"ArangoIntroductionView"];
 }
 
+// -----------------------------------------------------------------------------
+// --SECTION--                                                    public methods
+// -----------------------------------------------------------------------------
+
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief open web-site with more information
+/// @brief windows is about to close
+////////////////////////////////////////////////////////////////////////////////
+
+- (void) windowWillClose: (NSNotification*) notification {
+  [self.delegate clearIntroductionDialog];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief shows the new instance dialog
 ////////////////////////////////////////////////////////////////////////////////
 
 - (IBAction) createInstance: (id) sender {
-  // will autorelease on close
-  [[ArangoInstanceController alloc] initWithArangoManager:self.manager
-                                           andAppDelegate:self.delegate];
   [self.window orderOut:self.window];
+  [self.delegate showNewInstanceDialog];
 }
 
 @end
@@ -71,5 +83,5 @@
 
 // Local Variables:
 // mode: outline-minor
-// outline-regexp: "^\\(/// @brief\\|/// {@inheritDoc}\\|/// @addtogroup\\|/// @page\\|// --SECTION--\\|/// @\\}\\)"
+// outline-regexp: "/// @brief\\|/// {@inheritDoc}\\|/// @page\\|// --SECTION--\\|/// @\\}"
 // End:

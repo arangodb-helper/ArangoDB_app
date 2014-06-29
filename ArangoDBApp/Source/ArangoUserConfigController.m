@@ -5,7 +5,8 @@
 ///
 /// DISCLAIMER
 ///
-/// Copyright 2012 triAGENS GmbH, Cologne, Germany
+/// Copyright 2014 ArangoDB GmbH, Cologne, Germany
+/// Copyright 2004-2014 triAGENS GmbH, Cologne, Germany
 ///
 /// Licensed under the Apache License, Version 2.0 (the "License");
 /// you may not use this file except in compliance with the License.
@@ -19,15 +20,17 @@
 /// See the License for the specific language governing permissions and
 /// limitations under the License.
 ///
-/// Copyright holder is triAGENS GmbH, Cologne, Germany
+/// Copyright holder is ArangoDB GmbH, Cologne, Germany
 ///
 /// @author Dr. Frank Celler
 /// @author Michael Hackstein
+/// @author Copyright 2014, ArangoDB GmbH, Cologne, Germany
 /// @author Copyright 2012, triAGENS GmbH, Cologne, Germany
 ////////////////////////////////////////////////////////////////////////////////
 
 #import "ArangoUserConfigController.h"
 
+#import "ArangoAppDelegate.h"
 #import "ArangoManager.h"
 #import "User.h"
 
@@ -81,7 +84,7 @@ static const NSString* NON = @"Do not start instances";
 }
 
 // -----------------------------------------------------------------------------
-// --SECTION--                                                    public methods
+// --SECTION--                                      constructors and destructors
 // -----------------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -93,29 +96,29 @@ static const NSString* NON = @"Do not start instances";
   self = [super initWithArangoManager:manager
                        andAppDelegate:delegate
                           andNibNamed:@"ArangoUserConfigView"];
-  
+
   if (self) {
     switch ([self.manager runOnStartup]) {
       case 0:
         [self.runOnStartupOptions selectItemWithObjectValue:NON];
         break;
-        
+
       case 1:
         [self.runOnStartupOptions selectItemWithObjectValue:RES];
         break;
-        
+
       case 2:
         [self.runOnStartupOptions selectItemWithObjectValue:DEF];
         break;
-        
+
       case 3:
         [self.runOnStartupOptions selectItemWithObjectValue:ALL];
         break;
     }
-    
+
     self.startOnLoginButton.state = [self.manager startupOnLogin] ? NSOnState : NSOffState;
   }
-  
+
   return self;
 }
 
@@ -130,6 +133,18 @@ static const NSString* NON = @"Do not start instances";
   [self.runOnStartupOptions addItemWithObjectValue:NON];
 }
 
+// -----------------------------------------------------------------------------
+// --SECTION--                                                    public methods
+// -----------------------------------------------------------------------------
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief windows is about to close
+////////////////////////////////////////////////////////////////////////////////
+
+- (void) windowWillClose: (NSNotification*) notification {
+  [self.delegate clearConfigurationDialog];
+}
+
 @end
 
 // -----------------------------------------------------------------------------
@@ -138,5 +153,5 @@ static const NSString* NON = @"Do not start instances";
 
 // Local Variables:
 // mode: outline-minor
-// outline-regexp: "^\\(/// @brief\\|/// {@inheritDoc}\\|/// @addtogroup\\|/// @page\\|// --SECTION--\\|/// @\\}\\)"
+// outline-regexp: "/// @brief\\|/// {@inheritDoc}\\|/// @page\\|// --SECTION--\\|/// @\\}"
 // End:
