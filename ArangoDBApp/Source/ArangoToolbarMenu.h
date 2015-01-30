@@ -53,7 +53,7 @@
 /// @brief underlying delegate
 ////////////////////////////////////////////////////////////////////////////////
 
-@property (nonatomic, weak, readonly) ArangoAppDelegate* delegate;
+@property (nonatomic, weak, readonly) ArangoAppDelegate* appDelegate;
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                      constructors and destructors
