@@ -718,7 +718,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = ArangoDBApp/ArangoDB.entitlements;
-				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application: triAGENS GmbH (VV6QAXP22C)";
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "3rd Party Mac Developer Application: triAGENS GmbH (VV6QAXP22C)";
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "ArangoDBApp/PropertyLists/ArangoDB-Info.plist";
@@ -732,7 +732,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = ArangoDBApp/ArangoDB.entitlements;
-				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application: triAGENS GmbH (VV6QAXP22C)";
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "3rd Party Mac Developer Application: triAGENS GmbH (VV6QAXP22C)";
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "ArangoDBApp/PropertyLists/ArangoDB-Info.plist";
