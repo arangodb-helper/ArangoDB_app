@@ -32,6 +32,8 @@
 
 #import "ArangoAppDelegate.h"
 
+#include "../../ArangoDB/build.h"
+
 // -----------------------------------------------------------------------------
 // --SECTION--                                              ArangoHelpController
 // -----------------------------------------------------------------------------
@@ -49,9 +51,15 @@
 - (id) initWithArangoManager: (ArangoManager*) manager
               andAppDelegate: (ArangoAppDelegate*) delegate
                  andNibNamed: (NSString*) nib {
-  return [super initWithArangoManager:manager
+  self = [super initWithArangoManager:manager
                        andAppDelegate:delegate
                           andNibNamed:nib];
+
+  if (self) {
+    [_versionField setStringValue:[@"Version " stringByAppendingString:[[NSString alloc] initWithUTF8String:TRI_VERSION]]];
+  }
+
+  return self;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

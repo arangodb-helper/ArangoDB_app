@@ -27,6 +27,7 @@
 /// @author Copyright 2014, ArangoDB GmbH, Cologne, Germany
 /// @author Copyright 2012, triAGENS GmbH, Cologne, Germany
 ////////////////////////////////////////////////////////////////////////////////
+
 #import "ArangoBaseController.h"
 
 // -----------------------------------------------------------------------------
@@ -39,7 +40,6 @@
 // --SECTION--                                                interface elements
 // -----------------------------------------------------------------------------
 
-
 @property (weak) IBOutlet NSProgressIndicator *progressBar;
 
 // -----------------------------------------------------------------------------
@@ -49,7 +49,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief default constructor
 ////////////////////////////////////////////////////////////////////////////////
-
 
 - (id) initWithArangoManager: (ArangoManager*) manager
               andAppDelegate: (ArangoAppDelegate*) delegate
@@ -69,6 +68,7 @@
 - (IBAction) closeInfo: (id) sender;
 
 @end
+
 // -----------------------------------------------------------------------------
 // --SECTION--                                                       END-OF-FILE
 // -----------------------------------------------------------------------------

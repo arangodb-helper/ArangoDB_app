@@ -51,9 +51,11 @@
   self = [super initWithArangoManager:manager
                        andAppDelegate:delegate
                           andNibNamed:nib];
+
   if (self) {
     [_progressBar startAnimation:self];
   }
+
   return self;
 }
 
@@ -77,6 +79,7 @@
 }
 
 @end
+
 // -----------------------------------------------------------------------------
 // --SECTION--                                                       END-OF-FILE
 // -----------------------------------------------------------------------------
