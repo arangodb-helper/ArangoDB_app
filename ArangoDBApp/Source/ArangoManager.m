@@ -1229,6 +1229,9 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
                         @"--log.level", config.loglevel,
                         @"--javascript.app-path", userApps,
                         @"--temp-path", _arangoDBTempDir,
+#ifdef DISABLE_FRONTEND_VERSION_CHECK
+                        @"--frontend-version-check", @"false",
+#endif
                         database,
                         nil];
 

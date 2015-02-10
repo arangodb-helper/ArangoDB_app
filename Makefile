@@ -5,7 +5,7 @@
 ## -----------------------------------------------------------------------------
 
 NAME = ArangoDB
-VERSION ?= 2.4.2
+VERSION ?= 2.4.3
 
 SOURCE_FILES = build/ArangoDB.app ArangoDB/CHANGELOG ArangoDB/README
 
