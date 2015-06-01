@@ -12,5 +12,6 @@
 @implementation User
 
 @dynamic runOnStartUp;
+@dynamic showTooltip;
 
 @end

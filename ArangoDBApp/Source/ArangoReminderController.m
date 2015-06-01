@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief introduction controller
+/// @brief reminder controller
 ///
 /// @file
 ///
@@ -28,15 +28,16 @@
 /// @author Copyright 2012, triAGENS GmbH, Cologne, Germany
 ////////////////////////////////////////////////////////////////////////////////
 
-#import "ArangoHelpController.h"
+#import "ArangoReminderController.h"
 
-@class ArangoAppDelegate;
+#import "ArangoAppDelegate.h"
+#import "ArangoManager.h"
 
 // -----------------------------------------------------------------------------
-// --SECTION--                                      ArangoIntroductionController
+// --SECTION--                                          ArangoReminderController
 // -----------------------------------------------------------------------------
 
-@interface ArangoIntroductionController : ArangoHelpController
+@implementation ArangoReminderController
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                      constructors and destructors
@@ -47,23 +48,23 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 - (id) initWithArangoManager: (ArangoManager*) manager
-              andAppDelegate: (ArangoAppDelegate*) delegate;
+              andAppDelegate: (ArangoAppDelegate*) delegate{
+  return [self initWithArangoManager:manager
+                      andAppDelegate:delegate
+                         andNibNamed:@"ArangoReminderView"];
+}
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                                    public methods
 // -----------------------------------------------------------------------------
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief "create instance" button
+/// @brief windows is about to close
 ////////////////////////////////////////////////////////////////////////////////
 
-- (IBAction) createInstance: (id) sender;
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief "show tip" button
-////////////////////////////////////////////////////////////////////////////////
-
-- (IBAction) showTooltip: (id) sender;
+- (void) windowWillClose: (NSNotification*) notification {
+  [self.delegate clearReminderDialog];
+}
 
 @end
 

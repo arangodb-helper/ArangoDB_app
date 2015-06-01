@@ -28,6 +28,11 @@
 		2C33CF4E1895343A00190F2D /* etc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC518358C6000DB4CD6 /* etc */; };
 		2C33CF501895343A00190F2D /* share in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC718358C6000DB4CD6 /* share */; };
 		2C33CF511895343A00190F2D /* var in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC818358C6000DB4CD6 /* var */; };
+		2C71F7061B1C823300FE2D68 /* configurationModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 2C71F7041B1C823300FE2D68 /* configurationModel.xcdatamodeld */; };
+		2C71F70D1B1C881B00FE2D68 /* configurationModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 2C71F7041B1C823300FE2D68 /* configurationModel.xcdatamodeld */; };
+		2C71F70F1B1C90B400FE2D68 /* ArangoReminderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2C71F70E1B1C90B400FE2D68 /* ArangoReminderView.xib */; };
+		2C71F7111B1C919700FE2D68 /* ArangoReminderController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C71F7101B1C919700FE2D68 /* ArangoReminderController.m */; };
+		2C71F7131B1C926A00FE2D68 /* ArangoReminderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2C71F70E1B1C90B400FE2D68 /* ArangoReminderView.xib */; };
 		2C76DAB9167A26D200505954 /* ArangoHelpView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2C76DAB8167A26D200505954 /* ArangoHelpView.xib */; };
 		2C76DABE167A3BC900505954 /* ArangoUserConfigController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C76DABD167A3BC800505954 /* ArangoUserConfigController.m */; };
 		2C79EDCF18358C7500DB4CD6 /* sbin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC618358C6000DB4CD6 /* sbin */; };
@@ -37,7 +42,6 @@
 		2CA9A86A183578A0006D0322 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A539DBF15ECEE6500A267B6 /* main.m */; };
 		2CA9A86B183578A0006D0322 /* ArangoInstanceController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A293B5A15F64C27008959B1 /* ArangoInstanceController.m */; };
 		2CA9A86C183578A0006D0322 /* ArangoToolbarMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A94992F15F88BF000A0ABA7 /* ArangoToolbarMenu.m */; };
-		2CA9A86D183578A0006D0322 /* configurationModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 8A94993A15F8B9BF00A0ABA7 /* configurationModel.xcdatamodeld */; };
 		2CA9A86E183578A0006D0322 /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A9499691607159C00A0ABA7 /* User.m */; };
 		2CA9A86F183578A0006D0322 /* ArangoConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A4E6380160C85380001D66F /* ArangoConfiguration.m */; };
 		2CA9A870183578A0006D0322 /* Bookmarks.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A4E638C160CA9D30001D66F /* Bookmarks.m */; };
@@ -76,7 +80,6 @@
 		8A539DCA15ECEE6500A267B6 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8A539DC815ECEE6500A267B6 /* MainMenu.xib */; };
 		8A539DD015ED01B300A267B6 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A539DB815ECEE6500A267B6 /* Foundation.framework */; };
 		8A94993015F88BF000A0ABA7 /* ArangoToolbarMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A94992F15F88BF000A0ABA7 /* ArangoToolbarMenu.m */; };
-		8A94993C15F8B9BF00A0ABA7 /* configurationModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 8A94993A15F8B9BF00A0ABA7 /* configurationModel.xcdatamodeld */; };
 		8A949953160072B500A0ABA7 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 8A949952160072B500A0ABA7 /* icon.icns */; };
 		8A9499551600752100A0ABA7 /* IconGrey.png in Resources */ = {isa = PBXBuildFile; fileRef = 8A9499541600752100A0ABA7 /* IconGrey.png */; };
 		8A94996A1607159C00A0ABA7 /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A9499691607159C00A0ABA7 /* User.m */; };
@@ -171,6 +174,11 @@
 		2C29AF151668FA1700036073 /* ArangoHelpController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArangoHelpController.h; sourceTree = "<group>"; };
 		2C29AF161668FA2100036073 /* ArangoHelpController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ArangoHelpController.m; sourceTree = "<group>"; };
 		2C3B9461183398F4009BBBF4 /* arangod.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = arangod.entitlements; sourceTree = "<group>"; };
+		2C71F7051B1C823300FE2D68 /* configurationModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = configurationModel.xcdatamodel; sourceTree = "<group>"; };
+		2C71F70C1B1C850D00FE2D68 /* configurationModel 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "configurationModel 2.xcdatamodel"; sourceTree = "<group>"; };
+		2C71F70E1B1C90B400FE2D68 /* ArangoReminderView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ArangoReminderView.xib; sourceTree = "<group>"; };
+		2C71F7101B1C919700FE2D68 /* ArangoReminderController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ArangoReminderController.m; sourceTree = "<group>"; };
+		2C71F7121B1C919E00FE2D68 /* ArangoReminderController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArangoReminderController.h; sourceTree = "<group>"; };
 		2C76DAB8167A26D200505954 /* ArangoHelpView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ArangoHelpView.xib; sourceTree = "<group>"; };
 		2C76DABD167A3BC800505954 /* ArangoUserConfigController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ArangoUserConfigController.m; sourceTree = "<group>"; };
 		2C79EDC418358C6000DB4CD6 /* bin */ = {isa = PBXFileReference; lastKnownFileType = folder; name = bin; path = build/opt/arangodb/bin; sourceTree = "<group>"; };
@@ -207,7 +215,6 @@
 		8A539DC915ECEE6500A267B6 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		8A94992E15F88BF000A0ABA7 /* ArangoToolbarMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArangoToolbarMenu.h; sourceTree = "<group>"; };
 		8A94992F15F88BF000A0ABA7 /* ArangoToolbarMenu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ArangoToolbarMenu.m; sourceTree = "<group>"; };
-		8A94993B15F8B9BF00A0ABA7 /* configurationModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = configurationModel.xcdatamodel; sourceTree = "<group>"; };
 		8A949952160072B500A0ABA7 /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = icon.icns; sourceTree = "<group>"; };
 		8A9499541600752100A0ABA7 /* IconGrey.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = IconGrey.png; sourceTree = "<group>"; };
 		8A9499681607159B00A0ABA7 /* User.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = User.h; path = Configuration/User.h; sourceTree = "<group>"; };
@@ -269,6 +276,8 @@
 		2C29AF0E1668F0BD00036073 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				2C71F7121B1C919E00FE2D68 /* ArangoReminderController.h */,
+				2C71F7101B1C919700FE2D68 /* ArangoReminderController.m */,
 				8AF4A63917438C9700447481 /* ArangoUpgradeInfoController.h */,
 				8AF4A63A17438C9800447481 /* ArangoUpgradeInfoController.m */,
 				2C21DBDF1680C65800728A04 /* ArangoAppDelegate.h */,
@@ -297,7 +306,7 @@
 		2C29AF0F1668F24100036073 /* Configuration */ = {
 			isa = PBXGroup;
 			children = (
-				8A94993A15F8B9BF00A0ABA7 /* configurationModel.xcdatamodeld */,
+				2C71F7041B1C823300FE2D68 /* configurationModel.xcdatamodeld */,
 				8A4E637F160C85380001D66F /* ArangoConfiguration.h */,
 				8A4E6380160C85380001D66F /* ArangoConfiguration.m */,
 				8A4E638B160CA9D30001D66F /* Bookmarks.h */,
@@ -406,6 +415,7 @@
 		8A9499DE1609F3CE00A0ABA7 /* Interfaces */ = {
 			isa = PBXGroup;
 			children = (
+				2C71F70E1B1C90B400FE2D68 /* ArangoReminderView.xib */,
 				8AF4A63B17438C9800447481 /* ArangoUpgradeInfoView.xib */,
 				8A293B5B15F64C27008959B1 /* ArangoNewInstanceView.xib */,
 				2C76DAB8167A26D200505954 /* ArangoHelpView.xib */,
@@ -500,6 +510,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2C71F7131B1C926A00FE2D68 /* ArangoReminderView.xib in Resources */,
 				2CA9A87D183578A0006D0322 /* InfoPlist.strings in Resources */,
 				2CA9A87E183578A0006D0322 /* Credits.rtf in Resources */,
 				2CA9A87F183578A0006D0322 /* ArangoHelpView.xib in Resources */,
@@ -519,6 +530,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2C71F70F1B1C90B400FE2D68 /* ArangoReminderView.xib in Resources */,
 				8A539DBE15ECEE6500A267B6 /* InfoPlist.strings in Resources */,
 				8A539DC415ECEE6500A267B6 /* Credits.rtf in Resources */,
 				2C76DAB9167A26D200505954 /* ArangoHelpView.xib in Resources */,
@@ -560,10 +572,10 @@
 				2CA9A86A183578A0006D0322 /* main.m in Sources */,
 				2CA9A86B183578A0006D0322 /* ArangoInstanceController.m in Sources */,
 				2CA9A86C183578A0006D0322 /* ArangoToolbarMenu.m in Sources */,
-				2CA9A86D183578A0006D0322 /* configurationModel.xcdatamodeld in Sources */,
 				2CA9A86E183578A0006D0322 /* User.m in Sources */,
 				2CA9A86F183578A0006D0322 /* ArangoConfiguration.m in Sources */,
 				2CA9A870183578A0006D0322 /* Bookmarks.m in Sources */,
+				2C71F70D1B1C881B00FE2D68 /* configurationModel.xcdatamodeld in Sources */,
 				2CA9A871183578A0006D0322 /* ArangoHelpController.m in Sources */,
 				2CA9A872183578A0006D0322 /* ArangoBaseController.m in Sources */,
 				2CA9A873183578A0006D0322 /* ArangoManager.m in Sources */,
@@ -582,10 +594,11 @@
 				8A539DC015ECEE6500A267B6 /* main.m in Sources */,
 				8A293B5C15F64C28008959B1 /* ArangoInstanceController.m in Sources */,
 				8A94993015F88BF000A0ABA7 /* ArangoToolbarMenu.m in Sources */,
-				8A94993C15F8B9BF00A0ABA7 /* configurationModel.xcdatamodeld in Sources */,
 				8A94996A1607159C00A0ABA7 /* User.m in Sources */,
 				8A4E6381160C85380001D66F /* ArangoConfiguration.m in Sources */,
 				8A4E638D160CA9D30001D66F /* Bookmarks.m in Sources */,
+				2C71F7061B1C823300FE2D68 /* configurationModel.xcdatamodeld in Sources */,
+				2C71F7111B1C919700FE2D68 /* ArangoReminderController.m in Sources */,
 				2C29AF171668FA2100036073 /* ArangoHelpController.m in Sources */,
 				2C91EB901673A2F10007EFC0 /* ArangoBaseController.m in Sources */,
 				2C91EB971673A4910007EFC0 /* ArangoManager.m in Sources */,
@@ -781,12 +794,13 @@
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
-		8A94993A15F8B9BF00A0ABA7 /* configurationModel.xcdatamodeld */ = {
+		2C71F7041B1C823300FE2D68 /* configurationModel.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
-				8A94993B15F8B9BF00A0ABA7 /* configurationModel.xcdatamodel */,
+				2C71F70C1B1C850D00FE2D68 /* configurationModel 2.xcdatamodel */,
+				2C71F7051B1C823300FE2D68 /* configurationModel.xcdatamodel */,
 			);
-			currentVersion = 8A94993B15F8B9BF00A0ABA7 /* configurationModel.xcdatamodel */;
+			currentVersion = 2C71F70C1B1C850D00FE2D68 /* configurationModel 2.xcdatamodel */;
 			path = configurationModel.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

@@ -31,6 +31,7 @@
 #import "ArangoIntroductionController.h"
 
 #import "ArangoAppDelegate.h"
+#import "ArangoManager.h"
 #import "ArangoInstanceController.h"
 
 // -----------------------------------------------------------------------------
@@ -73,6 +74,21 @@
 - (IBAction) createInstance: (id) sender {
   [self.window orderOut:self.window];
   [self.delegate showNewInstanceDialog];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief "show tip" button
+////////////////////////////////////////////////////////////////////////////////
+
+- (IBAction) showTooltip: (id) sender {
+  int value = [sender intValue];
+  
+  if (value) {
+    [[self manager] setShowTooltip: YES];
+  }
+  else {
+    [[self manager] setShowTooltip: NO];
+  }
 }
 
 @end

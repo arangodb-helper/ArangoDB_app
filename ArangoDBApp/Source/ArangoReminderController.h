@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// @brief introduction controller
+/// @brief reminder controller
 ///
 /// @file
 ///
@@ -28,15 +28,15 @@
 /// @author Copyright 2012, triAGENS GmbH, Cologne, Germany
 ////////////////////////////////////////////////////////////////////////////////
 
-#import "ArangoHelpController.h"
+#import "ArangoIntroductionController.h"
 
 @class ArangoAppDelegate;
 
 // -----------------------------------------------------------------------------
-// --SECTION--                                      ArangoIntroductionController
+// --SECTION--                                          ArangoReminderController
 // -----------------------------------------------------------------------------
 
-@interface ArangoIntroductionController : ArangoHelpController
+@interface ArangoReminderController : ArangoIntroductionController
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                      constructors and destructors
@@ -48,22 +48,6 @@
 
 - (id) initWithArangoManager: (ArangoManager*) manager
               andAppDelegate: (ArangoAppDelegate*) delegate;
-
-// -----------------------------------------------------------------------------
-// --SECTION--                                                    public methods
-// -----------------------------------------------------------------------------
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief "create instance" button
-////////////////////////////////////////////////////////////////////////////////
-
-- (IBAction) createInstance: (id) sender;
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief "show tip" button
-////////////////////////////////////////////////////////////////////////////////
-
-- (IBAction) showTooltip: (id) sender;
 
 @end
 

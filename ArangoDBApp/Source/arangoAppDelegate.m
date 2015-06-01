@@ -32,6 +32,7 @@
 
 #import "ArangoInstanceController.h"
 #import "ArangoIntroductionController.h"
+#import "ArangoReminderController.h"
 #import "ArangoManager.h"
 #import "ArangoStatus.h"
 #import "ArangoToolbarMenu.h"
@@ -189,7 +190,11 @@
 
   // without any configuration, display some help
   if (0 == _manager.configurations.count) {
+    [_manager setShowTooltip: YES];
     [self showIntroductionDialog];
+  }
+  else if ([_manager showTooltip]) {
+    [self showReminderDialog];
   }
   else {
     [_manager startupInstances];
@@ -202,9 +207,9 @@
 
 - (void) showIntroductionDialog {
   [self showSingletonDialog: @"introductionController" withConstructor: ^id (void) {
-      return [[ArangoIntroductionController alloc] initWithArangoManager:_manager
-                                                          andAppDelegate:self];
-    }];
+    return [[ArangoIntroductionController alloc] initWithArangoManager:_manager
+                                                        andAppDelegate:self];
+  }];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -213,6 +218,25 @@
 
 - (void) clearIntroductionDialog {
   _introductionController = nil;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief shows the reminder dialog
+////////////////////////////////////////////////////////////////////////////////
+
+- (void) showReminderDialog {
+  [self showSingletonDialog: @"reminderController" withConstructor: ^id (void) {
+    return [[ArangoReminderController alloc] initWithArangoManager:_manager
+                                                    andAppDelegate:self];
+  }];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief clears the reminder dialog
+////////////////////////////////////////////////////////////////////////////////
+
+- (void) clearReminderDialog {
+  _reminderController = nil;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

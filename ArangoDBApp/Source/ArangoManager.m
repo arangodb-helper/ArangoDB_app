@@ -205,7 +205,12 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     NSManagedObjectModel* model = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
     NSPersistentStoreCoordinator* coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:model];
 
-    if (! [coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:sqliteURL options:nil error:&err]) {
+    NSDictionary *options = @{
+      NSMigratePersistentStoresAutomaticallyOption : @YES,
+      NSInferMappingModelAutomaticallyOption : @YES
+    };
+
+    if (! [coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:sqliteURL options:options error:&err]) {
       self.lastError = [@"cannot create SQLITE storage: " stringByAppendingString:err.localizedDescription];
       return NO;
     }
@@ -426,6 +431,7 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     if (c.loglevel == nil) {
       c.loglevel = @"info";
     }
+
     [_configurations setValue:c forKey:c.alias];
   }
 
@@ -1296,6 +1302,23 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   }
 
   return YES;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief showTooltip options
+////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL) showTooltip {
+  return [_user.showTooltip intValue] != 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// @brief sets showTooltip options
+////////////////////////////////////////////////////////////////////////////////
+
+- (void) setShowTooltip: (BOOL) showTooltip {
+  _user.showTooltip = [NSNumber numberWithInt:(showTooltip ? 1 : 0)];
+  [self saveConfigurations];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
