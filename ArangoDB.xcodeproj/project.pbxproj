@@ -39,6 +39,7 @@
 		2C79EDD418358C9F00DB4CD6 /* sbin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C79EDC618358C6000DB4CD6 /* sbin */; };
 		2C91EB901673A2F10007EFC0 /* ArangoBaseController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C91EB8F1673A2F10007EFC0 /* ArangoBaseController.m */; };
 		2C91EB971673A4910007EFC0 /* ArangoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C91EB961673A4910007EFC0 /* ArangoManager.m */; };
+		2C9575541B3E7A7300EABAF4 /* ArangoReminderController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C71F7101B1C919700FE2D68 /* ArangoReminderController.m */; };
 		2CA9A86A183578A0006D0322 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A539DBF15ECEE6500A267B6 /* main.m */; };
 		2CA9A86B183578A0006D0322 /* ArangoInstanceController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A293B5A15F64C27008959B1 /* ArangoInstanceController.m */; };
 		2CA9A86C183578A0006D0322 /* ArangoToolbarMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A94992F15F88BF000A0ABA7 /* ArangoToolbarMenu.m */; };
@@ -576,6 +577,7 @@
 				2CA9A86F183578A0006D0322 /* ArangoConfiguration.m in Sources */,
 				2CA9A870183578A0006D0322 /* Bookmarks.m in Sources */,
 				2C71F70D1B1C881B00FE2D68 /* configurationModel.xcdatamodeld in Sources */,
+				2C9575541B3E7A7300EABAF4 /* ArangoReminderController.m in Sources */,
 				2CA9A871183578A0006D0322 /* ArangoHelpController.m in Sources */,
 				2CA9A872183578A0006D0322 /* ArangoBaseController.m in Sources */,
 				2CA9A873183578A0006D0322 /* ArangoManager.m in Sources */,
