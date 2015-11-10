@@ -48,7 +48,7 @@ standalone:
 	@echo
 	@echo --------------------- Building ArangoDB --------------------
 
-	(cd ArangoDB && ./configure)
+	(cd ArangoDB && ./configure CPPFLAGS="-I`brew --prefix`/opt/openssl/include" LDFLAGS="-L`brew --prefix`/opt/openssl/lib")
 	(cd ArangoDB && make pack-macosx)
 	(cd ArangoDB/Build && make DESTDIR=../../build install)
 
