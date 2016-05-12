@@ -2,4 +2,4 @@
 
 export ROOTDIR="/Applications/ArangoDB.app/Contents/Resources/opt/arangodb"
 
-exec "${ROOTDIR}/bin/arangodump" -c "${ROOTDIR}/etc/arangodb/arangodump.conf" $*
+exec "${ROOTDIR}/bin/arangodump" -c "${ROOTDIR}/etc/arangodb/arangodump.conf" "$@"

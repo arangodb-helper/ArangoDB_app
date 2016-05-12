@@ -2,4 +2,4 @@
 
 export ROOTDIR="/Applications/ArangoDB.app/Contents/Resources/opt/arangodb"
 
-exec "${ROOTDIR}/bin/foxx-manager" -c "${ROOTDIR}/etc/arangodb/foxx-manager.conf" $*
+exec "${ROOTDIR}/bin/foxx-manager" -c "${ROOTDIR}/etc/arangodb/foxx-manager.conf" "$@"
