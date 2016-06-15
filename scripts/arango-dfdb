@@ -2,4 +2,4 @@
 
 export ROOTDIR="/Applications/ArangoDB.app/Contents/Resources/opt/arangodb"
 
-exec "${ROOTDIR}/sbin/arango-dfdb" -c "${ROOTDIR}/etc/arangodb/arango-dfdb.conf" "$@"
+exec "${ROOTDIR}/sbin/arango-dfdb" -c "${ROOTDIR}/etc/arangodb3/arango-dfdb.conf" "$@"

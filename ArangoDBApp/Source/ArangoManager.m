@@ -587,8 +587,8 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
 
     _arangoDBRoot     = resPath;
     _arangoDBBinary   = [binPath stringByAppendingString:_arangoDBVersion];
-    _arangoDBConfig   = [resPath stringByAppendingString:@"/etc/arangodb/arangod.conf"];
-    _arangoDBJsAppDir = [resPath stringByAppendingString:@"/share/arangodb/js/apps"];
+    _arangoDBConfig   = [resPath stringByAppendingString:@"/etc/arangodb3/arangod.conf"];
+    _arangoDBJsAppDir = [resPath stringByAppendingString:@"/share/arangodb3/js/apps"];
     _arangoDBTempDir  = [jsPath stringByAppendingString:@"/tmp"];
 
     BOOL ok = [self loadConfigurations];
@@ -1160,11 +1160,10 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   // check if upgrade is necessary.
   NSArray* checkArguments = [NSArray arrayWithObjects:
                              @"--config", _arangoDBConfig,
-                             @"--no-server",
                              @"--log.file", logPath,
                              @"--log.level", config.loglevel,
                              @"--javascript.app-path", userApps,
-                             @"--check-version",
+                             @"--database.check-version",
                              database,
                              nil];
 
@@ -1197,11 +1196,11 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
     // Database needs upgrade
     NSArray* upgradeArguments = [NSArray arrayWithObjects:
                                          @"--config", _arangoDBConfig,
-                                         @"--no-server",
+                                         @"--reset.rest-server", @"false",
                                          @"--log.file", logPath,
                                          @"--log.level", config.loglevel,
                                          @"--javascript.app-path", userApps,
-                                         @"--upgrade",
+                                         @"--database.auto-upgrade",
                                          database,
                                          nil];
 
@@ -1229,15 +1228,11 @@ NSString* ArangoConfigurationDidChange = @"ConfigurationDidChange";
   // prepare task
   NSArray* arguments = [NSArray arrayWithObjects:
                         @"--config", _arangoDBConfig,
-                        @"--exit-on-parent-death", @"true",
                         @"--server.endpoint", [NSString stringWithFormat:@"tcp://0.0.0.0:%@", config.port.stringValue],
                         @"--log.file", logPath,
                         @"--log.level", config.loglevel,
                         @"--javascript.app-path", userApps,
-                        @"--temp-path", _arangoDBTempDir,
-#ifdef DISABLE_FRONTEND_VERSION_CHECK
-                        @"--frontend-version-check", @"false",
-#endif
+                        @"--temp.path", _arangoDBTempDir,
                         database,
                         nil];
 
