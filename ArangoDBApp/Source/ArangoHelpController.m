@@ -32,7 +32,7 @@
 
 #import "ArangoAppDelegate.h"
 
-#include "../../ArangoDB/build.h"
+#include "../../ArangoDB/Build/lib/Basics/build.h"
 
 // -----------------------------------------------------------------------------
 // --SECTION--                                              ArangoHelpController
@@ -56,7 +56,7 @@
                           andNibNamed:nib];
 
   if (self) {
-    [_versionField setStringValue:[@"Version " stringByAppendingString:[[NSString alloc] initWithUTF8String:TRI_VERSION]]];
+    [_versionField setStringValue:[@"Version " stringByAppendingString:[[NSString alloc] initWithUTF8String:ARANGODB_VERSION]]];
   }
 
   return self;

@@ -364,10 +364,7 @@
   [info addButtonWithTitle:@"Delete Data"];
   [info addButtonWithTitle:@"Cancel"];
 
-  [info beginSheetModalForWindow:nil
-                   modalDelegate:self
-                  didEndSelector:@selector(deleteInstanceAnswer:returnCode:contextInfo:)
-                     contextInfo:(__bridge void *)(config)];
+  [info runModal];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -434,7 +431,7 @@
   [[NSWorkspace sharedWorkspace]
     openURL:[NSURL 
               URLWithString:[NSString 
-                              stringWithFormat:@"http://localhost:%d/_admin/html/index.html",status.port]]];
+                              stringWithFormat:@"http://localhost:%d/",status.port]]];
 }
 
 @end

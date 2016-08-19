@@ -41,15 +41,14 @@ update-version:
 
 standalone:
 	rm -rf build
-	rm -rf ArangoDB/Build
+	rm -rf ArangoDB/build
 
 	mkdir build
 
 	@echo
 	@echo --------------------- Building ArangoDB --------------------
 
-	(cd ArangoDB && ./configure)
-	(cd ArangoDB && make pack-macosx)
+	(cd ArangoDB && make pack-dmg)
 	(cd ArangoDB/Build && make DESTDIR=../../build install)
 
 	@echo
